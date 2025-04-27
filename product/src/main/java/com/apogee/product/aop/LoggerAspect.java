@@ -3,6 +3,8 @@ package com.apogee.product.aop;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.MapMessage;
+import org.apache.logging.log4j.message.StringMapMessage;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -37,7 +39,7 @@ public class LoggerAspect {
 
         request.setAttribute("requestId", requestId);
 
-        logRequestDetails(joinPoint, request, requestId);
+        logRequestDetails(joinPoint, request, null, requestId);
 
     }
 
@@ -49,31 +51,25 @@ public class LoggerAspect {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String requestId = (String) request.getAttribute("requestId");
 
-        logRequestAndResponseDetails(joinPoint, response, request, requestId);
+        logRequestDetails(joinPoint, request, response, requestId);
 
     }
 
-    private void logRequestAndResponseDetails(JoinPoint joinPoint, Object response, HttpServletRequest request, String requestId) {
+    private void logRequestDetails(JoinPoint joinPoint, HttpServletRequest request, Object response, String requestId) {
 
-        logRequestDetails(joinPoint, request, requestId);
-        logger.info( "Response Body: {}", formatAsJsonObject(response));
-    }
+        MapMessage<StringMapMessage, String> mapMessage = new StringMapMessage();
+        mapMessage.put("url", request.getRequestURL().toString());
+        mapMessage.put("httpMethod", request.getMethod());
+        mapMessage.put("queryParams", formatAsJsonObject(getQueryParams(request)));
+        mapMessage.put("requestBody", getRequestBody(joinPoint) != null ? getRequestBody(joinPoint) : "null");
+        mapMessage.put("timestamp", getCurrentTimeStamp());
+        mapMessage.put("pathVariables", getPathVariables(joinPoint));
+        mapMessage.put("headers", formatAsJsonObject(getHeaders(request)));
+        mapMessage.put("requestId", requestId);
+        mapMessage.put("responseBody", response != null ? formatAsJsonObject(response) : "null");
 
-    private void logRequestDetails(JoinPoint joinPoint, HttpServletRequest request, String requestId) {
 
-        logger.info("URL: {}", request.getRequestURL());
-        logger.info( "HTTP Method: {}", request.getMethod());
-        logger.info( "Timestamp: {}", getCurrentTimeStamp());
-        logger.info( "Session ID: {}", request.getRequestedSessionId());
-        logger.info( "Path Variables: {}", getPathVariables(joinPoint));
-        logger.info( "Query Parameters: {}", getQueryParams(request));
-        logger.info( "Headers: {}", getHeaders(request));
-        logger.info( "Request ID: {}", requestId);
-
-        // Log request body if present
-        if (joinPoint.getArgs().length > 0) {
-            logger.info( "Request Body: {}", getRequestBody(joinPoint));
-        }
+        logger.info(mapMessage);
     }
 
 

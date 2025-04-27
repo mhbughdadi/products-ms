@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" monitorInterval="30">
+    <Appenders>
+        <!-- Console Appender for Local Debugging (Optional) -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
+        </Console>
+
+        <!-- Socket Appender to send logs to Logstash -->
+        <Socket name="LogstashAppender" host="localhost" port="5044">
+            <JsonLayout complete="false" compact="true" eventEol="true"/>
+        </Socket>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root Logger -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="LogstashAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
