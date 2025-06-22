@@ -13,17 +13,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Service
 @Transactional
 public class ProductServiceImpl implements ProductService {
-
-    Logger logger = Logger.getLogger(ProductService.class.getName());
 
     @Autowired
     private ProductRepository productRepository;
@@ -33,7 +28,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> findAllProducts() throws Exception {
+
         List<ProductEntity> productEntities = productRepository.findAll();
+
         if (!productEntities.isEmpty()) {
             return transformCollection(productEntities, entity -> mapper.map(entity, Product.class));
         } else {
@@ -45,9 +42,8 @@ public class ProductServiceImpl implements ProductService {
     public Product addProduct(Product product) throws Exception {
 
         ProductEntity transientProduct = mapper.map(product, ProductEntity.class);
-        logger.log(Level.SEVERE, formatAsJsonObject(transientProduct));
-
         ProductEntity savedEntity = productRepository.save(transientProduct);
+
         return mapper.map(savedEntity, Product.class);
     }
 

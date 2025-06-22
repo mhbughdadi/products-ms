@@ -8,17 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
-
 @RestController
 public class ProductController {
-
-    Logger logger = Logger.getLogger(ProductController.class.getName());
 
     @Autowired
     private ProductsBackingService productsBackingService;
@@ -28,21 +19,19 @@ public class ProductController {
 
         AllProductsResponseDto response = productsBackingService.getAllProducts();
 
-        return new ResponseEntity<>( response , HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/products/{productId}")
-    public ResponseEntity<Response> findProduct(@PathVariable("productId") Long productId) throws Exception{
+    public ResponseEntity<Response> findProduct(@PathVariable("productId") Long productId) throws Exception {
 
         FindProductResponseDto response = productsBackingService.getProductById(productId);
 
-        return new ResponseEntity<>( response , HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/products")
     public ResponseEntity<Response> addProduct(@RequestBody ProductDto product) throws Exception {
-
-        logger.log(Level.SEVERE, "Adding product Request: " + formatAsJsonObject(product));
 
         AddProductResponseDto response = productsBackingService.addProduct(product);
 
@@ -52,7 +41,7 @@ public class ProductController {
     @RequestMapping(method = RequestMethod.PUT, value = "/products")
     public ResponseEntity<Response> updateProduct(@RequestBody Object product) throws Exception {
 
-        Response response =  this.productsBackingService.updateProduct(product);
+        Response response = this.productsBackingService.updateProduct(product);
 
         return new ResponseEntity<>(response, HttpStatus.NOT_IMPLEMENTED);
     }

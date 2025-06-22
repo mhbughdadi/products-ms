@@ -14,15 +14,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 
 @Service
 public class ProductsBackingService {
-
-    Logger logger = Logger.getLogger(ProductsBackingService.class.getName());
 
     @Autowired
     private ProductService productService;
@@ -53,41 +48,38 @@ public class ProductsBackingService {
 
         Product product = mapper.map(productDto, Product.class);
         Product savedProduct = productService.addProduct(product);
-        logger.log(Level.SEVERE, "transient product: " + formatAsJsonObject(product));
 
-        if (savedProduct != null && product.getImages() != null && !product.getImages().isEmpty()){
+        if (savedProduct != null && product.getImages() != null && !product.getImages().isEmpty()) {
 
-            product.getImages().forEach(image-> image.setProduct(savedProduct));
+            product.getImages().forEach(image -> image.setProduct(savedProduct));
             List<Image> savedImages = this.imageService.saveImages(product.getImages());
             savedProduct.setImages(savedImages);
         }
-        logger.log(Level.SEVERE, "Saved product: " + formatAsJsonObject(savedProduct));
 
-        response .setProduct(mapper.map(savedProduct, ProductOutputDto.class));
+        response.setProduct(mapper.map(savedProduct, ProductOutputDto.class));
 
         return response;
-
     }
 
-    public FindProductResponseDto getProductById(Long productId) throws Exception{
+    public FindProductResponseDto getProductById(Long productId) throws Exception {
 
         FindProductResponseDto response = new FindProductResponseDto();
 
         Product product = productService.findProductById(productId);
-        response.setProduct(mapper.map(product,ProductOutputDto.class));
+        response.setProduct(mapper.map(product, ProductOutputDto.class));
 
         return response;
     }
 
-    public void deleteProduct(Long productId) throws Exception{
+    public void deleteProduct(Long productId) throws Exception {
 
-         this.productService.deleteProductById(productId);
+        this.productService.deleteProductById(productId);
     }
 
     public Response updateProduct(Object product) {
 
         return new FailureResponse(
-                messageSource.getMessage("product.error.method.not.implemented",null,Locale.getDefault()),
-                messageSource.getMessage("product.error.method.not.implemented",null,Locale.of("ar")) );
+                messageSource.getMessage("product.error.method.not.implemented", null, Locale.getDefault()),
+                messageSource.getMessage("product.error.method.not.implemented", null, Locale.of("ar")));
     }
 }
