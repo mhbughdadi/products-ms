@@ -1,0 +1,18 @@
+FROM eclipse-temurin:21-jdk
+
+WORKDIR /app
+
+COPY target/products-ms.jar app.jar
+
+# Expose application port 9090 (instead of 8080)
+EXPOSE 9090
+
+# Expose the HTTP port for your microservice (default Spring Boot port)
+EXPOSE 8080
+
+# Run the application, passing environment variables to Spring Boot
+ENTRYPOINT ["sh", "-c", "java -jar \
+  -Dspring.datasource.username=$USERNAME \
+  -Dspring.datasource.password=$PASSWORD \
+  -Dspring.datasource.url=$DATABASE_URL \
+  app.jar"]
