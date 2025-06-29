@@ -9,13 +9,13 @@
         <relativePath/>
     </parent>
     <groupId>com.apogee</groupId>
-    <artifactId>product</artifactId>
+    <artifactId>products-ms</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>product</name>
+    <name>products-ms</name>
     <description>Product micro-service</description>
 
     <properties>
-        <java.version>23</java.version>
+        <java.version>21</java.version>
         <lombok.version>1.18.30</lombok.version>
         <dozer.version>8.5.1</dozer.version>
 
@@ -28,7 +28,7 @@
     <developers>
         <developer>
             <name>Mohammed Hassan</name>
-            <email>mohammed_hassan2525@gmail.com</email>
+            <email>mohammed_hassan2525@yahoo.com</email>
         </developer>
     </developers>
     <scm>

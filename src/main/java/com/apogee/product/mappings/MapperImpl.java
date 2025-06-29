@@ -54,7 +54,7 @@ public class MapperImpl implements Mapper {
                     destinationField.set(destinationObj, this.map(sourceValue, destinationField.getType()));
                 }
 
-            } catch (NoSuchFieldException _) {
+            } catch (NoSuchFieldException ignored) {
             }
 
         }
