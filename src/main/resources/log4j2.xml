@@ -7,7 +7,7 @@
         </Console>
 
         <!-- Socket Appender to send logs to Logstash -->
-        <Socket name="LogstashAppender" host="localhost" port="5044">
+        <Socket name="LogstashAppender" host="logstash" port="5044">
             <JsonLayout complete="false" compact="true" eventEol="true"/>
         </Socket>
     </Appenders>
