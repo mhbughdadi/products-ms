@@ -65,7 +65,7 @@ public class LoggerAspect {
         mapMessage.put("timestamp", getCurrentTimeStamp());
         mapMessage.put("pathVariables", getPathVariables(joinPoint));
         mapMessage.put("headers", formatAsJsonObject(getHeaders(request)));
-        mapMessage.put("requestId", requestId);
+        mapMessage.put("requestId", requestId != null ? requestId : "null");
         mapMessage.put("responseBody", response != null ? formatAsJsonObject(response) : "null");
 
 

@@ -1,10 +1,16 @@
 package com.apogee.product.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,15 +23,53 @@ import java.util.List;
 public class ProductEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "product_id")
     private Long productId;
-    private String shortName;
-    private String longName;
+    @Column(name= "name")
+    private String name;
+    @Column(name= "name_ar")
+    private String nameAR;
+    @Column(name= "description")
     private String description;
-    private Date productionDate;
-    private Date expireDate;
+    @Column(name= "description_ar")
+    private String descriptionAr;
+    @Column(name= "list_price")
+    private Double listPrice;
+    @Column(name= "vat")
+    private Boolean vat;
+    @Column(name= "short_description")
+    private String shortDescription;
+    @Column(name= "short_description_ar")
+    private String shortDescriptionAr;
+    @OneToOne(mappedBy = "product")
+    private PriceEntity oldPrice;
+    @Column(name= "expiration_date")
+    private Date expirationDate;
+    @Column(name= "manufacturing_date")
+    private String manufacturingDate;
+    @Column(name= "sku")
+    private String sku;
+    @Column(name= "quantity")
+    private Long quantity;
+    @Column(name= "status")
+    private Boolean status;
+    @Column(name= "created_at")
+    private Date createdAt;
+    @Column(name= "updated_at")
+    private Date updatedAt;
 
-    @OneToMany(mappedBy = "product")
+    @ManyToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "category_id", insertable = false, updatable = false)
+    private CategoryEntity category;
+
+    @Column(name= "price_id")
+    private Long priceId;
+
+    @OneToOne(mappedBy = "product")
+    private PriceEntity price;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<ImageEntity> images;
 
 }

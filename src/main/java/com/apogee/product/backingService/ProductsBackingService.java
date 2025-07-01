@@ -1,10 +1,13 @@
 package com.apogee.product.backingService;
 
+import com.apogee.product.dtos.inputs.CurrencyDto;
 import com.apogee.product.dtos.output.*;
 import com.apogee.product.mappings.Mapper;
 import com.apogee.product.dtos.inputs.ProductDto;
+import com.apogee.product.models.Currency;
 import com.apogee.product.models.Image;
 import com.apogee.product.models.Product;
+import com.apogee.product.services.CurrencyService;
 import com.apogee.product.services.ImageService;
 import com.apogee.product.services.ProductService;
 import com.apogee.product.utilities.Utilities;
@@ -24,6 +27,9 @@ public class ProductsBackingService {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private CurrencyService currencyService;
 
     @Autowired
     private Mapper mapper;
@@ -81,5 +87,19 @@ public class ProductsBackingService {
         return new FailureResponse(
                 messageSource.getMessage("product.error.method.not.implemented", null, Locale.getDefault()),
                 messageSource.getMessage("product.error.method.not.implemented", null, Locale.of("ar")));
+    }
+
+    public AddCurrencyResponseDto addCurrency(CurrencyDto currencyDto) throws Exception{
+
+        AddCurrencyResponseDto response = new AddCurrencyResponseDto();
+
+        Currency currency = mapper.map(currencyDto, Currency.class);
+
+        Currency savedCurrency = currencyService.saveCurrency(currency);
+
+        currencyDto.setCurrencyId(currency.getCurrencyId());
+        response.setCurrency(currencyDto);
+
+        return response;
     }
 }
