@@ -97,7 +97,7 @@ public class ProductsBackingService {
 
         Currency savedCurrency = currencyService.saveCurrency(currency);
 
-        currencyDto.setCurrencyId(currency.getCurrencyId());
+        currencyDto.setCurrencyId(savedCurrency.getCurrencyId());
         response.setCurrency(currencyDto);
 
         return response;

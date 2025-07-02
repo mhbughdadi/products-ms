@@ -69,7 +69,7 @@ public class LoggerAspect {
         mapMessage.put("responseBody", response != null ? formatAsJsonObject(response) : "null");
 
 
-        logger.info(mapMessage);
+        logger.debug(mapMessage);
     }
 
 

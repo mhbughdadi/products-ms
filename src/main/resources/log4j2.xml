@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="warn" monitorInterval="30">
+<Configuration status="DEBUG" monitorInterval="30" delay="60">
     <Appenders>
         <!-- Console Appender for Local Debugging (Optional) -->
         <Console name="Console" target="SYSTEM_OUT">
@@ -16,7 +16,14 @@
         <!-- Root Logger -->
         <Root level="info">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="LogstashAppender"/>
         </Root>
+        <Logger name="org.springframework.web" level="debug">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="LogstashAppender"/>
+        </Logger>
+        <Logger name="com.apogee.product" level="debug">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="LogstashAppender"/>
+        </Logger>
     </Loggers>
 </Configuration>
