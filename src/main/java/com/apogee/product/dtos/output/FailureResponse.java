@@ -10,16 +10,12 @@ public class FailureResponse extends Response {
 
     private final static int FAILURE_CODE = -1;
 
-    private String errorDescription;
-    private String errorDescriptionAr;
-
     public FailureResponse() {
         super(FAILURE_CODE, Status.FAILURE);
     }
 
     public FailureResponse(String errorDescription, String errorDescriptionAr){
         this();
-        this.errorDescription = errorDescription;
-        this.errorDescriptionAr = errorDescriptionAr;
+        this.setError(new ErrorMessage(errorDescription, errorDescriptionAr));
     }
 }

@@ -2,6 +2,7 @@ package com.apogee.product.services.impl;
 
 import com.apogee.product.entities.CurrencyEntity;
 import com.apogee.product.exceptions.BusinessException;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.mappings.Mapper;
 import com.apogee.product.models.Currency;
 import com.apogee.product.repositories.CurrencyRepository;
@@ -42,7 +43,7 @@ public class CurrencyServiceImpl implements CurrencyService {
 
         Optional<CurrencyEntity> currencyOpt = this.currencyRepository.findById(currencyId);
 
-        CurrencyEntity foundCurrencyEntity = currencyOpt.orElseThrow(() -> new BusinessException("Currency not found with ID: " + currencyId, "currency.not.found"));
+        CurrencyEntity foundCurrencyEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException("record.not.found",  currencyId));
 
         return mapper.map(foundCurrencyEntity, Currency.class);
     }
@@ -68,7 +69,7 @@ public class CurrencyServiceImpl implements CurrencyService {
 
         Optional<CurrencyEntity> currencyOpt = this.currencyRepository.findById(currencyId);
 
-        CurrencyEntity toBeDeletedEntity = currencyOpt.orElseThrow(() -> new BusinessException("Currency not found with ID: " + currencyId, "currency.not.found"));
+        CurrencyEntity toBeDeletedEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException("record.not.found" , currencyId));
 
         this.currencyRepository.deleteById(currencyId);
 

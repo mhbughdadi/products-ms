@@ -20,8 +20,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
 
-
-import static com.apogee.product.utilities.DateUtilities.getCurrentTimeStamp;
 import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 
 @Aspect
@@ -58,16 +56,17 @@ public class LoggerAspect {
     private void logRequestDetails(JoinPoint joinPoint, HttpServletRequest request, Object response, String requestId) {
 
         MapMessage<StringMapMessage, String> mapMessage = new StringMapMessage();
+        Date now = new Date();
+
         mapMessage.put("url", request.getRequestURL().toString());
         mapMessage.put("httpMethod", request.getMethod());
         mapMessage.put("queryParams", formatAsJsonObject(getQueryParams(request)));
         mapMessage.put("requestBody", getRequestBody(joinPoint) != null ? getRequestBody(joinPoint) : "null");
-        mapMessage.put("timestamp", getCurrentTimeStamp());
+        mapMessage.put("timestamp", now.toString());
         mapMessage.put("pathVariables", getPathVariables(joinPoint));
         mapMessage.put("headers", formatAsJsonObject(getHeaders(request)));
         mapMessage.put("requestId", requestId != null ? requestId : "null");
         mapMessage.put("responseBody", response != null ? formatAsJsonObject(response) : "null");
-
 
         logger.debug(mapMessage);
     }
