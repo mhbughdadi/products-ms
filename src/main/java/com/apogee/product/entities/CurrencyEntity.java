@@ -31,6 +31,6 @@ public class CurrencyEntity {
     @Column(name = "exchange_rate")
     private double exchangeRate;
 
-    @OneToOne(mappedBy = "currency")
+    @OneToOne(mappedBy = "currency", optional = true)
     private PriceEntity price;
 }

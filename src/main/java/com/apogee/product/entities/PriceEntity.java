@@ -20,7 +20,6 @@ import lombok.Setter;
 public class PriceEntity {
 
     @Id
-    // add generatedValue with strategy to use GenerationType.IDENTITY for auto-incrementing primary key for MySQL
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     @Column(name = "price_id")
@@ -29,13 +28,15 @@ public class PriceEntity {
     @Column(name = "price")
     private Double price;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "currency_id")
+    @OneToOne
+    @JoinColumn(name = "currency_id", referencedColumnName = "currency_id")
     private CurrencyEntity currency;
 
-    @OneToOne
-    @JoinColumn(name = "product_id")
+    @OneToOne(mappedBy = "oldPrice")
     private ProductEntity product;
+
+    @OneToOne(mappedBy = "price")
+    private ProductEntity productEntity;
 
 
 }

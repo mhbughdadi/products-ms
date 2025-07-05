@@ -6,6 +6,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class AddCurrencyResponseDto extends SuccessfulResponse {
-    private CurrencyDto currency;
+public class CurrencyResponseDto extends SuccessfulResponse {
+    CurrencyDto currency;
 }

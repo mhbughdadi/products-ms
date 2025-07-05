@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +21,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
+@Table(name = "products")
 public class ProductEntity {
 
     @Id
@@ -42,8 +44,7 @@ public class ProductEntity {
     private String shortDescription;
     @Column(name= "short_description_ar")
     private String shortDescriptionAr;
-    @OneToOne(mappedBy = "product")
-    private PriceEntity oldPrice;
+
     @Column(name= "expiration_date")
     private Date expirationDate;
     @Column(name= "manufacturing_date")
@@ -63,11 +64,13 @@ public class ProductEntity {
     @JoinColumn(name = "category_id", referencedColumnName = "category_id", insertable = false, updatable = false)
     private CategoryEntity category;
 
-    @Column(name= "price_id")
-    private Long priceId;
-
-    @OneToOne(mappedBy = "product")
+    @OneToOne
+    @JoinColumn(name = "price_id", referencedColumnName = "price_id", insertable = false)
     private PriceEntity price;
+
+    @OneToOne
+    @JoinColumn(name = "old_price_id", referencedColumnName = "price_id", insertable = false)
+    private PriceEntity oldPrice;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<ImageEntity> images;
