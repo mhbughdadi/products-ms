@@ -10,12 +10,9 @@ import com.apogee.product.services.ImageService;
 import com.apogee.product.services.ProductService;
 import com.apogee.product.utilities.Utilities;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Locale;
-
 
 @Service
 public class ProductsBackingService {
@@ -31,9 +28,6 @@ public class ProductsBackingService {
 
     @Autowired
     private Mapper mapper;
-
-    @Autowired
-    ResourceBundleMessageSource messageSource;
 
 
     public AllProductsResponseDto getAllProducts() throws Exception {
@@ -83,7 +77,7 @@ public class ProductsBackingService {
     public Response updateProduct(Object product) {
 
         return new FailureResponse(
-                messageSource.getMessage("product.error.method.not.implemented", null, Locale.getDefault()),
-                messageSource.getMessage("product.error.method.not.implemented", null, Locale.of("ar")));
+                "product.error.method.not.implemented",
+                "product.error.method.not.implemented");
     }
 }
