@@ -7,8 +7,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -28,41 +26,37 @@ public class ProductEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private Long productId;
-    @Column(name= "name")
+    @Column(name = "name")
     private String name;
-    @Column(name= "name_ar")
+    @Column(name = "name_ar")
     private String nameAR;
-    @Column(name= "description")
+    @Column(name = "description")
     private String description;
-    @Column(name= "description_ar")
+    @Column(name = "description_ar")
     private String descriptionAr;
-    @Column(name= "list_price")
+    @Column(name = "list_price")
     private Double listPrice;
-    @Column(name= "vat")
+    @Column(name = "vat")
     private Boolean vat;
-    @Column(name= "short_description")
+    @Column(name = "short_description")
     private String shortDescription;
-    @Column(name= "short_description_ar")
+    @Column(name = "short_description_ar")
     private String shortDescriptionAr;
 
-    @Column(name= "expiration_date")
+    @Column(name = "expiration_date")
     private Date expirationDate;
-    @Column(name= "manufacturing_date")
+    @Column(name = "manufacturing_date")
     private String manufacturingDate;
-    @Column(name= "sku")
+    @Column(name = "sku")
     private String sku;
-    @Column(name= "quantity")
+    @Column(name = "quantity")
     private Long quantity;
-    @Column(name= "status")
+    @Column(name = "status")
     private Boolean status;
-    @Column(name= "created_at")
+    @Column(name = "created_at")
     private Date createdAt;
-    @Column(name= "updated_at")
+    @Column(name = "updated_at")
     private Date updatedAt;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "category_id", insertable = false, updatable = false)
-    private CategoryEntity category;
 
     @OneToOne
     @JoinColumn(name = "price_id", referencedColumnName = "price_id", insertable = false)
