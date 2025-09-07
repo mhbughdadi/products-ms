@@ -1,7 +1,6 @@
 package com.apogee.product.services.impl;
 
 import com.apogee.product.entities.ImageEntity;
-import com.apogee.product.mappings.Mapper;
 import com.apogee.product.models.Image;
 import com.apogee.product.repositories.ImageRepository;
 import com.apogee.product.services.ImageService;
@@ -20,16 +19,14 @@ public class ImageServiceImpl implements ImageService {
 
     @Autowired
     private ImageRepository imageRepository;
-    @Autowired
-    private Mapper mapper;
 
     @Override
-    public List<Image> findAllImages() throws Exception{
+    public List<Image> findAllImages() throws Exception {
 
         List<ImageEntity> imageEntities = imageRepository.findAll();
 
         if (!imageEntities.isEmpty()) {
-            return transformCollection(imageEntities, entity -> mapper.map(entity, Image.class));
+            return transformCollection(imageEntities, Image.class);
         } else {
             return Collections.emptyList();
         }
@@ -38,9 +35,9 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public List<Image> saveImages(List<Image> images) throws Exception {
 
-        List<ImageEntity> savedEntities = imageRepository.saveAll(transformCollection(images, (image) -> mapper.map(image, ImageEntity.class)));
+        List<ImageEntity> savedEntities = imageRepository.saveAll(transformCollection(images, ImageEntity.class));
 
-        return transformCollection(savedEntities, (savedEntity) -> mapper.map(savedEntity, Image.class));
+        return transformCollection(savedEntities, Image.class);
     }
 
 }

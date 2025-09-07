@@ -2,7 +2,7 @@ package com.apogee.product.services.impl;
 
 import com.apogee.product.entities.CategoryEntity;
 import com.apogee.product.exceptions.RecordNotFoundException;
-import com.apogee.product.mappings.Mapper;
+import com.apogee.product.utilities.Mapper;
 import com.apogee.product.models.Category;
 import com.apogee.product.repositories.CategoryRepository;
 import com.apogee.product.services.CategoryService;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
@@ -24,16 +23,20 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @Autowired
-    Mapper mapper;
 
     @Override
     public List<Category> findAllCategories() throws Exception {
 
-        List<CategoryEntity> categoryEntities = categoryRepository.findAll();
+        List<CategoryEntity> categoryEntities = categoryRepository.findAllRootCategoriesWithSubCategories();
 
         if (!categoryEntities.isEmpty()) {
-            return transformCollection(categoryEntities, entity -> mapper.map(entity, Category.class));
+            return transformCollection(categoryEntities, Category.class, ((categoryEntity, category) -> {
+                category = this.addCategoryIdAndParentId(categoryEntity, category);
+
+                category.setSubCategories(transformCollection(categoryEntity.getSubCategories(), Category.class, this::addCategoryIdAndParentId));
+
+                return category;
+            }));
         } else {
             return Collections.emptyList();
         }
@@ -42,27 +45,28 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category addCategory(Category category) throws Exception {
 
-        CategoryEntity transientCategory = mapper.map(category, CategoryEntity.class);
-        CategoryEntity savedEntity = categoryRepository.save(transientCategory);
+        CategoryEntity transientCategory = Mapper.map(category, CategoryEntity.class);
 
-        return mapper.map(savedEntity, Category.class);
+        CategoryEntity savedCategory = categoryRepository.save(transientCategory);
+
+        if (category.getParentId() != null) {
+            CategoryEntity parentCategory = this.categoryRepository.findById(category.getParentId()).orElseThrow(() -> new RecordNotFoundException("record.not.found", category.getParentId()));
+            savedCategory.setParent(parentCategory);
+        }
+        this.categoryRepository.save(savedCategory);
+
+        return Mapper.map(savedCategory, Category.class);
     }
 
     @Override
     public Category findCategoryByID(Long categoryId) throws Exception {
 
-        AtomicReference<Category> categoryAtomicReference = new AtomicReference<>();
         Optional<CategoryEntity> categoryEntityOptional = this.categoryRepository.findById(categoryId);
-
-        categoryEntityOptional.ifPresent(productEntity -> {
-            try {
-                categoryAtomicReference.set(mapper.map(productEntity, Category.class));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        return categoryAtomicReference.get();
+        if (categoryEntityOptional.isPresent()) {
+            return Mapper.map(categoryEntityOptional.get(), Category.class);
+        } else {
+            throw new RecordNotFoundException("record.not.found", categoryId);
+        }
     }
 
     @Override
@@ -74,15 +78,25 @@ public class CategoryServiceImpl implements CategoryService {
 
         this.categoryRepository.deleteById(categoryId);
 
-        return this.mapper.map(toBeDeletedEntity, Category.class);
+        return Mapper.map(toBeDeletedEntity, Category.class);
     }
 
     @Override
     public Category updateCategory(Category category) throws Exception {
 
-        CategoryEntity updatedCurrency = this.categoryRepository.save(mapper.map(category, CategoryEntity.class));
+        CategoryEntity updatedCurrency = this.categoryRepository.save(Mapper.map(category, CategoryEntity.class));
 
-        return mapper.map(updatedCurrency, Category.class);
+        return Mapper.map(updatedCurrency, Category.class);
+    }
+
+    private Category addCategoryIdAndParentId(CategoryEntity categoryEntity, Category category) {
+
+        if (categoryEntity != null && category != null) {
+            category.setId(categoryEntity.getId());
+            category.setParentId(categoryEntity.getParent() != null ? categoryEntity.getParent().getId() : null);
+        }
+
+        return category;
     }
 
 }

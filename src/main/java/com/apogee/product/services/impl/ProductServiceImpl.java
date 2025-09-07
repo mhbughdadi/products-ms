@@ -1,7 +1,7 @@
 package com.apogee.product.services.impl;
 
 import com.apogee.product.entities.ProductEntity;
-import com.apogee.product.mappings.Mapper;
+import com.apogee.product.utilities.Mapper;
 import com.apogee.product.models.Product;
 import com.apogee.product.repositories.ProductRepository;
 import com.apogee.product.services.ProductService;
@@ -23,16 +23,13 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    @Autowired
-    Mapper mapper;
-
     @Override
     public List<Product> findAllProducts() throws Exception {
 
         List<ProductEntity> productEntities = productRepository.findAll();
 
         if (!productEntities.isEmpty()) {
-            return transformCollection(productEntities, entity -> mapper.map(entity, Product.class));
+            return transformCollection(productEntities, Product.class);
         } else {
             return Collections.emptyList();
         }
@@ -41,10 +38,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product addProduct(Product product) throws Exception {
 
-        ProductEntity transientProduct = mapper.map(product, ProductEntity.class);
+        ProductEntity transientProduct = Mapper.map(product, ProductEntity.class);
         ProductEntity savedEntity = productRepository.save(transientProduct);
 
-        return mapper.map(savedEntity, Product.class);
+        return Mapper.map(savedEntity, Product.class);
     }
 
     @Override
@@ -55,7 +52,7 @@ public class ProductServiceImpl implements ProductService {
 
         productEntityOptional.ifPresent(productEntity -> {
             try {
-                productReference.set(mapper.map(productEntity, Product.class));
+                productReference.set(Mapper.map(productEntity, Product.class));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

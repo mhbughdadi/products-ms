@@ -1,9 +1,8 @@
 package com.apogee.product.services.impl;
 
 import com.apogee.product.entities.CurrencyEntity;
-import com.apogee.product.exceptions.BusinessException;
 import com.apogee.product.exceptions.RecordNotFoundException;
-import com.apogee.product.mappings.Mapper;
+import com.apogee.product.utilities.Mapper;
 import com.apogee.product.models.Currency;
 import com.apogee.product.repositories.CurrencyRepository;
 import com.apogee.product.services.CurrencyService;
@@ -21,20 +20,17 @@ import static com.apogee.product.utilities.Utilities.transformCollection;
 public class CurrencyServiceImpl implements CurrencyService {
 
     @Autowired
-    private Mapper mapper;
-
-    @Autowired
     private CurrencyRepository currencyRepository;
 
 
     @Override
     public Currency saveCurrency(Currency currency) throws Exception {
 
-        var currencyEntity = mapper.map(currency, CurrencyEntity.class);
+        var currencyEntity = Mapper.map(currency, CurrencyEntity.class);
 
         var savedEntity = currencyRepository.save(currencyEntity);
 
-        return mapper.map(savedEntity, Currency.class);
+        return Mapper.map(savedEntity, Currency.class);
 
     }
 
@@ -43,9 +39,9 @@ public class CurrencyServiceImpl implements CurrencyService {
 
         Optional<CurrencyEntity> currencyOpt = this.currencyRepository.findById(currencyId);
 
-        CurrencyEntity foundCurrencyEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException("record.not.found",  currencyId));
+        CurrencyEntity foundCurrencyEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException("record.not.found", currencyId));
 
-        return mapper.map(foundCurrencyEntity, Currency.class);
+        return Mapper.map(foundCurrencyEntity, Currency.class);
     }
 
     @Override
@@ -53,15 +49,15 @@ public class CurrencyServiceImpl implements CurrencyService {
 
         List<CurrencyEntity> foundCurrencies = this.currencyRepository.findAll();
 
-        return transformCollection(foundCurrencies, (currencyEntity -> this.mapper.map(currencyEntity, Currency.class)));
+        return transformCollection(foundCurrencies, Currency.class);
     }
 
     @Override
     public Currency UpdateCurrency(Currency currency) throws Exception {
 
-        CurrencyEntity updatedCurrency = this.currencyRepository.save(mapper.map(currency, CurrencyEntity.class));
+        CurrencyEntity updatedCurrency = this.currencyRepository.save(Mapper.map(currency, CurrencyEntity.class));
 
-        return mapper.map(updatedCurrency, Currency.class);
+        return Mapper.map(updatedCurrency, Currency.class);
     }
 
     @Override
@@ -69,10 +65,10 @@ public class CurrencyServiceImpl implements CurrencyService {
 
         Optional<CurrencyEntity> currencyOpt = this.currencyRepository.findById(currencyId);
 
-        CurrencyEntity toBeDeletedEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException("record.not.found" , currencyId));
+        CurrencyEntity toBeDeletedEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException("record.not.found", currencyId));
 
         this.currencyRepository.deleteById(currencyId);
 
-        return this.mapper.map(toBeDeletedEntity, Currency.class);
+        return Mapper.map(toBeDeletedEntity, Currency.class);
     }
 }

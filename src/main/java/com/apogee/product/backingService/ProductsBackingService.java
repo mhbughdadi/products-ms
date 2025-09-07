@@ -1,7 +1,7 @@
 package com.apogee.product.backingService;
 
 import com.apogee.product.dtos.output.*;
-import com.apogee.product.mappings.Mapper;
+import com.apogee.product.utilities.Mapper;
 import com.apogee.product.dtos.inputs.ProductDto;
 import com.apogee.product.models.Image;
 import com.apogee.product.models.Product;
@@ -26,15 +26,12 @@ public class ProductsBackingService {
     @Autowired
     private CurrencyService currencyService;
 
-    @Autowired
-    private Mapper mapper;
-
 
     public AllProductsResponseDto getAllProducts() throws Exception {
 
         AllProductsResponseDto response = new AllProductsResponseDto();
 
-        List<ProductOutputDto> allProducts = Utilities.transformCollection(productService.findAllProducts(), (product) -> mapper.map(product, ProductOutputDto.class));
+        List<ProductOutputDto> allProducts = Utilities.transformCollection(productService.findAllProducts(), ProductOutputDto.class);
         response.setProducts(allProducts);
 
         return response;
@@ -44,7 +41,7 @@ public class ProductsBackingService {
 
         AddProductResponseDto response = new AddProductResponseDto();
 
-        Product product = mapper.map(productDto, Product.class);
+        Product product = Mapper.map(productDto, Product.class);
         Product savedProduct = productService.addProduct(product);
 
         if (savedProduct != null && product.getImages() != null && !product.getImages().isEmpty()) {
@@ -54,7 +51,7 @@ public class ProductsBackingService {
             savedProduct.setImages(savedImages);
         }
 
-        response.setProduct(mapper.map(savedProduct, ProductOutputDto.class));
+        response.setProduct(Mapper.map(savedProduct, ProductOutputDto.class));
 
         return response;
     }
@@ -64,7 +61,7 @@ public class ProductsBackingService {
         FindProductResponseDto response = new FindProductResponseDto();
 
         Product product = productService.findProductById(productId);
-        response.setProduct(mapper.map(product, ProductOutputDto.class));
+        response.setProduct(Mapper.map(product, ProductOutputDto.class));
 
         return response;
     }
