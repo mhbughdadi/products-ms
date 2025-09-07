@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "entity_type")
+@DiscriminatorColumn(name = "entity_type", discriminatorType = jakarta.persistence.DiscriminatorType.STRING)
 @Table(name = "auditable_item")
 public abstract class AuditableItem {
 
