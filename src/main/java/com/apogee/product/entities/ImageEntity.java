@@ -29,6 +29,6 @@ public class ImageEntity {
     private String base64;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", referencedColumnName = "product_id", insertable = false)
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
     private ProductEntity product;
 }

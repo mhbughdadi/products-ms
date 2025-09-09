@@ -5,30 +5,29 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @Entity
-@Table(name = "prices")
-public class PriceEntity {
+@Table(name = "tags")
+public class TagEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "price_id")
-    private Long priceId;
+    @Column(name = "name", nullable = false, unique = true)
+    private String name;
+    @Column(name = "description")
+    private String description;
+    @Column(name = "description_ar")
+    private String descriptionAr;
 
-    @Column(name = "price")
-    private Double price;
-
-    @OneToOne
-    @JoinColumn(name = "currency_id", referencedColumnName = "currency_id")
-    private CurrencyEntity currency;
-
-
+    @Column(name = "created_at")
+    private Date createdAt;
 }

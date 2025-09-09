@@ -5,6 +5,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
@@ -13,6 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -41,10 +43,16 @@ public class CategoryEntity extends AuditableItem {
     private boolean active;
 
     @ManyToOne
-    @JoinColumn(name = "parent_id", referencedColumnName = "id" )
+    @JoinColumn(name = "parent_id", referencedColumnName = "id")
     private CategoryEntity parent;
 
-    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER )
+    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
     private List<CategoryEntity> subCategories;
+
+    @ManyToMany(mappedBy = "categories")
+    private Set<ProductEntity> products;
+
+    @OneToMany(mappedBy = "category")
+    private List<CategoryTagEntity> tags;
 
 }
