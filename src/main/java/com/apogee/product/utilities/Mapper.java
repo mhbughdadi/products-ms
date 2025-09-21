@@ -19,6 +19,17 @@ public class Mapper {
         if (source == null) {
             return null;
         }
+        // Enhanced enum mapping: map by name if destination is enum, else return as-is
+        if (source.getClass().isEnum()) {
+            if (destinationClass.isEnum()) {
+                // Map by name if possible
+                return (D) Enum.valueOf((Class<Enum>) destinationClass, ((Enum<?>) source).name());
+            } else {
+                // If destination is not enum, throw exception for safety
+                throw new IllegalArgumentException("Cannot map enum type " + source.getClass().getName() + " to non-enum type " + destinationClass.getName());
+            }
+        }
+
         // getting reference to the destination class constructor
         Constructor<D> constructor = destinationClass.getDeclaredConstructor();
 
