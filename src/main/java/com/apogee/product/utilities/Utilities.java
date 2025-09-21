@@ -98,6 +98,7 @@ public class Utilities {
      * @return a list of transformed destination objects after applying the complementary function
      * @throws Exception if any error occurs during the mapping or function application process
      */
+    @Deprecated()
     public static <S, R> List<R> transformCollection(Collection<S> sourceCollection, ThrowingFunction<S, R> mappingFunction, ThrowingBiFunction<S, R, R> complementaryFunction) throws Exception {
 
         List<R> destinationCollection = transformCollection(sourceCollection, mappingFunction);
@@ -118,6 +119,20 @@ public class Utilities {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    public static <S, R> R transform(S sourceObject, Class<R> destinationClass, ThrowingBiFunction<S, R, R> complementaryFunction) throws Exception {
+
+        if (sourceObject != null) {
+            try {
+                R mapped = Mapper.map(sourceObject, destinationClass);
+
+                return complementaryFunction != null ? complementaryFunction.apply(sourceObject, mapped) : mapped;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
     }
 
     public static String formatAsJsonObject(Object object) {
