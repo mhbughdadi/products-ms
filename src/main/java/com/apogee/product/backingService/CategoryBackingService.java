@@ -1,16 +1,23 @@
 package com.apogee.product.backingService;
 
 import com.apogee.product.dtos.inputs.CategoryDto;
+import com.apogee.product.dtos.inputs.TagDto;
 import com.apogee.product.dtos.output.AllCategoriesResponseDto;
+import com.apogee.product.dtos.output.AllTagsResponseDto;
 import com.apogee.product.dtos.output.CategoryResponseDto;
+import com.apogee.product.dtos.output.SuccessfulResponse;
+import com.apogee.product.dtos.output.TagResponseDto;
 import com.apogee.product.models.Category;
+import com.apogee.product.models.Tag;
 import com.apogee.product.services.CategoryService;
+import com.apogee.product.services.CategoryTagService;
 import com.apogee.product.utilities.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Service
@@ -18,6 +25,9 @@ public class CategoryBackingService {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private CategoryTagService categoryTagService;
 
     public CategoryResponseDto addCategory(CategoryDto categoryDto) throws Exception {
 
@@ -77,4 +87,34 @@ public class CategoryBackingService {
     }
 
 
+    public TagResponseDto assignTag(Long categoryId, Long tagId) throws Exception {
+
+        TagResponseDto response = new TagResponseDto();
+
+        Tag tag = this.categoryTagService.assignTagToCategory(categoryId, tagId);
+
+        response.setTag( Mapper.map(tag, TagDto.class));
+
+        return response;
+    }
+
+    public SuccessfulResponse removeTag(Long categoryId, Long tagId) throws Exception {
+
+        SuccessfulResponse response = new SuccessfulResponse();
+
+        this.categoryTagService.removeTagFromCategory(categoryId, tagId);
+
+        return response;
+    }
+
+    public AllTagsResponseDto fetchCategoryTags(Long categoryId) throws Exception {
+
+        AllTagsResponseDto response = new AllTagsResponseDto();
+
+        List<Tag> categoryTags = this.categoryTagService.getTagsForCategory(categoryId);
+
+        response.setTags(transformCollection(categoryTags, TagDto.class));
+
+        return response;
+    }
 }

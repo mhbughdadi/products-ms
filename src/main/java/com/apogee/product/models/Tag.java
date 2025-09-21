@@ -12,6 +12,6 @@ public class Tag {
     private Long id;
     private String name;
     private String description;
-    private String descriptionAR;
+    private String descriptionAr;
     private Date createdAt;
 }

@@ -22,8 +22,6 @@ import lombok.Setter;
 @DiscriminatorColumn(name = "tag_type", discriminatorType = DiscriminatorType.STRING)
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public abstract class TagAssignmentEntity {
 
     @Id
@@ -32,6 +30,5 @@ public abstract class TagAssignmentEntity {
 
     @ManyToOne
     @JoinColumn(name = "tags_id", referencedColumnName = "id", nullable = false)
-
     private TagEntity tag;
 }

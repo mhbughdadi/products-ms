@@ -3,9 +3,12 @@ package com.apogee.product.controllers;
 import com.apogee.product.backingService.CategoryBackingService;
 import com.apogee.product.dtos.inputs.CategoryDto;
 import com.apogee.product.dtos.output.AllCategoriesResponseDto;
+import com.apogee.product.dtos.output.AllTagsResponseDto;
 import com.apogee.product.dtos.output.CategoryResponseDto;
 import com.apogee.product.dtos.output.FailureResponse;
 import com.apogee.product.dtos.output.Response;
+import com.apogee.product.dtos.output.SuccessfulResponse;
+import com.apogee.product.dtos.output.TagResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -78,4 +81,38 @@ public class CategoryController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping("/categories/{categoryId}/tags/{tagId}")
+    @Operation(summary = "Assign Tag to Category", description = "This endpoint assigns Tag with tagId to Category with categoryId.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TagResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    public ResponseEntity<Response> assignTag(@PathVariable("categoryId") Long categoryId, @PathVariable("tagId") Long tagId) throws Exception {
+
+        TagResponseDto response = categoryBackingService.assignTag(categoryId, tagId);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/categories/{categoryId}/tags/{tagId}")
+    @Operation(summary = "Remove Tag From Category", description = "This endpoint deletes Tag with tagId from Category with categoryId.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    public ResponseEntity<Response> removeTag(@PathVariable("categoryId") Long categoryId, @PathVariable("tagId") Long tagId) throws Exception {
+
+        SuccessfulResponse response = categoryBackingService.removeTag(categoryId, tagId);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/categories/{categoryId}/tags")
+    @Operation(summary = "Fetch Category Tags", description = "This endpoint fetches Tags assigned to Category with categoryId.")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllTagsResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    public ResponseEntity<Response> assignTag(@PathVariable("categoryId") Long categoryId) throws Exception {
+
+        AllTagsResponseDto response = categoryBackingService.fetchCategoryTags(categoryId);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+
+
 }
