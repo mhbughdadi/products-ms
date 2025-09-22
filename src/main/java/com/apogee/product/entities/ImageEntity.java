@@ -5,11 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
 
 @Setter
 @Getter
@@ -19,16 +19,34 @@ public class ImageEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "image_id")
-    private Long imageId;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "url")
     private String url;
 
-    @Column(name = "base64")
-    private String base64;
+    @Column(name = "alt_text_en")
+    private String altTextEn;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
-    private ProductEntity product;
+    @Column(name = "alt_text_ar")
+    private String altTextAr;
+
+    @Column(name = "entity_type", nullable = false)
+    private String entityType;
+
+    @Column(name = "entity_id", nullable = false)
+    private Long entityId;
+
+    @Column(name = "type")
+    private String type;
+
+    @Column(name = "sort_order")
+    private Integer sortOrder;
+
+    @Column(name = "is_active")
+    private Boolean isActive;
+
+    @Column(name = "uploaded_at")
+    private Date uploadedAt;
+
 }
