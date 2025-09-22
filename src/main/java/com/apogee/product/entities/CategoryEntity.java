@@ -22,7 +22,7 @@ import java.util.Set;
 @Table(name = "categories")
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue("category")
-public class CategoryEntity extends AuditableItem {
+public class CategoryEntity extends ParentItemEntity {
 
     @Column(name = "description_ar")
     private String descriptionAr;
@@ -51,8 +51,5 @@ public class CategoryEntity extends AuditableItem {
 
     @ManyToMany(mappedBy = "categories")
     private Set<ProductEntity> products;
-
-    @OneToMany(mappedBy = "category")
-    private List<CategoryTagEntity> tags;
 
 }

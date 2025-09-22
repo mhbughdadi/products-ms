@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Setter
 @Getter
@@ -34,4 +35,5 @@ public class Product {
     private Double ratingAvg;
     private Long reviewCount;
     private String code;
+    private List<Tag> tags;
 }

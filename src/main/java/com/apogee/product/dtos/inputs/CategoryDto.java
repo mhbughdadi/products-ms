@@ -1,10 +1,12 @@
 package com.apogee.product.dtos.inputs;
 
+import com.apogee.product.models.Tag;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -18,7 +20,8 @@ public class CategoryDto {
     private String code;
     private Long id;
     private boolean active;
-    private ArrayList<CategoryDto> subCategories ;
+    private ArrayList<CategoryDto> subCategories;
     private Long parentId;
+    private List<Tag> tags;
 
 }

@@ -1,7 +1,11 @@
 package com.apogee.product.services.impl;
 
 import com.apogee.product.entities.CategoryEntity;
+import com.apogee.product.entities.TagEntity;
+import com.apogee.product.exceptions.DBException;
 import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.models.Tag;
+import com.apogee.product.repositories.TagRepository;
 import com.apogee.product.utilities.Mapper;
 import com.apogee.product.models.Category;
 import com.apogee.product.repositories.CategoryRepository;
@@ -10,10 +14,13 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Service
@@ -22,6 +29,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
 
 
     @Override
@@ -97,6 +107,62 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         return category;
+    }
+
+
+    @Override
+    public Category assignTagToCategory(Long categoryId, Long tagId) throws Exception {
+
+        categoryRepository.findByIdAndTagsId(categoryId, tagId).ifPresent(existingAssignment -> {
+            throw new DBException("errors.duplicate.record", CategoryEntity.class, categoryId, tagId);
+        });
+
+        TagEntity tag = tagRepository.findById(tagId).orElseThrow(() -> new RecordNotFoundException("Tag not found", tagId));
+        CategoryEntity category = categoryRepository.findById(categoryId).orElseThrow(() -> new RecordNotFoundException("Product not found", categoryId));
+
+        category.getTags().add(tag);
+        category = categoryRepository.save(category);
+
+        return transform(category, Category.class, this::getCategory);
+    }
+
+    @Override
+    public List<Tag> getTagsForCategory(Long categoryId) throws Exception {
+
+        List<TagEntity> assignments = tagRepository.findByItemsId(categoryId);
+
+        return transformCollection(assignments, Tag.class, this::getTag);
+    }
+
+
+    @Override
+    public void removeTagFromCategory(Long categoryId, Long tagId) throws Exception {
+
+        CategoryEntity found = categoryRepository.findByIdAndTagsId(categoryId, tagId)
+                .orElseThrow(
+                        () -> new DBException("errors.categories.tags.not.found", CategoryEntity.class, categoryId, tagId)
+                );
+
+        found.setTags(found.getTags().stream()
+                .filter(t -> !t.getId().equals(tagId))
+                .collect(Collectors.toCollection(ArrayList::new)));
+
+        categoryRepository.save(found);
+    }
+
+    private Category getCategory(CategoryEntity entity, Category model) throws Exception {
+
+        model.setId(entity.getId());
+        model.setTags(transformCollection(entity.getTags(), Tag.class, this::getTag));
+        return model;
+    }
+
+    private Tag getTag(TagEntity tagEntity, Tag tag) {
+        tag.setId(tagEntity.getId());
+        tag.setName(tagEntity.getName());
+        tag.setDescription(tagEntity.getDescription());
+        tag.setDescriptionAr(tagEntity.getDescriptionAr());
+        return tag;
     }
 
 }

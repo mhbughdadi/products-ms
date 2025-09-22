@@ -9,19 +9,23 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Setter
 @Getter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "entity_type", discriminatorType = jakarta.persistence.DiscriminatorType.STRING)
-@Table(name = "auditable_item")
-public abstract class AuditableItem {
+@Table(name = "parent_item")
+public abstract class ParentItemEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,5 +45,13 @@ public abstract class AuditableItem {
 
     @Column(name = "deleted")
     private Boolean deleted = false;
+
+    @ManyToMany
+    @JoinTable(
+            name = "item_tags",
+            joinColumns = @JoinColumn(name = "item_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<TagEntity> tags;
 
 }

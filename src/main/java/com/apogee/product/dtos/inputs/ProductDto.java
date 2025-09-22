@@ -9,7 +9,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class ProductDto{
+public class ProductDto {
 
     private Long id;
     private String nameEn;
@@ -35,4 +35,5 @@ public class ProductDto{
     private Double ratingAvg;
     private Long reviewCount;
     private String code;
+    private List<TagDto> tags;
 }

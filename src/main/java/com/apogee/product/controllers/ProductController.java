@@ -71,10 +71,10 @@ public class ProductController {
 
     @PostMapping("/products/{productId}/tags/{tagId}")
     @Operation(summary = "Assign Tag to Product", description = "This endpoint assigns Tag with tagId to Product with productId.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TagResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AddProductResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
     public ResponseEntity<Response> assignTag(@PathVariable("productId") Long productId, @PathVariable("tagId") Long tagId) throws Exception {
 
-        TagResponseDto response = productsBackingService.assignTag(productId, tagId);
+        AddProductResponseDto response = productsBackingService.assignTag(productId, tagId);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

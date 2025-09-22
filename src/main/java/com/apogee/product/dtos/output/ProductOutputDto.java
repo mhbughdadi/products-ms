@@ -1,14 +1,16 @@
 package com.apogee.product.dtos.output;
 
+import com.apogee.product.dtos.inputs.TagDto;
 import com.apogee.product.enums.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Setter
 @Getter
-public class ProductOutputDto{
+public class ProductOutputDto {
 
     private Long id;
     private String nameEn;
@@ -34,4 +36,5 @@ public class ProductOutputDto{
     private Double ratingAvg;
     private Long reviewCount;
     private String code;
+    private List<TagDto> tags;
 }

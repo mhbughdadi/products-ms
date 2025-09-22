@@ -18,5 +18,6 @@ public class Category {
     private boolean active;
     private List<Category> subCategories;
     private Long parentId;
+    private List<Tag> tags;
 
 }

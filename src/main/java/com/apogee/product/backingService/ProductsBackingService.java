@@ -3,10 +3,8 @@ package com.apogee.product.backingService;
 import com.apogee.product.dtos.inputs.TagDto;
 import com.apogee.product.dtos.output.*;
 import com.apogee.product.models.Tag;
-import com.apogee.product.services.ProductTagService;
 import com.apogee.product.utilities.Mapper;
 import com.apogee.product.dtos.inputs.ProductDto;
-import com.apogee.product.models.Image;
 import com.apogee.product.models.Product;
 import com.apogee.product.services.CurrencyService;
 import com.apogee.product.services.ImageService;
@@ -30,10 +28,6 @@ public class ProductsBackingService {
 
     @Autowired
     private CurrencyService currencyService;
-
-    @Autowired
-    private ProductTagService productTagService;
-
 
     public AllProductsResponseDto getAllProducts() throws Exception {
 
@@ -81,13 +75,13 @@ public class ProductsBackingService {
         return response;
     }
 
-    public TagResponseDto assignTag(Long productId, Long tagId) throws Exception {
+    public AddProductResponseDto assignTag(Long productId, Long tagId) throws Exception {
 
-        TagResponseDto response = new TagResponseDto();
+        AddProductResponseDto response = new AddProductResponseDto();
 
-        Tag tag = this.productTagService.assignTagToProduct(productId, tagId);
+        Product product = this.productService.assignTagToProduct(productId, tagId);
 
-        response.setTag( Mapper.map(tag, TagDto.class));
+        response.setProduct(Mapper.map(product, ProductOutputDto.class));
 
         return response;
     }
@@ -96,7 +90,7 @@ public class ProductsBackingService {
 
         SuccessfulResponse response = new SuccessfulResponse();
 
-        this.productTagService.removeTagFromProduct(productId, tagId);
+        this.productService.removeTagFromProduct(productId, tagId);
 
         return response;
     }
@@ -105,7 +99,7 @@ public class ProductsBackingService {
 
         AllTagsResponseDto response = new AllTagsResponseDto();
 
-        List<Tag> categoryTags = this.productTagService.getTagsForProduct(productId);
+        List<Tag> categoryTags = this.productService.getTagsForProduct(productId);
 
         response.setTags(transformCollection(categoryTags, TagDto.class));
 

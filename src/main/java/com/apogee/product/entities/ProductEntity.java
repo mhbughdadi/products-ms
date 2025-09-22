@@ -9,14 +9,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -25,7 +23,7 @@ import java.util.Set;
 @Table(name = "products")
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue("product")
-public class ProductEntity extends AuditableItem {
+public class ProductEntity extends ParentItemEntity {
 
     @Column(name = "name_en")
     private String nameEn;
@@ -100,8 +98,5 @@ public class ProductEntity extends AuditableItem {
     @ManyToMany
     @JoinTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<CategoryEntity> categories;
-
-    @OneToMany(mappedBy = "product")
-    private List<ProductTagEntity> tags;
 
 }
