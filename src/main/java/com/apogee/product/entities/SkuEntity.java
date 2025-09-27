@@ -90,8 +90,8 @@ public class SkuEntity extends ParentItemEntity {
     @Column(name = "barcode")
     private String barcode;
 
-    @Column(name = "attributes")
-    private JSONObject attributes;
+    @Column(name = "attributes", columnDefinition = "json")
+    private String attributes;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")

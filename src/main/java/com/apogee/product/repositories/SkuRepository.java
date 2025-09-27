@@ -1,6 +1,5 @@
 package com.apogee.product.repositories;
 
-import com.apogee.product.entities.ProductEntity;
 import com.apogee.product.entities.SkuEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,6 +10,9 @@ import java.util.Optional;
 @Repository
 public interface SkuRepository extends JpaRepository<SkuEntity, Long> {
 
-    Optional<SkuEntity> findByIdAndTagsId(Long productId, Long tagId);
-    List<SkuEntity> findByProductId(Long productId);
+    Optional<SkuEntity> findByIdAndTagsId(Long skuId, Long tagId);
+
+    Optional<SkuEntity> findByIdAndBenefitsId(Long skuId, Long benefitId);
+
+    List<SkuEntity> findByProductId(Long skuId);
 }

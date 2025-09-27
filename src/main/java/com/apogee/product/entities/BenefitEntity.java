@@ -21,7 +21,7 @@ public class BenefitEntity {
     @Column(name = "id")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Long id;
 
     @Column(name = "key_ar")
     private String kayAr;
