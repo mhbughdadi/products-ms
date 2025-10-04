@@ -19,8 +19,14 @@
         <lombok.version>1.18.30</lombok.version>
         <dozer.version>8.5.1</dozer.version>
         <swagger.version>2.5.0</swagger.version>
-
-
+        <sonar.projectKey>products-ms</sonar.projectKey>
+        <sonar.projectName>products-ms</sonar.projectName>
+        <sonar.projectVersion>1.0</sonar.projectVersion>
+        <sonar.sources>src/main/java</sonar.sources>
+        <sonar.tests>src/test/java</sonar.tests>
+        <sonar.java.binaries>target/classes</sonar.java.binaries>
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <sonar.login>${env.SONAR_TOKEN}</sonar.login>
     </properties>
     <url/>
     <licenses>
@@ -169,6 +175,12 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.11.0.3922</version>
+            </plugin>
+
         </plugins>
     </build>
 
