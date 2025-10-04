@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +30,9 @@ public class CategoryController {
 
     @PostMapping("/categories")
     @Operation(summary = "Add a new category", description = "This endpoint allows you to add a new category to the system.", tags = {"categories"})
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Category added successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Category added successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> addCategory(@RequestBody CategoryDto categoryDto) throws Exception {
 
         CategoryResponseDto response = categoryBackingService.addCategory(categoryDto);
@@ -42,7 +43,9 @@ public class CategoryController {
 
     @PutMapping("/categories")
     @Operation(summary = "Update an existing category", description = "This endpoint allows you to update an existing category in the system.", tags = {"categories"})
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Category updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Category updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> updateCategory(@RequestBody CategoryDto category) throws Exception {
 
         CategoryResponseDto response = categoryBackingService.updateCategory(category);
@@ -52,7 +55,8 @@ public class CategoryController {
 
     @GetMapping("/categories")
     @Operation(summary = "Get all categories", description = "This endpoint retrieves all categories available in the system.", tags = {"categories"})
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllCategoriesResponseDto.class))), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllCategoriesResponseDto.class)))
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<AllCategoriesResponseDto> getAllCategories() throws Exception {
 
         AllCategoriesResponseDto response = categoryBackingService.getAllCategories();
@@ -62,7 +66,9 @@ public class CategoryController {
 
     @DeleteMapping("/categories/{categoryId}")
     @Operation(summary = "Delete a category", description = "This endpoint allows you to delete a category by its ID.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Category deleted successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Category deleted successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> deleteCategory(@PathVariable("categoryId") Long categoryId) throws Exception {
 
         CategoryResponseDto response = categoryBackingService.deleteCategoryById(categoryId);
@@ -72,7 +78,9 @@ public class CategoryController {
 
     @GetMapping("/categories/{categoryId}")
     @Operation(summary = "Get a category by ID", description = "This endpoint retrieves a specific category by its ID.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> getCategory(@PathVariable("categoryId") Long categoryId) throws Exception {
 
         CategoryResponseDto response = categoryBackingService.getCategoryById(categoryId);
@@ -82,7 +90,9 @@ public class CategoryController {
 
     @PostMapping("/categories/{categoryId}/tags/{tagId}")
     @Operation(summary = "Assign Tag to Category", description = "This endpoint assigns Tag with tagId to Category with categoryId.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> assignTag(@PathVariable("categoryId") Long categoryId, @PathVariable("tagId") Long tagId) throws Exception {
 
         CategoryResponseDto response = categoryBackingService.assignTag(categoryId, tagId);
@@ -92,7 +102,9 @@ public class CategoryController {
 
     @DeleteMapping("/categories/{categoryId}/tags/{tagId}")
     @Operation(summary = "Remove Tag From Category", description = "This endpoint deletes Tag with tagId from Category with categoryId.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> removeTag(@PathVariable("categoryId") Long categoryId, @PathVariable("tagId") Long tagId) throws Exception {
 
         SuccessfulResponse response = categoryBackingService.removeTag(categoryId, tagId);
@@ -102,7 +114,9 @@ public class CategoryController {
 
     @GetMapping("/categories/{categoryId}/tags")
     @Operation(summary = "Fetch Category Tags", description = "This endpoint fetches Tags assigned to Category with categoryId.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllTagsResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllTagsResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> assignTag(@PathVariable("categoryId") Long categoryId) throws Exception {
 
         AllTagsResponseDto response = categoryBackingService.fetchCategoryTags(categoryId);

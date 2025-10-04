@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +34,8 @@ public class SkuController {
 
     @GetMapping("/skus")
     @Operation(summary = "Get all skus", description = "This endpoint retrieves all skus available in the system.", tags = {"skus"})
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllSkusResponseDto.class))), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllSkusResponseDto.class)))
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> allSkus() throws Exception {
 
         AllSkusResponseDto response = skuBackingService.getAllSkus();
@@ -45,7 +45,9 @@ public class SkuController {
 
     @GetMapping("/skus/{skuId}")
     @Operation(summary = "Find sku by ID", description = "This endpoint retrieves a sku by its ID.", tags = {"skus"})
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> findSku(@PathVariable("skuId") Long skuId) throws Exception {
 
         SkuResponseDto response = skuBackingService.getSkuById(skuId);
@@ -55,7 +57,9 @@ public class SkuController {
 
     @PostMapping("/skus")
     @Operation(summary = "Add a new sku", description = "This endpoint allows you to add a new sku to the system.", tags = {"skus"})
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Sku added successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Sku added successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> addSku(@RequestBody SkuDto sku) throws Exception {
 
         SkuResponseDto response = skuBackingService.addSku(sku);
@@ -65,7 +69,9 @@ public class SkuController {
 
     @RequestMapping(method = RequestMethod.PUT, value = "/skus")
     @Operation(summary = "Update an existing sku", description = "This endpoint allows you to update an existing sku in the system.", tags = {"skus"})
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Sku updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Sku updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> updateSku(@RequestBody SkuDto sku) throws Exception {
 
         Response response = this.skuBackingService.updateSku(sku);
@@ -75,7 +81,9 @@ public class SkuController {
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/skus/{skuId}")
     @Operation(summary = "Delete a sku", description = "This endpoint allows you to delete a sku from the system by its ID.", tags = {"skus"})
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Sku deleted successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Sku deleted successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> deleteSku(@PathVariable("skuId") Long skuId) throws Exception {
 
         this.skuBackingService.deleteSku(skuId);
@@ -85,7 +93,9 @@ public class SkuController {
 
     @PostMapping("/skus/{skuId}/tags/{tagId}")
     @Operation(summary = "Assign Tag to Sku", description = "This endpoint assigns Tag with tagId to Sku with skuId.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> assignTag(@PathVariable("skuId") Long skuId, @PathVariable("tagId") Long tagId) throws Exception {
 
         SkuResponseDto response = skuBackingService.assignTag(skuId, tagId);
@@ -95,7 +105,9 @@ public class SkuController {
 
     @DeleteMapping("/skus/{skuId}/tags/{tagId}")
     @Operation(summary = "Remove Tag From Sku", description = "This endpoint deletes Tag with tagId from Sku with skuId.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> removeTag(@PathVariable("skuId") Long skuId, @PathVariable("tagId") Long tagId) throws Exception {
 
         SuccessfulResponse response = skuBackingService.removeTag(skuId, tagId);
@@ -105,7 +117,9 @@ public class SkuController {
 
     @GetMapping("/skus/{skuId}/tags")
     @Operation(summary = "Fetch Sku Tags", description = "This endpoint fetches Tags assigned to Sku with skuId.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllTagsResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllTagsResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> assignTag(@PathVariable("skuId") Long skuId) throws Exception {
 
         AllTagsResponseDto response = skuBackingService.fetchSkuTags(skuId);
@@ -116,7 +130,9 @@ public class SkuController {
 
     @GetMapping("/skus/{skuId}/benefits")
     @Operation(summary = "Fetch Sku benefits", description = "This endpoint fetches benefits assigned to Sku with skuId.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllBenefitResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllBenefitResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> fetchSkuBenefits(@PathVariable("skuId") Long skuId) throws Exception {
 
         AllBenefitResponseDto response = skuBackingService.getSkuBenefits(skuId);
@@ -127,7 +143,9 @@ public class SkuController {
 
     @PostMapping("/skus/{skuId}/benefits")
     @Operation(summary = "Add Sku benefits", description = "This endpoint adds Benefits to Sku with skuId.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BenefitResponseDto.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BenefitResponseDto.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> addSkuBenefit(@PathVariable("skuId") Long skuId, @RequestBody BenefitDto benefit) throws Exception {
 
         BenefitResponseDto response = skuBackingService.addSkuBenefit(skuId, benefit);
@@ -138,7 +156,9 @@ public class SkuController {
 
     @DeleteMapping("/skus/{skuId}/benefits/{benefitId}")
     @Operation(summary = "Remove Sku Benefit", description = "This endpoint deletes Benefit with benefitId from Sku with skuId.")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class))), @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse"), @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")})
+    @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
+    @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
+    @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
     public ResponseEntity<Response> removeSkuBenefit(@PathVariable("skuId") Long skuId, @PathVariable("benefitId") Long benefitId) throws Exception {
 
         SuccessfulResponse response = skuBackingService.removeSkuBenefit(skuId, benefitId);
