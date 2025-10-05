@@ -1,6 +1,7 @@
 package com.apogee.product.entities;
 
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
@@ -12,6 +13,7 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,5 +55,9 @@ public abstract class ParentItemEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<TagEntity> tags;
+
+    @OneToMany(mappedBy = "parentItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ParentImageEntity> parentImages;
+
 
 }

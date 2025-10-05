@@ -1,13 +1,13 @@
-package com.apogee.product.models;
+package com.apogee.product.dtos.inputs;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
 
-@Setter
 @Getter
-public class Image {
+@Setter
+public class ImageDto {
 
     private Long id;
 
@@ -26,4 +26,5 @@ public class Image {
     private int sortOrder;
 
     private String type;
+
 }

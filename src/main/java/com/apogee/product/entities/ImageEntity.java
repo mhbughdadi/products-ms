@@ -1,15 +1,18 @@
 package com.apogee.product.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Setter
 @Getter
@@ -31,22 +34,9 @@ public class ImageEntity {
     @Column(name = "alt_text_ar")
     private String altTextAr;
 
-    @Column(name = "entity_type", nullable = false)
-    private String entityType;
+    @Column(name = "created_at")
+    private Date createdAt;
 
-    @Column(name = "entity_id", nullable = false)
-    private Long entityId;
-
-    @Column(name = "type")
-    private String type;
-
-    @Column(name = "sort_order")
-    private Integer sortOrder;
-
-    @Column(name = "is_active")
-    private Boolean isActive;
-
-    @Column(name = "uploaded_at")
-    private Date uploadedAt;
-
+    @OneToMany(mappedBy = "image", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ParentImageEntity> parentImages;
 }

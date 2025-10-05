@@ -1,8 +1,13 @@
 package com.apogee.product.services.impl;
 
 import com.apogee.product.entities.ImageEntity;
+import com.apogee.product.entities.ParentImageEntity;
+import com.apogee.product.entities.ParentImageId;
+import com.apogee.product.entities.ParentItemEntity;
 import com.apogee.product.models.Image;
 import com.apogee.product.repositories.ImageRepository;
+import com.apogee.product.repositories.ParentImageRepository;
+import com.apogee.product.repositories.ParentItemRepository;
 import com.apogee.product.services.ImageService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
+import static com.apogee.product.utilities.Mapper.map;
+import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Service
@@ -19,6 +26,12 @@ public class ImageServiceImpl implements ImageService {
 
     @Autowired
     private ImageRepository imageRepository;
+
+    @Autowired
+    private ParentImageRepository parentImageRepository;
+
+    @Autowired
+    private ParentItemRepository parentItemRepository;
 
     @Override
     public List<Image> findAllImages() throws Exception {
@@ -39,5 +52,125 @@ public class ImageServiceImpl implements ImageService {
 
         return transformCollection(savedEntities, Image.class);
     }
+
+    @Override
+    public Image findImageById(Long imageId) throws Exception {
+
+        ImageEntity imageEntity = imageRepository.findById(imageId).orElseThrow(() -> new Exception("Image not found with id: " + imageId));
+
+        return transform(imageEntity, Image.class, this::getImage);
+    }
+
+    @Override
+    public Image updateImage(Image image) throws Exception {
+
+        if (!imageRepository.existsById(image.getId())) {
+            throw new Exception("Image not found with id: " + image.getId());
+        }
+
+        ImageEntity updatedImage = imageRepository.save(map(image, ImageEntity.class));
+
+        return transform(updatedImage, Image.class, this::getImage);
+    }
+
+    @Override
+    public void deleteImageById(Long imageId) throws Exception {
+
+        if (!imageRepository.existsById(imageId)) {
+            throw new Exception("Image not found with id: " + imageId);
+        }
+
+        imageRepository.deleteById(imageId);
+    }
+
+    @Override
+    public Image saveImage(Image image) throws Exception {
+
+        if (imageRepository.existsById(image.getId())) {
+            throw new Exception("An Image found with the same id: " + image.getId());
+        }
+
+        ImageEntity updatedImage = imageRepository.save(map(image, ImageEntity.class));
+
+        return transform(updatedImage, Image.class, this::getImage);
+    }
+
+    @Override
+    public List<Image> findImagesByParentItemId(Long parentItemId) throws Exception {
+
+//        List<ParentImageEntity> parentImageEntities = parentImageRepository.findAllById_ParentItemId(parentItemId);
+        ParentItemEntity parentItem = parentItemRepository.findById(parentItemId).orElseThrow(() -> new Exception("Parent Item not found with id: " + parentItemId));
+
+        return transformCollection( parentItem.getParentImages(), Image.class, this::getParentImageDetails);
+//        return transformCollection( parentImageEntities, Image.class, this::getParentImageDetails);
+    }
+
+    @Override
+    public void deleteImagesByParentItemId(Long parentItemId) throws Exception {
+
+//        if(parentImageRepository.existsById_ParentItemId(parentItemId)){
+//            parentImageRepository.deleteAllById_ParentItemId(parentItemId);
+//        } else {
+//            throw new Exception("No Images found for the Parent Item id: " + parentItemId);
+//        }
+        ParentItemEntity parentItem = parentItemRepository.findById(parentItemId).orElseThrow(() -> new Exception("Parent Item not found with id: " + parentItemId));
+
+        if(parentItem.getParentImages() != null && !parentItem.getParentImages().isEmpty()){
+            parentImageRepository.deleteAll(parentItem.getParentImages());
+        } else {
+            throw new Exception("No Images found for the Parent Item id: " + parentItemId);
+        }
+
+    }
+
+    @Override
+    public Image addImageToParentItem(Long parentItemId, Image image) throws Exception {
+
+        ParentItemEntity parentItemEntity = parentItemRepository.findById(parentItemId).orElseThrow(() -> new Exception("Parent Item not found with id: " + parentItemId));
+        ImageEntity imageEntity = imageRepository.findById(image.getId()).orElseThrow(() -> new Exception("Image not found with id: " + image.getId()));
+
+        ParentImageEntity parentImageEntity = new ParentImageEntity();
+        parentImageEntity.setParentItem(parentItemEntity);
+        parentImageEntity.setImage(imageEntity);
+        parentImageEntity.setIsActive(image.isActive());
+        parentImageEntity.setSortOrder(image.getSortOrder());
+        parentImageEntity.setType(image.getType());
+
+        ParentImageEntity savedParentImage = parentImageRepository.save(parentImageEntity);
+
+
+        return transform(savedParentImage, Image.class, this::getParentImageDetails);
+    }
+
+    @Override
+    public void removeImageFromParentItem(Long parentItemId, Long imageId) throws Exception {
+
+        ParentImageId parentImageId = new ParentImageId(parentItemId, imageId);
+
+        if (parentImageRepository.existsById(parentImageId)) {
+            parentImageRepository.deleteById(parentImageId);
+        } else {
+            throw new Exception("No association found between Parent Item id: " + parentItemId + " and Image id: " + imageId);
+        }
+
+    }
+
+    private Image getImage(ImageEntity imageEntity, Image image) {
+
+        image.setId(imageEntity.getId());
+        image.setAssigned(imageEntity.getParentImages() != null && !imageEntity.getParentImages().isEmpty());
+
+        return image;
+    }
+
+    private Image getParentImageDetails(ParentImageEntity parentImageEntity, Image image) {
+
+        image.setActive(parentImageEntity.getIsActive());
+        image.setSortOrder(parentImageEntity.getSortOrder());
+        image.setType(parentImageEntity.getType());
+
+        return getImage(parentImageEntity.getImage(), image);
+    }
+
 
 }

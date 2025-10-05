@@ -3,7 +3,6 @@ package com.apogee.product.services;
 import com.apogee.product.models.Benefit;
 import com.apogee.product.models.Sku;
 import com.apogee.product.models.Tag;
-
 import java.util.List;
 
 public interface SkuService {
