@@ -73,7 +73,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Optional<CategoryEntity> categoryEntityOptional = this.categoryRepository.findById(categoryId);
         if (categoryEntityOptional.isPresent()) {
-            return Mapper.map(categoryEntityOptional.get(), Category.class);
+            return transform(categoryEntityOptional.get(), Category.class, this::getCategory);
         } else {
             throw new RecordNotFoundException("record.not.found", categoryId);
         }
