@@ -57,15 +57,13 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryEntity transientCategory = Mapper.map(category, CategoryEntity.class);
 
-        CategoryEntity savedCategory = categoryRepository.save(transientCategory);
-
         if (category.getParentId() != null) {
             CategoryEntity parentCategory = this.categoryRepository.findById(category.getParentId()).orElseThrow(() -> new RecordNotFoundException("record.not.found", category.getParentId()));
-            savedCategory.setParent(parentCategory);
+            transientCategory.setParent(parentCategory);
         }
-        this.categoryRepository.save(savedCategory);
+        CategoryEntity savedCategory = categoryRepository.save(transientCategory);
 
-        return Mapper.map(savedCategory, Category.class);
+        return transform(savedCategory, Category.class, this::getCategory);
     }
 
     @Override
@@ -88,7 +86,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         this.categoryRepository.deleteById(categoryId);
 
-        return Mapper.map(toBeDeletedEntity, Category.class);
+        return transform(toBeDeletedEntity, Category.class, this::getCategory);
     }
 
     @Override
@@ -96,14 +94,15 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryEntity updatedCurrency = this.categoryRepository.save(Mapper.map(category, CategoryEntity.class));
 
-        return Mapper.map(updatedCurrency, Category.class);
+        return transform(updatedCurrency, Category.class, this::getCategory);
     }
 
-    private Category addCategoryIdAndParentId(CategoryEntity categoryEntity, Category category) {
+    private Category addCategoryIdAndParentId(CategoryEntity categoryEntity, Category category) throws Exception {
 
         if (categoryEntity != null && category != null) {
             category.setId(categoryEntity.getId());
             category.setParentId(categoryEntity.getParent() != null ? categoryEntity.getParent().getId() : null);
+            category.setTags(transformCollection(categoryEntity.getTags(), Tag.class, this::getTag));
         }
 
         return category;
@@ -154,6 +153,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         model.setId(entity.getId());
         model.setTags(transformCollection(entity.getTags(), Tag.class, this::getTag));
+        if (entity.getParent() != null) {
+            model.setParentId(entity.getParent().getId());
+        }
         return model;
     }
 
