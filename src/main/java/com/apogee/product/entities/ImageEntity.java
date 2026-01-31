@@ -1,15 +1,18 @@
 package com.apogee.product.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
+import java.util.List;
 
 @Setter
 @Getter
@@ -19,16 +22,21 @@ public class ImageEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "image_id")
-    private Long imageId;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "url")
     private String url;
 
-    @Column(name = "base64")
-    private String base64;
+    @Column(name = "alt_text_en")
+    private String altTextEn;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", referencedColumnName = "product_id", insertable = false)
-    private ProductEntity product;
+    @Column(name = "alt_text_ar")
+    private String altTextAr;
+
+    @Column(name = "created_at")
+    private Date createdAt;
+
+    @OneToMany(mappedBy = "image", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ParentImageEntity> parentImages;
 }

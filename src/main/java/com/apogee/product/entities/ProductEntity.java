@@ -1,78 +1,107 @@
 package com.apogee.product.entities;
 
+import com.apogee.product.enums.ProductStatus;
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Setter
 @Getter
 @Entity
 @Table(name = "products")
-public class ProductEntity {
+@PrimaryKeyJoinColumn(name = "id")
+@DiscriminatorValue("product")
+public class ProductEntity extends ParentItemEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_id")
-    private Long productId;
-    @Column(name= "name")
-    private String name;
-    @Column(name= "name_ar")
+    @Column(name = "name_en")
+    private String nameEn;
+
+    @Column(name = "name_ar")
     private String nameAR;
-    @Column(name= "description")
-    private String description;
-    @Column(name= "description_ar")
+
+    @Column(name = "description_en")
+    private String descriptionEn;
+
+    @Column(name = "description_ar")
     private String descriptionAr;
-    @Column(name= "list_price")
-    private Double listPrice;
-    @Column(name= "vat")
-    private Boolean vat;
-    @Column(name= "short_description")
-    private String shortDescription;
-    @Column(name= "short_description_ar")
-    private String shortDescriptionAr;
 
-    @Column(name= "expiration_date")
-    private Date expirationDate;
-    @Column(name= "manufacturing_date")
-    private String manufacturingDate;
-    @Column(name= "sku")
-    private String sku;
-    @Column(name= "quantity")
-    private Long quantity;
-    @Column(name= "status")
-    private Boolean status;
-    @Column(name= "created_at")
-    private Date createdAt;
-    @Column(name= "updated_at")
-    private Date updatedAt;
+    @Column(name = "active")
+    private Boolean active;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "category_id", insertable = false, updatable = false)
-    private CategoryEntity category;
+    @Column(name = "brand")
+    private String brand;
 
-    @OneToOne
-    @JoinColumn(name = "price_id", referencedColumnName = "price_id", insertable = false)
-    private PriceEntity price;
+    @Column(name = "manufacturer_code")
+    private String manufacturerCode;
 
-    @OneToOne
-    @JoinColumn(name = "old_price_id", referencedColumnName = "price_id", insertable = false)
-    private PriceEntity oldPrice;
+    @Column(name = "warranty_info_en")
+    private String warrantyInfoEn;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    private List<ImageEntity> images;
+    @Column(name = "warranty_info_ar")
+    private String warrantyInfoAr;
+
+    @Column(name = "return_policy_ar")
+    private String returnPolicyAr;
+
+    @Column(name = "return_policy_en")
+    private String returnPolicyEn;
+
+    @Column(name = "available_from")
+    private Date availableFrom;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
+
+    @Column(name = "default_currency")
+    private String defaultCurrency;
+
+    @Column(name = "is_featured")
+    private Boolean featured;
+
+    @Column(name = "seo_title_en")
+    private String seoTitleEn;
+
+    @Column(name = "seo_title_ar")
+    private String seoTitleAr;
+
+    @Column(name = "seo_description_en")
+    private String seoDescriptionEn;
+
+    @Column(name = "seo_description_ar")
+    private String seoDescriptionAr;
+
+    @Column(name = "view_count")
+    private Integer viewCount;
+
+    @Column(name = "rating_avg")
+    private Double ratingAvg;
+
+    @Column(name = "review_count")
+    private Long reviewCount;
+
+    @Column(name = "code")
+    private String code;
+
+    @ManyToMany
+    @JoinTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<CategoryEntity> categories;
+
+    @OneToMany(mappedBy = "product")
+    List<SkuEntity> skus;
 
 }

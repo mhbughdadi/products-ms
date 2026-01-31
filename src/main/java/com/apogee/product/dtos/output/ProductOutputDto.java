@@ -1,5 +1,7 @@
 package com.apogee.product.dtos.output;
 
+import com.apogee.product.dtos.inputs.TagDto;
+import com.apogee.product.enums.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,13 +10,31 @@ import java.util.List;
 
 @Setter
 @Getter
-public class ProductOutputDto{
+public class ProductOutputDto {
 
-    private Long productId;
-    private String shortName;
-    private String longName;
-    private String description;
-    private Date productionDate;
-    private Date expireDate;
-    private List<ImageDto> images;
+    private Long id;
+    private String nameEn;
+    private String nameAR;
+    private String descriptionEn;
+    private String descriptionAr;
+    private Boolean active;
+    private String brand;
+    private String manufacturerCode;
+    private String warrantyInfoEn;
+    private String warrantyInfoAr;
+    private String returnPolicyAr;
+    private String returnPolicyEn;
+    private Date availableFrom;
+    private ProductStatus status;
+    private String defaultCurrency;
+    private Boolean featured;
+    private String seoTitleEn;
+    private String seoTitleAr;
+    private String seoDescriptionEn;
+    private String seoDescriptionAr;
+    private Integer viewCount;
+    private Double ratingAvg;
+    private Long reviewCount;
+    private String code;
+    private List<TagDto> tags;
 }

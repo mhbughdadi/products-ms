@@ -1,137 +1,182 @@
-# Microservices
-This repository contains basics to build robust micoroservices applicaiton, during this repository will try to demonestrate knowledge to be shared with whom consern.
-a lot of topics will be handled in this repository.
+# 🛍️ Products Microservice
 
-## Services:
- ### product micro-service :  
-  basic functionality of catalog service like:
-* add product and its information , images ,
-* reteive one product or all products,
-* delete product
-* in future will add sorting criteria and filters and categories to match the well-known ecommerce websites isA.
-### email micro-service :
-will be updated to be responsible to handle emails notification to customers.
-
-## Utilities
-### Mapper Mini Framework:
-it is a custome implemented mini framework to enable us from converting dto to entities and vsv.
-this mini frame work is implemented using Reflection API.
-it works without any cofigurations related to the destination Class. just you have to pass the Class of the destination class.
-
-### Spring Aspect Oriented Programming ( Spring AOP ): 
-I have integrted AOP to facilitate the prcess of logging and remove the poiler plate code and the not business code from our Controllers.
-
-### Logging ( log4j2 ) : 
-I have integrated with log4j2 as it is more secure than log4j.
-used socket appender to log to ELK.
-
-### Elastiksearch, Logstash and Kibana ( ELK ): 
-i have installed then locally, and will provide here the configurations and how to install locally: 
-and will share with you the logstash.conf file you can find it in the main folder of this project.
-
-### 🚀 Run ELK Environment
-
-#### 1. Elasticsearch  
-> **Powerful search engine that stores and queries data in JSON format**
+## 📖 Overview
+The **Products Microservice** is a core component of a modular **e-commerce platform**, responsible for managing **product data, categories, tags, SKUs, images, and related business logic**.  
+It exposes **RESTful APIs** for CRUD operations and advanced queries, supporting seamless integration with other microservices and external systems.
 
 ---
 
-##### 📖 What it is:
-A distributed, RESTful search and analytics engine.
+## 💼 Business Context
+This service enables:
 
-##### 🎯 Main job:
-Stores large amounts of data and enables fast search and analysis.
+- 🛒 **Product catalog management** (add, update, delete, search)
+- 🏷️ **Category and tag assignment**
+- 📦 **SKU and benefit management**
+- 🖼️ **Image handling** for products and parent items
+- ⚙️ **Extensible backing services** for custom business rules
 
-##### 🔑 Key points:
-- Data is stored as **JSON documents**.
-- Supports **full-text search**, **structured queries**, **metrics**, and **analytics**.
-- **Distributed architecture** — scales horizontally by adding more nodes.
-- **Extremely fast** — handles petabytes of data.
+---
 
-##### ▶️ How to start:
+## ⚙️ Prerequisites
+Before running the service, ensure you have the following installed:
+
+- **Java 21+**
+- **Maven 3.8+**
+- **MySQL 8+** (or compatible database)
+- **Docker** (for containerization)
+- **Docker Compose** (for multi-service orchestration)
+- **ELK Stack** (Elasticsearch, Logstash, Kibana) – for logging and monitoring
+- **SonarQube** *(optional)* – for code quality and static analysis
+
+---
+
+## 🧰 Tools & Frameworks Used
+
+| Tool | Description |
+|------|--------------|
+| **Spring Boot** | Main framework for REST APIs, dependency injection, and configuration |
+| **Maven** | Build automation and dependency management |
+| **Lombok** | Reduces boilerplate code for models and DTOs |
+| **Log4j2** | Advanced logging, configured via `log4j2.xml` |
+| **Swagger / OpenAPI** | API documentation and interactive testing |
+| **MySQL Connector/J** | JDBC driver for database connectivity |
+| **Mapper Mini-Framework (Dozer)** | Simplifies entity-to-DTO mapping |
+| **ELK Stack (Elasticsearch, Logstash, Kibana)** | Centralized logging and visualization |
+| **Docker / Docker Compose** | Containerization and orchestration |
+| **SonarQube** | Static code quality and coverage analysis |
+
+---
+
+## ⚙️ Configuration
+
+**Key configuration files:**
+
+| File                                   | Description                                 |
+|----------------------------------------|---------------------------------------------|
+| `application.properties` / `application-dev.properties` | Environment-specific settings (DB, logging, etc.) |
+| `log4j2.xml`                           | Logging configuration                       |
+| `pom.xml`                              | Build and dependency configuration          |
+
+---
+
+## 🚀 How to Run
+
+### 🧑‍💻 Local Development
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/<your-username>/products-microservice.git
+   cd products-microservice
+   ```
+2. **Configure your database** in `application.properties`
+3. **Build the project**
+   ```bash
+   mvn clean install
+   ```
+4. **Run the microservice**
+   ```bash
+   mvn spring-boot:run
+   ```
+
+Access Swagger UI at:
+👉 [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+---
+
+## 📦 ELK Integration
+
+- Ensure **Logstash** and **Elasticsearch** are running.
+- Configure **Log4j2** to send logs to Logstash (see `log4j2.xml`).
+- Use **Kibana** to visualize logs and application metrics.
+
+---
+
+## 🧩 Mapper Mini-Framework (Custom)
+
+This project provided a **custom Mapper utility** for object mapping between entities and DTOs. Key features:
+
+- **No configuration required:** Works out-of-the-box, no XML or annotations needed.
+- **Automatic caching:** Uses internal caches for constructors, fields, and enums for high performance.
+- **Callback support:** Allows you to provide custom mapping logic via callback functions.
+- **Supports collections and maps:** Handles nested collections and maps automatically.
+- **Type-safe and extensible:** Works with primitives, enums, complex types, and supports custom extensions.
+
+**Example usage:**
+```java
+// Simple mapping
+ProductDto dto = Mapper.map(productEntity, ProductDto.class);
+
+// Custom mapping with callback
+ProductDto dto = Utilities.transform(productEntity, ProductDto.class, (src, dest) -> {
+    // Custom logic here
+    dest.setCustomField(src.getSomeValue() + "_custom");
+    return dest;
+});
+```
+
+**Advantages over traditional mappers:**
+- No external dependencies or configuration files
+- Fast, thanks to caching
+- Flexible for advanced mapping scenarios
+
+For more details, see `src/main/java/com/apogee/product/utilities/Mapper.java` and `Utilities.java`.
+
+---
+
+## 📘 API Documentation
+
+The service uses **Swagger** annotations for API documentation.
+Access the interactive documentation at:
+👉 [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+---
+
+# 🔍 SonarQube Integration
+
+Static analysis can be run via **Maven** with **SonarQube** configured in your `pom.xml`.
+
+### 🧪 Example Command
 ```bash
-cd "C:\Tools\ELK\bin"
-elasticsearch.bat
+mvn clean verify sonar:sonar \
+  -Dsonar.projectKey=products-microservice \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.login=<your-token>
 ```
 
 ---
 
-#### 2. Logstash  
-> **Data processing pipeline that collects, transforms, and enriches data for Elasticsearch**
+## 🤝 Contribution
+
+1. **Fork** this repository.
+2. **Create a new branch** for your feature or fix:
+   ```bash
+   git checkout -b feature/your-feature
+   ```
+3. **Commit** your changes.
+4. **Submit a Pull Request**.
+
+**Please ensure:**
+- Code style follows existing conventions.
+- Tests are added for new features.
 
 ---
 
-##### 📖 What it is:
-A flexible data processing engine that ingests and transforms data from various sources.
+## 🆘 Support
 
-##### 🎯 Main job:
-Collects data, processes it (filtering, enriching, etc.), and sends it to Elasticsearch or other targets.
-
-##### 🔑 Key points:
-- Parses **logs, events, metrics**, and more.
-- Can **filter**, **mask sensitive data**, and **enrich** data.
-- Supports a wide variety of **input/output plugins** (files, databases, APIs, queues, etc.).
-- Think of it as:  
-  **Input → Filter → Output**
-
-##### ▶️ How to start:
-```bash
-cd "C:\Tools\ELK\logstash-8.17.2\bin"
-logstash.bat -f C:\Tools\ELK\logstash-8.17.2\logstash.conf
-```
+For issues or feature requests:
+- Open a **GitHub Issue**
+- Or contact the maintainer listed in `pom.xml`
 
 ---
 
-#### 3. Kibana  
-> **Visualization and dashboarding tool for Elasticsearch data**
+## 👨‍💻 Maintainer
+
+**Mohammed Hassan**  
+📧 mohammedhassan101994@gmail.com
+📧 mohammed_hassan2525@yahoo.com
+
+🔗 [LinkedIn](https://www.linkedin.com/in/mhbughdadi/) | [GitHub](https://github.com/mhbughdadi)
 
 ---
 
-##### 📖 What it is:
-A dashboarding and visualization platform that connects to Elasticsearch.
-
-##### 🎯 Main job:
-Allows users to explore, analyze, and visualize the data stored in Elasticsearch.
-
-##### 🔑 Key points:
-- Create **beautiful charts, tables, maps**, and **dashboards**.
-- Build **alerts**, **reports**, and even **machine learning models**.
-- Great for **business intelligence** and **real-time monitoring**.
-- Fetches and displays data directly from **Elasticsearch**.
-
-##### ▶️ How to start:
-```bash
-cd "C:\Tools\ELK\kibana-8.17.2\bin"
-kibana.bat
-```
-
----
-
-#### 📚 Quick Overview
-
-| Component    | Role                                                 | Start Command |
-|--------------|------------------------------------------------------|---------------|
-| Elasticsearch| Stores and searches JSON documents                   | `elasticsearch.bat` |
-| Logstash     | Collects, processes, and ships data                  | `logstash.bat -f logstash.conf` |
-| Kibana       | Visualizes data from Elasticsearch                   | `kibana.bat` |
-
----
-
-✅ Once all three services are running, open **Kibana** in your browser:  
-[http://localhost:5601](http://localhost:5601)
-
-
-## Topics touched here:
-all the following topics will be affected inside this reposatory. even if now or in future.
-
-* clean spring boot archtecture
-* using h2 In memory data base.
-* Spring JPA
-* Log4j confiugrations
-* ELK ( Elasticsearch, Logstash and Kibana)
-* will dockorize all the microservices
-* security
-* api gateway
-* services registery
-* more topics ......
-  
+> "Built with passion for scalable, modular, and maintainable microservice architecture."

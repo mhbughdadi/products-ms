@@ -1,0 +1,168 @@
+package com.apogee.product.services.impl;
+
+import com.apogee.product.entities.CategoryEntity;
+import com.apogee.product.entities.TagEntity;
+import com.apogee.product.exceptions.DBException;
+import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.models.Tag;
+import com.apogee.product.repositories.TagRepository;
+import com.apogee.product.utilities.Mapper;
+import com.apogee.product.models.Category;
+import com.apogee.product.repositories.CategoryRepository;
+import com.apogee.product.services.CategoryService;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.apogee.product.utilities.Utilities.transform;
+import static com.apogee.product.utilities.Utilities.transformCollection;
+
+@Service
+@Transactional
+public class CategoryServiceImpl implements CategoryService {
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
+
+
+    @Override
+    public List<Category> findAllCategories() throws Exception {
+
+        List<CategoryEntity> categoryEntities = categoryRepository.findAllRootCategoriesWithSubCategories();
+
+        if (!categoryEntities.isEmpty()) {
+            return transformCollection(categoryEntities, Category.class, ((categoryEntity, category) -> {
+                category = this.addCategoryIdAndParentId(categoryEntity, category);
+
+                category.setSubCategories(transformCollection(categoryEntity.getSubCategories(), Category.class, this::addCategoryIdAndParentId));
+
+                return category;
+            }));
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public Category addCategory(Category category) throws Exception {
+
+        CategoryEntity transientCategory = Mapper.map(category, CategoryEntity.class);
+
+        CategoryEntity savedCategory = categoryRepository.save(transientCategory);
+
+        if (category.getParentId() != null) {
+            CategoryEntity parentCategory = this.categoryRepository.findById(category.getParentId()).orElseThrow(() -> new RecordNotFoundException("record.not.found", category.getParentId()));
+            savedCategory.setParent(parentCategory);
+        }
+        this.categoryRepository.save(savedCategory);
+
+        return Mapper.map(savedCategory, Category.class);
+    }
+
+    @Override
+    public Category findCategoryByID(Long categoryId) throws Exception {
+
+        Optional<CategoryEntity> categoryEntityOptional = this.categoryRepository.findById(categoryId);
+        if (categoryEntityOptional.isPresent()) {
+            return transform(categoryEntityOptional.get(), Category.class, this::getCategory);
+        } else {
+            throw new RecordNotFoundException("record.not.found", categoryId);
+        }
+    }
+
+    @Override
+    public Category deleteCategoryById(Long categoryId) throws Exception {
+
+        Optional<CategoryEntity> categoryEntity = this.categoryRepository.findById(categoryId);
+
+        CategoryEntity toBeDeletedEntity = categoryEntity.orElseThrow(() -> new RecordNotFoundException("record.not.found", categoryId));
+
+        this.categoryRepository.deleteById(categoryId);
+
+        return Mapper.map(toBeDeletedEntity, Category.class);
+    }
+
+    @Override
+    public Category updateCategory(Category category) throws Exception {
+
+        CategoryEntity updatedCurrency = this.categoryRepository.save(Mapper.map(category, CategoryEntity.class));
+
+        return Mapper.map(updatedCurrency, Category.class);
+    }
+
+    private Category addCategoryIdAndParentId(CategoryEntity categoryEntity, Category category) {
+
+        if (categoryEntity != null && category != null) {
+            category.setId(categoryEntity.getId());
+            category.setParentId(categoryEntity.getParent() != null ? categoryEntity.getParent().getId() : null);
+        }
+
+        return category;
+    }
+
+
+    @Override
+    public Category assignTagToCategory(Long categoryId, Long tagId) throws Exception {
+
+        categoryRepository.findByIdAndTagsId(categoryId, tagId).ifPresent(existingAssignment -> {
+            throw new DBException("errors.duplicate.record", CategoryEntity.class, categoryId, tagId);
+        });
+
+        TagEntity tag = tagRepository.findById(tagId).orElseThrow(() -> new RecordNotFoundException("Tag not found", tagId));
+        CategoryEntity category = categoryRepository.findById(categoryId).orElseThrow(() -> new RecordNotFoundException("Product not found", categoryId));
+
+        category.getTags().add(tag);
+        category = categoryRepository.save(category);
+
+        return transform(category, Category.class, this::getCategory);
+    }
+
+    @Override
+    public List<Tag> getTagsForCategory(Long categoryId) throws Exception {
+
+        List<TagEntity> assignments = tagRepository.findByItemsId(categoryId);
+
+        return transformCollection(assignments, Tag.class, this::getTag);
+    }
+
+
+    @Override
+    public void removeTagFromCategory(Long categoryId, Long tagId) throws Exception {
+
+        CategoryEntity found = categoryRepository.findByIdAndTagsId(categoryId, tagId)
+                .orElseThrow(
+                        () -> new DBException("errors.categories.tags.not.found", CategoryEntity.class, categoryId, tagId)
+                );
+
+        found.setTags(found.getTags().stream()
+                .filter(t -> !t.getId().equals(tagId))
+                .collect(Collectors.toCollection(ArrayList::new)));
+
+        categoryRepository.save(found);
+    }
+
+    private Category getCategory(CategoryEntity entity, Category model) throws Exception {
+
+        model.setId(entity.getId());
+        model.setTags(transformCollection(entity.getTags(), Tag.class, this::getTag));
+        return model;
+    }
+
+    private Tag getTag(TagEntity tagEntity, Tag tag) {
+        tag.setId(tagEntity.getId());
+        tag.setName(tagEntity.getName());
+        tag.setDescription(tagEntity.getDescription());
+        tag.setDescriptionAr(tagEntity.getDescriptionAr());
+        return tag;
+    }
+
+}

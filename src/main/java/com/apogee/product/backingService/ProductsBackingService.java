@@ -1,9 +1,10 @@
 package com.apogee.product.backingService;
 
+import com.apogee.product.dtos.inputs.TagDto;
 import com.apogee.product.dtos.output.*;
-import com.apogee.product.mappings.Mapper;
+import com.apogee.product.models.Tag;
+import com.apogee.product.utilities.Mapper;
 import com.apogee.product.dtos.inputs.ProductDto;
-import com.apogee.product.models.Image;
 import com.apogee.product.models.Product;
 import com.apogee.product.services.CurrencyService;
 import com.apogee.product.services.ImageService;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Service
 public class ProductsBackingService {
@@ -26,15 +29,11 @@ public class ProductsBackingService {
     @Autowired
     private CurrencyService currencyService;
 
-    @Autowired
-    private Mapper mapper;
-
-
     public AllProductsResponseDto getAllProducts() throws Exception {
 
         AllProductsResponseDto response = new AllProductsResponseDto();
 
-        List<ProductOutputDto> allProducts = Utilities.transformCollection(productService.findAllProducts(), (product) -> mapper.map(product, ProductOutputDto.class));
+        List<ProductOutputDto> allProducts = Utilities.transformCollection(productService.findAllProducts(), ProductOutputDto.class);
         response.setProducts(allProducts);
 
         return response;
@@ -44,17 +43,9 @@ public class ProductsBackingService {
 
         AddProductResponseDto response = new AddProductResponseDto();
 
-        Product product = mapper.map(productDto, Product.class);
+        Product product = Mapper.map(productDto, Product.class);
         Product savedProduct = productService.addProduct(product);
-
-        if (savedProduct != null && product.getImages() != null && !product.getImages().isEmpty()) {
-
-            product.getImages().forEach(image -> image.setProduct(savedProduct));
-            List<Image> savedImages = this.imageService.saveImages(product.getImages());
-            savedProduct.setImages(savedImages);
-        }
-
-        response.setProduct(mapper.map(savedProduct, ProductOutputDto.class));
+        response.setProduct(Mapper.map(savedProduct, ProductOutputDto.class));
 
         return response;
     }
@@ -64,7 +55,7 @@ public class ProductsBackingService {
         FindProductResponseDto response = new FindProductResponseDto();
 
         Product product = productService.findProductById(productId);
-        response.setProduct(mapper.map(product, ProductOutputDto.class));
+        response.setProduct(Mapper.map(product, ProductOutputDto.class));
 
         return response;
     }
@@ -74,10 +65,46 @@ public class ProductsBackingService {
         this.productService.deleteProductById(productId);
     }
 
-    public Response updateProduct(Object product) {
+    public AddProductResponseDto updateProduct(ProductDto product) throws Exception {
 
-        return new FailureResponse(
-                "product.error.method.not.implemented",
-                "product.error.method.not.implemented");
+        AddProductResponseDto response = new AddProductResponseDto();
+
+        Product updatedProduct = this.productService.updateProduct(Mapper.map(product, Product.class));
+        response.setProduct(Mapper.map(updatedProduct, ProductOutputDto.class));
+
+        return response;
     }
+
+    public AddProductResponseDto assignTag(Long productId, Long tagId) throws Exception {
+
+        AddProductResponseDto response = new AddProductResponseDto();
+
+        Product product = this.productService.assignTagToProduct(productId, tagId);
+
+        response.setProduct(Mapper.map(product, ProductOutputDto.class));
+
+        return response;
+    }
+
+    public SuccessfulResponse removeTag(Long productId, Long tagId) throws Exception {
+
+        SuccessfulResponse response = new SuccessfulResponse();
+
+        this.productService.removeTagFromProduct(productId, tagId);
+
+        return response;
+    }
+
+    public AllTagsResponseDto fetchProductTags(Long productId) throws Exception {
+
+        AllTagsResponseDto response = new AllTagsResponseDto();
+
+        List<Tag> categoryTags = this.productService.getTagsForProduct(productId);
+
+        response.setTags(transformCollection(categoryTags, TagDto.class));
+
+        return response;
+    }
+
+
 }
