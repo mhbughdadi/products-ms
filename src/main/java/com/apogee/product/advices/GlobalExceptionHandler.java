@@ -19,9 +19,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RecordNotFoundException.class)
     public ResponseEntity<FailureResponse> handleResourceNotFound(RecordNotFoundException ex) {
 
-        FailureResponse errorResponse = new FailureResponse(
-                this.getMessageFromBundle(ex.getMessage(), Locale.ENGLISH, ex.getRecordId().toString()),
-                this.getMessageFromBundle(ex.getMessage(), Locale.of("ar"), ex.getRecordId().toString()));
+        FailureResponse errorResponse = new FailureResponse();
+        if(ex.getRecordId() != null ){
+            errorResponse = new FailureResponse(
+                    this.getMessageFromBundle(ex.getMessage(), Locale.ENGLISH, ex.getRecordId().toString()),
+                    this.getMessageFromBundle(ex.getMessage(), Locale.of("ar"), ex.getRecordId().toString()));
+
+        }
+        if(ex.getRecordIds() != null && ex.getRecordIds().length > 0){
+            errorResponse = new FailureResponse(
+                    this.getMessageFromBundle(ex.getMessage(), Locale.ENGLISH, toObjectArray(ex.getRecordIds())),
+                    this.getMessageFromBundle(ex.getMessage(), Locale.forLanguageTag("ar"), toObjectArray(ex.getRecordIds())));
+        }
 
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }

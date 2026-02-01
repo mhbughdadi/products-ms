@@ -4,6 +4,7 @@ import com.apogee.product.entities.ImageEntity;
 import com.apogee.product.entities.ParentImageEntity;
 import com.apogee.product.entities.ParentImageId;
 import com.apogee.product.entities.ParentItemEntity;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Image;
 import com.apogee.product.repositories.ImageRepository;
 import com.apogee.product.repositories.ParentImageRepository;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
+import static com.apogee.product.constants.ProductsConstant.PRODUCT_IMAGE_NOT_FOUND;
+import static com.apogee.product.constants.ProductsConstant.RECORD_NOT_FOUND;
 import static com.apogee.product.utilities.Mapper.map;
 import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
@@ -56,7 +59,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public Image findImageById(Long imageId) throws Exception {
 
-        ImageEntity imageEntity = imageRepository.findById(imageId).orElseThrow(() -> new Exception("Image not found with id: " + imageId));
+        ImageEntity imageEntity = imageRepository.findById(imageId).orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, imageId));
 
         return transform(imageEntity, Image.class, this::getImage);
     }
@@ -65,7 +68,7 @@ public class ImageServiceImpl implements ImageService {
     public Image updateImage(Image image) throws Exception {
 
         if (!imageRepository.existsById(image.getId())) {
-            throw new Exception("Image not found with id: " + image.getId());
+            throw new RecordNotFoundException(RECORD_NOT_FOUND, image.getId());
         }
 
         ImageEntity updatedImage = imageRepository.save(map(image, ImageEntity.class));
@@ -77,7 +80,7 @@ public class ImageServiceImpl implements ImageService {
     public void deleteImageById(Long imageId) throws Exception {
 
         if (!imageRepository.existsById(imageId)) {
-            throw new Exception("Image not found with id: " + imageId);
+            throw new RecordNotFoundException(RECORD_NOT_FOUND, imageId);
         }
 
         imageRepository.deleteById(imageId);
@@ -87,7 +90,7 @@ public class ImageServiceImpl implements ImageService {
     public Image saveImage(Image image) throws Exception {
 
         if (imageRepository.existsById(image.getId())) {
-            throw new Exception("An Image found with the same id: " + image.getId());
+            throw new RecordNotFoundException(RECORD_NOT_FOUND, image.getId());
         }
 
         ImageEntity updatedImage = imageRepository.save(map(image, ImageEntity.class));
@@ -98,27 +101,20 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public List<Image> findImagesByParentItemId(Long parentItemId) throws Exception {
 
-//        List<ParentImageEntity> parentImageEntities = parentImageRepository.findAllById_ParentItemId(parentItemId);
-        ParentItemEntity parentItem = parentItemRepository.findById(parentItemId).orElseThrow(() -> new Exception("Parent Item not found with id: " + parentItemId));
+        ParentItemEntity parentItem = parentItemRepository.findById(parentItemId).orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, parentItemId));
 
-        return transformCollection( parentItem.getParentImages(), Image.class, this::getParentImageDetails);
-//        return transformCollection( parentImageEntities, Image.class, this::getParentImageDetails);
+        return transformCollection(parentItem.getParentImages(), Image.class, this::getParentImageDetails);
     }
 
     @Override
     public void deleteImagesByParentItemId(Long parentItemId) throws Exception {
 
-//        if(parentImageRepository.existsById_ParentItemId(parentItemId)){
-//            parentImageRepository.deleteAllById_ParentItemId(parentItemId);
-//        } else {
-//            throw new Exception("No Images found for the Parent Item id: " + parentItemId);
-//        }
-        ParentItemEntity parentItem = parentItemRepository.findById(parentItemId).orElseThrow(() -> new Exception("Parent Item not found with id: " + parentItemId));
+        ParentItemEntity parentItem = parentItemRepository.findById(parentItemId).orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, parentItemId));
 
-        if(parentItem.getParentImages() != null && !parentItem.getParentImages().isEmpty()){
+        if (parentItem.getParentImages() != null && !parentItem.getParentImages().isEmpty()) {
             parentImageRepository.deleteAll(parentItem.getParentImages());
         } else {
-            throw new Exception("No Images found for the Parent Item id: " + parentItemId);
+            throw new RecordNotFoundException(RECORD_NOT_FOUND, parentItemId);
         }
 
     }
@@ -126,8 +122,8 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public Image addImageToParentItem(Long parentItemId, Image image) throws Exception {
 
-        ParentItemEntity parentItemEntity = parentItemRepository.findById(parentItemId).orElseThrow(() -> new Exception("Parent Item not found with id: " + parentItemId));
-        ImageEntity imageEntity = imageRepository.findById(image.getId()).orElseThrow(() -> new Exception("Image not found with id: " + image.getId()));
+        ParentItemEntity parentItemEntity = parentItemRepository.findById(parentItemId).orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, parentItemId));
+        ImageEntity imageEntity = imageRepository.findById(image.getId()).orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, parentItemId));
 
         ParentImageEntity parentImageEntity = new ParentImageEntity();
         parentImageEntity.setParentItem(parentItemEntity);
@@ -150,7 +146,7 @@ public class ImageServiceImpl implements ImageService {
         if (parentImageRepository.existsById(parentImageId)) {
             parentImageRepository.deleteById(parentImageId);
         } else {
-            throw new Exception("No association found between Parent Item id: " + parentItemId + " and Image id: " + imageId);
+            throw new RecordNotFoundException(PRODUCT_IMAGE_NOT_FOUND, parentItemId, imageId);
         }
 
     }

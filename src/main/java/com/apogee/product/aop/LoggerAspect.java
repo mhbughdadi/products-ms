@@ -1,5 +1,6 @@
 package com.apogee.product.aop;
 
+import com.apogee.product.constants.ProductsConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,6 +21,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import static com.apogee.product.constants.ProductsConstant.NULL_STRING;
 import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 
 @Aspect
@@ -55,18 +57,19 @@ public class LoggerAspect {
 
     private void logRequestDetails(JoinPoint joinPoint, HttpServletRequest request, Object response, String requestId) {
 
-        MapMessage<StringMapMessage, String> mapMessage = new StringMapMessage();
+       MapMessage<StringMapMessage, String> mapMessage = new StringMapMessage();
         Date now = new Date();
 
-        mapMessage.put("url", request.getRequestURL().toString());
-        mapMessage.put("httpMethod", request.getMethod());
-        mapMessage.put("queryParams", formatAsJsonObject(getQueryParams(request)));
-        mapMessage.put("requestBody", getRequestBody(joinPoint) != null ? getRequestBody(joinPoint) : "null");
-        mapMessage.put("timestamp", now.toString());
-        mapMessage.put("pathVariables", getPathVariables(joinPoint));
-        mapMessage.put("headers", formatAsJsonObject(getHeaders(request)));
-        mapMessage.put("requestId", requestId != null ? requestId : "null");
-        mapMessage.put("responseBody", response != null ? formatAsJsonObject(response) : "null");
+        mapMessage.put(ProductsConstant.URL, request.getRequestURL().toString());
+        mapMessage.put(ProductsConstant.HTTP_METHOD, request.getMethod());
+        mapMessage.put(ProductsConstant.QUERY_PARAMS, formatAsJsonObject(getQueryParams(request)));
+        String requestBody = getRequestBody(joinPoint);
+        mapMessage.put(ProductsConstant.REQUEST_BODY, requestBody != null ? requestBody : NULL_STRING);
+        mapMessage.put(ProductsConstant.TIMESTAMP, now.toString());
+        mapMessage.put(ProductsConstant.PATH_VARIABLES, getPathVariables(joinPoint));
+        mapMessage.put(ProductsConstant.HEADERS, formatAsJsonObject(getHeaders(request)));
+        mapMessage.put(ProductsConstant.REQUEST_ID, requestId != null ? requestId : NULL_STRING);
+        mapMessage.put(ProductsConstant.RESPONSE_BODY, response != null ? formatAsJsonObject(response) : NULL_STRING);
 
         logger.debug(mapMessage);
     }
@@ -86,10 +89,10 @@ public class LoggerAspect {
 
         for (int i = 0; i < args.length; i++) {
             for (Annotation annotation : parameterAnnotations[i]) {
-                if (annotation instanceof PathVariable) {
-                    String pathVariableName = ((PathVariable) annotation).value();
+                if (annotation instanceof PathVariable annotationPathVariable) {
+                    String pathVariableName = annotationPathVariable.value();
                     // Use parameter name if @PathVariable name is empty
-                    if (pathVariableName.isEmpty()) {
+                    if (pathVariableName.isBlank()) {
                         pathVariableName = parameterNames[i];
                     }
                     pathVariables.put(pathVariableName, args[i]);

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.apogee.product.constants.ProductsConstant.RECORD_NOT_FOUND;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Transactional
@@ -39,7 +40,7 @@ public class CurrencyServiceImpl implements CurrencyService {
 
         Optional<CurrencyEntity> currencyOpt = this.currencyRepository.findById(currencyId);
 
-        CurrencyEntity foundCurrencyEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException("record.not.found", currencyId));
+        CurrencyEntity foundCurrencyEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, currencyId));
 
         return Mapper.map(foundCurrencyEntity, Currency.class);
     }
@@ -65,7 +66,7 @@ public class CurrencyServiceImpl implements CurrencyService {
 
         Optional<CurrencyEntity> currencyOpt = this.currencyRepository.findById(currencyId);
 
-        CurrencyEntity toBeDeletedEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException("record.not.found", currencyId));
+        CurrencyEntity toBeDeletedEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, currencyId));
 
         this.currencyRepository.deleteById(currencyId);
 

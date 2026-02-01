@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.apogee.product.constants.ProductsConstant.RECORD_NOT_FOUND;
 import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
@@ -58,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
         CategoryEntity transientCategory = Mapper.map(category, CategoryEntity.class);
 
         if (category.getParentId() != null) {
-            CategoryEntity parentCategory = this.categoryRepository.findById(category.getParentId()).orElseThrow(() -> new RecordNotFoundException("record.not.found", category.getParentId()));
+            CategoryEntity parentCategory = this.categoryRepository.findById(category.getParentId()).orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, category.getParentId()));
             transientCategory.setParent(parentCategory);
         }
         CategoryEntity savedCategory = categoryRepository.save(transientCategory);
@@ -73,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryEntityOptional.isPresent()) {
             return transform(categoryEntityOptional.get(), Category.class, this::getCategory);
         } else {
-            throw new RecordNotFoundException("record.not.found", categoryId);
+            throw new RecordNotFoundException(RECORD_NOT_FOUND, categoryId);
         }
     }
 
@@ -82,7 +83,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Optional<CategoryEntity> categoryEntity = this.categoryRepository.findById(categoryId);
 
-        CategoryEntity toBeDeletedEntity = categoryEntity.orElseThrow(() -> new RecordNotFoundException("record.not.found", categoryId));
+        CategoryEntity toBeDeletedEntity = categoryEntity.orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, categoryId));
 
         this.categoryRepository.deleteById(categoryId);
 

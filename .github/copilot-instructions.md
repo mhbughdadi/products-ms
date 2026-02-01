@@ -34,7 +34,7 @@ Purpose: Short, actionable notes to help an AI agent contribute safely and produ
   - Caches constructors/fields for performance.
   - **Important:** adding a new field requires updates on both sides (DTO/model/entity) because unmatched fields are silently ignored.
 - Utilities: prefer `Utilities.transformCollection` / `Utilities.transform` helpers for collection mapping and applying complementary functions (see `Utilities.java`). Note there is a deprecated overload — prefer the non-deprecated variants.
-- Error handling / i18n: prefer throwing `RecordNotFoundException` or `DBException` with i18n keys (e.g. `throw new RecordNotFoundException("record.not.found", id)`) so `GlobalExceptionHandler` can create localized `FailureResponse` from `errors_*.properties`. Be aware some services use literal messages (e.g., `"Tag not found"` in `ProductServiceImpl`) — new code should use i18n keys and add strings to `errors_en.properties` and `errors_ar.properties`.
+- Error handling / i18n: prefer throwing `RecordNotFoundException` or `DBException` with i18n keys (e.g. `throw new RecordNotFoundException(RECORD_NOT_FOUND, id)`) so `GlobalExceptionHandler` can create localized `FailureResponse` from `errors_*.properties`. Be aware some services use literal messages (e.g., `"Tag not found"` in `ProductServiceImpl`) — new code should use i18n keys and add strings to `errors_en.properties` and `errors_ar.properties`.
 - AOP logging: `LoggerAspect` sets a `requestId` attribute and constructs request/response logs using `@PathVariable` and `@RequestBody` annotations. Keep controller method parameter annotations intact to preserve logging details and `requestId` behavior.
 - Transactions: Service implementations are typically `@Transactional` — maintain transaction boundaries in services, not controllers or backing services.
 - Unit testing patterns (recommended):
@@ -55,7 +55,7 @@ Purpose: Short, actionable notes to help an AI agent contribute safely and produ
 
 ## Example snippets (reference patterns)
 - Controller → backing service pattern: `ProductController` delegates to `ProductsBackingService` and returns `ResponseEntity<FindProductResponseDto>`.
-- Throwing a not-found error from service: `throw new RecordNotFoundException("record.not.found", productId);` (ensure `errors_*.properties` contains the key).
+- Throwing a not-found error from service: `throw new RecordNotFoundException(RECORD_NOT_FOUND, productId);` (ensure `errors_*.properties` contains the key).
 - Map entity to model with complementary properties: `Utilities.transformCollection(productEntities, Product.class, this::getProduct)` (see `ProductServiceImpl#getProduct`).
 
 ## Where to look first (quick navigation)

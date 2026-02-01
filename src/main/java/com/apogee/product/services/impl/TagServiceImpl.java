@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.apogee.product.constants.ProductsConstant.RECORD_NOT_FOUND;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Service
@@ -37,7 +38,7 @@ public class TagServiceImpl implements TagService {
         if (tagEntityOptional.isPresent()) {
             return Mapper.map(tagEntityOptional.get(), Tag.class);
         } else {
-            throw new RecordNotFoundException("record.not.found", tagId);
+            throw new RecordNotFoundException(RECORD_NOT_FOUND, tagId);
         }
     }
 
@@ -59,7 +60,7 @@ public class TagServiceImpl implements TagService {
     public Tag updateTag(Tag tag) throws Exception {
 
         if (tag.getId() == null || !tagRepository.existsById(tag.getId())) {
-            throw new RecordNotFoundException("record.not.found", tag.getId());
+            throw new RecordNotFoundException(RECORD_NOT_FOUND, tag.getId());
         }
 
         TagEntity updatedTag = tagRepository.save(Mapper.map(tag, TagEntity.class));
@@ -71,7 +72,7 @@ public class TagServiceImpl implements TagService {
     public Tag deleteTag(Long tagId) throws Exception {
 
         Optional<TagEntity> tagEntity = tagRepository.findById(tagId);
-        TagEntity toBeDeletedEntity = tagEntity.orElseThrow(() -> new RecordNotFoundException("record.not.found", tagId));
+        TagEntity toBeDeletedEntity = tagEntity.orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, tagId));
 
         tagRepository.deleteById(tagId);
 

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.apogee.product.constants.ProductsConstant.RECORD_NOT_FOUND;
 import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
@@ -75,7 +76,7 @@ public class SkuServiceImpl implements SkuService {
     public Sku updateSku(Sku sku) throws Exception {
 
         if (!this.skuRepository.existsById(sku.getId()) || sku.getProductId() == null) {
-            throw new RecordNotFoundException("record.not.found", sku.getId());
+            throw new RecordNotFoundException(RECORD_NOT_FOUND, sku.getId());
         }
 
         SkuEntity skuEntity = transform(sku, SkuEntity.class, this::setSkuId);
@@ -88,7 +89,7 @@ public class SkuServiceImpl implements SkuService {
 
         Optional<SkuEntity> skuEntityOptional = this.skuRepository.findById(skuId);
 
-        return transform(skuEntityOptional.orElseThrow(() -> new RecordNotFoundException("record.not.found", skuId)), Sku.class, this::getSku);
+        return transform(skuEntityOptional.orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, skuId)), Sku.class, this::getSku);
     }
 
     @Override
@@ -99,7 +100,7 @@ public class SkuServiceImpl implements SkuService {
             this.benefitRepository.deleteBySkuId(skuId);
             this.skuRepository.deleteById(skuId);
         } else {
-            throw new RecordNotFoundException("record.not.found", skuId);
+            throw new RecordNotFoundException(RECORD_NOT_FOUND, skuId);
         }
     }
 

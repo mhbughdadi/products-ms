@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.apogee.product.constants.ProductsConstant.RECORD_NOT_FOUND;
 import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
@@ -65,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
 
             return transform(this.productRepository.save(productEntity), Product.class, this::getProduct);
         } else {
-            throw new RecordNotFoundException("record.not.found", product.getId());
+            throw new RecordNotFoundException(RECORD_NOT_FOUND, product.getId());
         }
     }
 
@@ -74,7 +75,7 @@ public class ProductServiceImpl implements ProductService {
 
         Optional<ProductEntity> productEntityOptional = this.productRepository.findById(productId);
 
-        return transform(productEntityOptional.orElseThrow(() -> new RecordNotFoundException("record.not.found", productId)), Product.class, this::getProduct);
+        return transform(productEntityOptional.orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, productId)), Product.class, this::getProduct);
     }
 
     @Override
@@ -84,7 +85,7 @@ public class ProductServiceImpl implements ProductService {
 
             this.productRepository.deleteById(productId);
         } else {
-            throw new RecordNotFoundException("record.not.found", productId);
+            throw new RecordNotFoundException(RECORD_NOT_FOUND, productId);
         }
     }
 
