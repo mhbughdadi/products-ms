@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ImageServiceImplTest {
+class ImageServiceImplTest {
 
     @Mock
     private ImageRepository imageRepository;
@@ -56,7 +56,7 @@ public class ImageServiceImplTest {
     }
 
     @Test
-    public void findAllImages_returnsListOrEmpty() throws Exception {
+    void findAllImages_returnsListOrEmpty() throws Exception {
         ImageEntity e = buildImageEntity(1L);
         when(imageRepository.findAll()).thenReturn(List.of(e));
 
@@ -70,7 +70,7 @@ public class ImageServiceImplTest {
     }
 
     @Test
-    public void saveImages_savesAndReturns() throws Exception {
+    void saveImages_savesAndReturns() throws Exception {
         Image img = new Image();
         img.setId(5L);
         List<Image> imgs = List.of(img);
@@ -84,7 +84,7 @@ public class ImageServiceImplTest {
     }
 
     @Test
-    public void findImageById_returnsWhenFound() throws Exception {
+    void findImageById_returnsWhenFound() throws Exception {
         ImageEntity e = new ImageEntity();
         e.setId(9L);
         when(imageRepository.findById(9L)).thenReturn(Optional.of(e));
@@ -95,13 +95,13 @@ public class ImageServiceImplTest {
     }
 
     @Test
-    public void findImageById_throwsWhenNotFound() {
+    void findImageById_throwsWhenNotFound() {
         when(imageRepository.findById(99L)).thenReturn(Optional.empty());
         assertThrows(Exception.class, () -> imageService.findImageById(99L));
     }
 
     @Test
-    public void updateImage_throwsWhenNotExists() {
+    void updateImage_throwsWhenNotExists() {
         Image i = new Image();
         i.setId(4L);
         when(imageRepository.existsById(4L)).thenReturn(false);
@@ -109,13 +109,13 @@ public class ImageServiceImplTest {
     }
 
     @Test
-    public void deleteImageById_throwsWhenNotExists() {
+    void deleteImageById_throwsWhenNotExists() {
         when(imageRepository.existsById(20L)).thenReturn(false);
         assertThrows(Exception.class, () -> imageService.deleteImageById(20L));
     }
 
     @Test
-    public void saveImage_throwsWhenExists() {
+    void saveImage_throwsWhenExists() {
         Image i = new Image();
         i.setId(6L);
         when(imageRepository.existsById(6L)).thenReturn(true);
@@ -123,7 +123,7 @@ public class ImageServiceImplTest {
     }
 
     @Test
-    public void findImagesByParentItemId_returnsWhenParentExists() throws Exception {
+    void findImagesByParentItemId_returnsWhenParentExists() throws Exception {
         ProductEntity parent = new ProductEntity();
         parent.setId(2L);
         ParentImageEntity pi = new ParentImageEntity();
@@ -143,7 +143,7 @@ public class ImageServiceImplTest {
     }
 
     @Test
-    public void deleteImagesByParentItemId_throwsWhenParentHasNoImages() {
+    void deleteImagesByParentItemId_throwsWhenParentHasNoImages() {
         ProductEntity parent = new ProductEntity();
         parent.setId(3L);
         parent.setParentImages(new ArrayList<>());
@@ -153,7 +153,7 @@ public class ImageServiceImplTest {
     }
 
     @Test
-    public void addImageToParentItem_savesAssociation() throws Exception {
+    void addImageToParentItem_savesAssociation() throws Exception {
         ProductEntity parent = new ProductEntity();
         parent.setId(4L);
         when(parentItemRepository.findById(4L)).thenReturn(Optional.of(parent));
@@ -178,7 +178,7 @@ public class ImageServiceImplTest {
     }
 
     @Test
-    public void removeImageFromParentItem_throwsWhenNotExists() {
+    void removeImageFromParentItem_throwsWhenNotExists() {
         when(parentImageRepository.existsById(any())).thenReturn(false);
         assertThrows(Exception.class, () -> imageService.removeImageFromParentItem(5L, 6L));
     }

@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class SkuServiceImplTest {
+class SkuServiceImplTest {
 
     @Mock
     private SkuRepository skuRepository;
@@ -73,11 +73,11 @@ public class SkuServiceImplTest {
     }
 
     @BeforeEach
-    public void setup() {
+    void setup() {
     }
 
     @Test
-    public void findAllSkus_returnsMappedList_whenExists() throws Exception {
+    void findAllSkus_returnsMappedList_whenExists() throws Exception {
         List<SkuEntity> list = new ArrayList<>();
         list.add(buildSkuEntity(1L));
         when(skuRepository.findAll()).thenReturn(list);
@@ -88,7 +88,7 @@ public class SkuServiceImplTest {
     }
 
     @Test
-    public void addSku_requiresProductExists() {
+    void addSku_requiresProductExists() {
         Sku s = new Sku();
         s.setProductId(9L);
 
@@ -98,7 +98,7 @@ public class SkuServiceImplTest {
     }
 
     @Test
-    public void addSku_savesWhenProductExists() throws Exception {
+    void addSku_savesWhenProductExists() throws Exception {
         Sku s = new Sku();
         s.setProductId(1L);
         SkuEntity saved = buildSkuEntity(10L);
@@ -112,7 +112,7 @@ public class SkuServiceImplTest {
     }
 
     @Test
-    public void updateSku_throwsWhenNotExistsOrNoProduct() {
+    void updateSku_throwsWhenNotExistsOrNoProduct() {
         Sku s = new Sku();
         s.setId(5L);
         s.setProductId(null);
@@ -123,7 +123,7 @@ public class SkuServiceImplTest {
     }
 
     @Test
-    public void findSkuById_returnsWhenFound() throws Exception {
+    void findSkuById_returnsWhenFound() throws Exception {
         SkuEntity e = buildSkuEntity(7L);
         when(skuRepository.findById(7L)).thenReturn(Optional.of(e));
 
@@ -133,7 +133,7 @@ public class SkuServiceImplTest {
     }
 
     @Test
-    public void deleteSkuById_deletesWhenExists() throws Exception {
+    void deleteSkuById_deletesWhenExists() throws Exception {
         when(skuRepository.existsById(3L)).thenReturn(true);
 
         skuService.deleteSkuById(3L);
@@ -143,20 +143,20 @@ public class SkuServiceImplTest {
     }
 
     @Test
-    public void deleteSkuById_throwsWhenNotExists() {
+    void deleteSkuById_throwsWhenNotExists() {
         when(skuRepository.existsById(33L)).thenReturn(false);
         assertThrows(RecordNotFoundException.class, () -> skuService.deleteSkuById(33L));
     }
 
     @Test
-    public void addBenefitToSku_requiresSku() {
+    void addBenefitToSku_requiresSku() {
         Benefit b = new Benefit();
         when(skuRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(RecordNotFoundException.class, () -> skuService.addBenefitToSku(1L, b));
     }
 
     @Test
-    public void addBenefitToSku_savesBenefit() throws Exception {
+    void addBenefitToSku_savesBenefit() throws Exception {
         Benefit b = new Benefit();
         b.setKeyEn("B");
         SkuEntity sku = buildSkuEntity(1L);
@@ -168,7 +168,7 @@ public class SkuServiceImplTest {
     }
 
     @Test
-    public void getSkuBenefits_returnsList() throws Exception {
+    void getSkuBenefits_returnsList() throws Exception {
         BenefitEntity be = buildBenefitEntity(8L, 2L);
         when(benefitRepository.findBySkuId(2L)).thenReturn(List.of(be));
 
@@ -177,19 +177,19 @@ public class SkuServiceImplTest {
     }
 
     @Test
-    public void removeBenefitFromSku_throwsWhenNotFound() {
+    void removeBenefitFromSku_throwsWhenNotFound() {
         when(skuRepository.findByIdAndBenefitsId(1L, 99L)).thenReturn(Optional.empty());
         assertThrows(DBException.class, () -> skuService.removeBenefitFromSku(1L, 99L));
     }
 
     @Test
-    public void assignTagToSku_throwsWhenDuplicate() {
+    void assignTagToSku_throwsWhenDuplicate() {
         when(skuRepository.findByIdAndTagsId(1L, 10L)).thenReturn(Optional.of(new SkuEntity()));
         assertThrows(DBException.class, () -> skuService.assignTagToSku(1L, 10L));
     }
 
     @Test
-    public void assignTagToSku_successAssigns() throws Exception {
+    void assignTagToSku_successAssigns() throws Exception {
         TagEntity t = buildTagEntity(10L, null);
         SkuEntity sku = buildSkuEntity(1L);
         sku.setTags(new ArrayList<>());
@@ -205,7 +205,7 @@ public class SkuServiceImplTest {
     }
 
     @Test
-    public void getTagsForSku_returnsList() throws Exception {
+    void getTagsForSku_returnsList() throws Exception {
         TagEntity t = buildTagEntity(100L, null);
         when(tagRepository.findByItemsId(5L)).thenReturn(List.of(t));
 
@@ -214,7 +214,7 @@ public class SkuServiceImplTest {
     }
 
     @Test
-    public void removeTagFromSku_throwsWhenNotFound() {
+    void removeTagFromSku_throwsWhenNotFound() {
         when(skuRepository.findByIdAndTagsId(1L, 90L)).thenReturn(Optional.empty());
         assertThrows(DBException.class, () -> skuService.removeTagFromSku(1L, 90L));
     }

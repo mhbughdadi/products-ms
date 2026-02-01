@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProductServiceImplTest {
+class ProductServiceImplTest {
 
     @Mock
     private ProductRepository productRepository;
@@ -64,11 +64,11 @@ public class ProductServiceImplTest {
     }
 
     @BeforeEach
-    public void setup() {
+    void setup() {
     }
 
     @Test
-    public void findAllProducts_returnsMappedList_whenProductsExist() throws Exception {
+    void findAllProducts_returnsMappedList_whenProductsExist() throws Exception {
         List<ProductEntity> list = new ArrayList<>();
         list.add(buildProductEntity(1L));
         when(productRepository.findAll()).thenReturn(list);
@@ -81,7 +81,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void findAllProducts_returnsEmpty_whenNoProducts() throws Exception {
+    void findAllProducts_returnsEmpty_whenNoProducts() throws Exception {
         when(productRepository.findAll()).thenReturn(Collections.emptyList());
 
         List<Product> products = productService.findAllProducts();
@@ -91,7 +91,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void addProduct_savesAndReturnsProduct() throws Exception {
+    void addProduct_savesAndReturnsProduct() throws Exception {
         Product input = new Product();
         input.setNameEn("New");
 
@@ -106,7 +106,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void updateProduct_updatesWhenExists() throws Exception {
+    void updateProduct_updatesWhenExists() throws Exception {
         Product p = new Product();
         p.setId(2L);
         p.setNameEn("U");
@@ -126,7 +126,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void updateProduct_throwsWhenNotExists() {
+    void updateProduct_throwsWhenNotExists() {
         Product p = new Product();
         p.setId(99L);
 
@@ -136,7 +136,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void findProductById_returnsWhenFound() throws Exception {
+    void findProductById_returnsWhenFound() throws Exception {
         ProductEntity e = buildProductEntity(5L);
         when(productRepository.findById(5L)).thenReturn(Optional.of(e));
 
@@ -147,13 +147,13 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void findProductById_throwsWhenNotFound() {
+    void findProductById_throwsWhenNotFound() {
         when(productRepository.findById(7L)).thenReturn(Optional.empty());
         assertThrows(RecordNotFoundException.class, () -> productService.findProductById(7L));
     }
 
     @Test
-    public void deleteProductById_deletesWhenExists() throws Exception {
+    void deleteProductById_deletesWhenExists() throws Exception {
         when(productRepository.existsById(3L)).thenReturn(true);
 
         productService.deleteProductById(3L);
@@ -162,19 +162,19 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void deleteProductById_throwsWhenNotExists() {
+    void deleteProductById_throwsWhenNotExists() {
         when(productRepository.existsById(33L)).thenReturn(false);
         assertThrows(RecordNotFoundException.class, () -> productService.deleteProductById(33L));
     }
 
     @Test
-    public void assignTagToProduct_throwsWhenDuplicate() {
+    void assignTagToProduct_throwsWhenDuplicate() {
         when(productRepository.findByIdAndTagsId(1L, 10L)).thenReturn(Optional.of(new ProductEntity()));
         assertThrows(DBException.class, () -> productService.assignTagToProduct(1L, 10L));
     }
 
     @Test
-    public void assignTagToProduct_successAssignsTag() throws Exception {
+    void assignTagToProduct_successAssignsTag() throws Exception {
         TagEntity t = buildTagEntity(10L, "T");
 
         ProductEntity p = buildProductEntity(1L);
@@ -193,7 +193,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void getTagsForProduct_returnsTags() throws Exception {
+    void getTagsForProduct_returnsTags() throws Exception {
         TagEntity t = buildTagEntity(100L, "Tag100");
 
         when(tagRepository.findByItemsId(5L)).thenReturn(List.of(t));
@@ -206,7 +206,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void removeTagFromProduct_successRemovesTag() throws Exception {
+    void removeTagFromProduct_successRemovesTag() throws Exception {
         TagEntity t1 = buildTagEntity(200L, null);
         ProductEntity p = buildProductEntity(1L);
         List<TagEntity> tags = new ArrayList<>();
@@ -225,7 +225,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void removeTagFromProduct_throwsWhenNotFound() {
+    void removeTagFromProduct_throwsWhenNotFound() {
         when(productRepository.findByIdAndTagsId(1L, 90L)).thenReturn(Optional.empty());
         assertThrows(DBException.class, () -> productService.removeTagFromProduct(1L, 90L));
     }

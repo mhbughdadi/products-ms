@@ -33,7 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CategoryServiceImplTest {
+class CategoryServiceImplTest {
 
     @Mock
     private CategoryRepository categoryRepository;
@@ -57,7 +57,7 @@ public class CategoryServiceImplTest {
     }
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         categoryEntities = new ArrayList<>();
 
         // root category with one child and a tag to exercise mappings
@@ -78,7 +78,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void findAllCategories_shouldReturnHierarchicalCategories_whenRootAndSubCategoriesExist() throws Exception {
+    void findAllCategories_shouldReturnHierarchicalCategories_whenRootAndSubCategoriesExist() throws Exception {
 
         when(categoryRepository.findAllRootCategoriesWithSubCategories()).thenReturn(categoryEntities);
 
@@ -103,7 +103,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void findAllCategories_shouldReturnEmptyList_whenNoRootCategoriesExist() throws Exception {
+    void findAllCategories_shouldReturnEmptyList_whenNoRootCategoriesExist() throws Exception {
 
         when(categoryRepository.findAllRootCategoriesWithSubCategories()).thenReturn(Collections.emptyList());
 
@@ -114,7 +114,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void givenRepositoryThrowsException_whenFindAllCategories_thenExceptionPropagated() {
+    void givenRepositoryThrowsException_whenFindAllCategories_thenExceptionPropagated() {
 
         when(categoryRepository.findAllRootCategoriesWithSubCategories()).thenThrow(new RuntimeException("mapping exception"));
 
@@ -122,7 +122,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void findAllCategories_returnsCategoriesWithTags_whenTagsAreAssigned() throws Exception {
+    void findAllCategories_returnsCategoriesWithTags_whenTagsAreAssigned() throws Exception {
         when(categoryRepository.findAllRootCategoriesWithSubCategories()).thenReturn(categoryEntities);
 
         List<Category> categories = this.categoryService.findAllCategories();
@@ -135,7 +135,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void findCategoryByID_returnsCategory_whenCategoryExists() throws Exception {
+    void findCategoryByID_returnsCategory_whenCategoryExists() throws Exception {
         CategoryEntity entity = this.buildCategoryEntityObject(1L, "CAT001", "Electronics", "إلكترونيات", "Category for electronic products", "فئة للمنتجات الإلكترونية", true, null);
 
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(entity));
@@ -147,14 +147,14 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void findCategoryByID_throwsRecordNotFoundException_whenCategoryDoesNotExist() {
+    void findCategoryByID_throwsRecordNotFoundException_whenCategoryDoesNotExist() {
 
         when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(RecordNotFoundException.class, () -> this.categoryService.findCategoryByID(1L));
     }
 
     @Test
-    public void addCategory_savesAndReturnsCategory_whenValidCategoryProvided_withoutParent() throws Exception {
+    void addCategory_savesAndReturnsCategory_whenValidCategoryProvided_withoutParent() throws Exception {
         // input model
         Category toAdd = new Category();
         toAdd.setCode("NEW");
@@ -174,7 +174,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void addCategory_savesAndReturnsCategory_whenValidCategoryProvided_withParent() throws Exception {
+    void addCategory_savesAndReturnsCategory_whenValidCategoryProvided_withParent() throws Exception {
         // input model with parent
         Category toAdd = new Category();
         toAdd.setCode("NEW");
@@ -196,7 +196,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void deleteCategoryById_deletesAndReturnsCategory_whenCategoryExists() throws Exception {
+    void deleteCategoryById_deletesAndReturnsCategory_whenCategoryExists() throws Exception {
         CategoryEntity entity = this.buildCategoryEntityObject(5L, "DEL", "ToDelete", "", "desc", "", true, null);
 
         when(categoryRepository.findById(5L)).thenReturn(Optional.of(entity));
@@ -209,13 +209,13 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void deleteCategoryById_throwsRecordNotFoundException_whenCategoryDoesNotExist() {
+    void deleteCategoryById_throwsRecordNotFoundException_whenCategoryDoesNotExist() {
         when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
         assertThrows(RecordNotFoundException.class, () -> this.categoryService.deleteCategoryById(99L));
     }
 
     @Test
-    public void updateCategory_savesAndReturnsUpdatedCategory() throws Exception {
+    void updateCategory_savesAndReturnsUpdatedCategory() throws Exception {
         Category toUpdate = new Category();
         toUpdate.setId(2L);
         toUpdate.setCode("UPD");
@@ -233,14 +233,14 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void assignTagToCategory_whenAssignmentExists_shouldThrowDBException() {
+    void assignTagToCategory_whenAssignmentExists_shouldThrowDBException() {
         when(categoryRepository.findByIdAndTagsId(1L, 10L)).thenReturn(Optional.of(new CategoryEntity()));
 
         assertThrows(DBException.class, () -> this.categoryService.assignTagToCategory(1L, 10L));
     }
 
     @Test
-    public void assignTagToCategory_successfulAssignment() throws Exception {
+    void assignTagToCategory_successfulAssignment() throws Exception {
         TagEntity tagEntity = new TagEntity();
         tagEntity.setId(10L);
         tagEntity.setName("T1");
@@ -267,7 +267,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void getTagsForCategory_returnsTags() throws Exception {
+    void getTagsForCategory_returnsTags() throws Exception {
         TagEntity tag1 = buildTagEntity(100L, "Tag100");
 
         when(tagRepository.findByItemsId(5L)).thenReturn(List.of(tag1));
@@ -280,14 +280,14 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void removeTagFromCategory_whenNotFound_throwsDBException() {
+    void removeTagFromCategory_whenNotFound_throwsDBException() {
         when(categoryRepository.findByIdAndTagsId(1L, 90L)).thenReturn(Optional.empty());
 
         assertThrows(DBException.class, () -> this.categoryService.removeTagFromCategory(1L, 90L));
     }
 
     @Test
-    public void removeTagFromCategory_success_removesTagAndSaves() throws Exception {
+    void removeTagFromCategory_success_removesTagAndSaves() throws Exception {
         TagEntity t1 = buildTagEntity(200L, null);
         TagEntity t2 = buildTagEntity(201L, null);
 
@@ -309,7 +309,7 @@ public class CategoryServiceImplTest {
         assertTrue(saved.getTags().stream().noneMatch(tag -> tag.getId().equals(200L)));
     }
 
-    public CategoryEntity buildCategoryEntityObject(Long id, String code, String nameEn, String nameAr, String descriptionEn, String descriptionAr, boolean active, CategoryEntity parent) {
+    CategoryEntity buildCategoryEntityObject(Long id, String code, String nameEn, String nameAr, String descriptionEn, String descriptionAr, boolean active, CategoryEntity parent) {
         CategoryEntity category = new CategoryEntity();
         category.setId(id);
         category.setCode(code);

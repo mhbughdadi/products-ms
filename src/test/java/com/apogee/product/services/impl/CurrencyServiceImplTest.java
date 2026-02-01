@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class CurrencyServiceImplTest {
+class CurrencyServiceImplTest {
 
     @Mock
     private CurrencyRepository currencyRepository;
@@ -33,7 +33,7 @@ public class CurrencyServiceImplTest {
     }
 
     @Test
-    public void saveCurrency_savesAndReturns() throws Exception {
+    void saveCurrency_savesAndReturns() throws Exception {
         Currency c = new Currency();
         c.setCode("USD");
 
@@ -47,7 +47,7 @@ public class CurrencyServiceImplTest {
     }
 
     @Test
-    public void findCurrency_returnsWhenFound() throws Exception {
+    void findCurrency_returnsWhenFound() throws Exception {
         CurrencyEntity e = buildCurrencyEntity(2L, null);
         when(currencyRepository.findById(2L)).thenReturn(Optional.of(e));
 
@@ -57,13 +57,13 @@ public class CurrencyServiceImplTest {
     }
 
     @Test
-    public void findCurrency_throwsWhenNotFound() {
+    void findCurrency_throwsWhenNotFound() {
         when(currencyRepository.findById(3L)).thenReturn(Optional.empty());
         assertThrows(RecordNotFoundException.class, () -> currencyService.findCurrency(3L));
     }
 
     @Test
-    public void findAllCurrencies_returnsList() throws Exception {
+    void findAllCurrencies_returnsList() throws Exception {
         CurrencyEntity e = new CurrencyEntity();
         e.setCurrencyId(4L);
         when(currencyRepository.findAll()).thenReturn(List.of(e));
@@ -73,7 +73,7 @@ public class CurrencyServiceImplTest {
     }
 
     @Test
-    public void updateCurrency_savesAndReturns() throws Exception {
+    void updateCurrency_savesAndReturns() throws Exception {
         Currency c = new Currency();
         c.setCurrencyId(5L);
         c.setCode("EUR");
@@ -85,7 +85,7 @@ public class CurrencyServiceImplTest {
     }
 
     @Test
-    public void deleteCurrency_deletesWhenFound() throws Exception {
+    void deleteCurrency_deletesWhenFound() throws Exception {
         CurrencyEntity e = new CurrencyEntity();
         e.setCurrencyId(6L);
         when(currencyRepository.findById(6L)).thenReturn(Optional.of(e));
@@ -97,7 +97,7 @@ public class CurrencyServiceImplTest {
     }
 
     @Test
-    public void deleteCurrency_throwsWhenNotFound() {
+    void deleteCurrency_throwsWhenNotFound() {
         when(currencyRepository.findById(7L)).thenReturn(Optional.empty());
         assertThrows(RecordNotFoundException.class, () -> currencyService.deleteCurrency(7L));
     }

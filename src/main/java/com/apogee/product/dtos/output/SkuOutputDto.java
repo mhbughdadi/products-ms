@@ -2,6 +2,7 @@ package com.apogee.product.dtos.output;
 
 import com.apogee.product.dtos.inputs.BenefitDto;
 import com.apogee.product.enums.ProductStatus;
+import com.apogee.product.models.Tag;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,4 +40,5 @@ public class SkuOutputDto {
     private String attributes;
     private Long productId;
     private List<BenefitDto> benefits;
+    private List<Tag> tags;
 }

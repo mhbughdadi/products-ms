@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TagServiceImplTest {
+class TagServiceImplTest {
 
     @Mock
     private TagRepository tagRepository;
@@ -35,7 +35,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void saveTag_savesAndReturns() throws Exception {
+    void saveTag_savesAndReturns() throws Exception {
         Tag input = new Tag();
         input.setName("T1");
 
@@ -50,7 +50,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void findTag_returnsWhenFound() throws Exception {
+    void findTag_returnsWhenFound() throws Exception {
         TagEntity e = buildTagEntity(5L, "Tag5");
 
         when(tagRepository.findById(5L)).thenReturn(Optional.of(e));
@@ -61,13 +61,13 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void findTag_throwsWhenNotFound() {
+    void findTag_throwsWhenNotFound() {
         when(tagRepository.findById(6L)).thenReturn(Optional.empty());
         assertThrows(RecordNotFoundException.class, () -> tagService.findTag(6L));
     }
 
     @Test
-    public void findAllTags_returnsListOrEmpty() throws Exception {
+    void findAllTags_returnsListOrEmpty() throws Exception {
         TagEntity e = buildTagEntity(7L, null);
         when(tagRepository.findAll()).thenReturn(List.of(e));
 
@@ -81,7 +81,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void updateTag_updatesWhenExists() throws Exception {
+    void updateTag_updatesWhenExists() throws Exception {
         Tag t = new Tag();
         t.setId(2L);
         t.setName("U");
@@ -95,7 +95,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void updateTag_throwsWhenNotExists() {
+    void updateTag_throwsWhenNotExists() {
         Tag t = new Tag();
         t.setId(99L);
         when(tagRepository.existsById(99L)).thenReturn(false);
@@ -103,7 +103,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void deleteTag_deletesWhenFound() throws Exception {
+    void deleteTag_deletesWhenFound() throws Exception {
         TagEntity e = buildTagEntity(11L, null);
         when(tagRepository.findById(11L)).thenReturn(Optional.of(e));
 
@@ -114,7 +114,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void deleteTag_throwsWhenNotFound() {
+    void deleteTag_throwsWhenNotFound() {
         when(tagRepository.findById(12L)).thenReturn(Optional.empty());
         assertThrows(RecordNotFoundException.class, () -> tagService.deleteTag(12L));
     }
