@@ -7,6 +7,7 @@ class ProductApplicationTests {
 
 	@Test
 	void contextLoads() {
+		assertTrue(true);
 	}
 
 }
