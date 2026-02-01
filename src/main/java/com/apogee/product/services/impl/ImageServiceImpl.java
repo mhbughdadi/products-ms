@@ -4,6 +4,7 @@ import com.apogee.product.entities.ImageEntity;
 import com.apogee.product.entities.ParentImageEntity;
 import com.apogee.product.entities.ParentImageId;
 import com.apogee.product.entities.ParentItemEntity;
+import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Image;
 import com.apogee.product.repositories.ImageRepository;
@@ -17,8 +18,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
-import static com.apogee.product.constants.ProductsConstant.PRODUCT_IMAGE_NOT_FOUND;
-import static com.apogee.product.constants.ProductsConstant.RECORD_NOT_FOUND;
+import static com.apogee.product.constants.ProductsConstant.ERROR_PRODUCT_IMAGE_NOT_FOUND;
+import static com.apogee.product.constants.ProductsConstant.ERROR_RECORD_NOT_FOUND;
 import static com.apogee.product.utilities.Mapper.map;
 import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
@@ -37,7 +38,7 @@ public class ImageServiceImpl implements ImageService {
     private ParentItemRepository parentItemRepository;
 
     @Override
-    public List<Image> findAllImages() throws Exception {
+    public List<Image> findAllImages() throws MapperException {
 
         List<ImageEntity> imageEntities = imageRepository.findAll();
 
@@ -49,7 +50,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public List<Image> saveImages(List<Image> images) throws Exception {
+    public List<Image> saveImages(List<Image> images) throws MapperException {
 
         List<ImageEntity> savedEntities = imageRepository.saveAll(transformCollection(images, ImageEntity.class));
 
@@ -57,18 +58,18 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Image findImageById(Long imageId) throws Exception {
+    public Image findImageById(Long imageId) throws MapperException, RecordNotFoundException {
 
-        ImageEntity imageEntity = imageRepository.findById(imageId).orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, imageId));
+        ImageEntity imageEntity = imageRepository.findById(imageId).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, imageId));
 
         return transform(imageEntity, Image.class, this::getImage);
     }
 
     @Override
-    public Image updateImage(Image image) throws Exception {
+    public Image updateImage(Image image) throws MapperException, RecordNotFoundException {
 
         if (!imageRepository.existsById(image.getId())) {
-            throw new RecordNotFoundException(RECORD_NOT_FOUND, image.getId());
+            throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, image.getId());
         }
 
         ImageEntity updatedImage = imageRepository.save(map(image, ImageEntity.class));
@@ -77,20 +78,20 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void deleteImageById(Long imageId) throws Exception {
+    public void deleteImageById(Long imageId) throws MapperException, RecordNotFoundException {
 
         if (!imageRepository.existsById(imageId)) {
-            throw new RecordNotFoundException(RECORD_NOT_FOUND, imageId);
+            throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, imageId);
         }
 
         imageRepository.deleteById(imageId);
     }
 
     @Override
-    public Image saveImage(Image image) throws Exception {
+    public Image saveImage(Image image) throws MapperException, RecordNotFoundException {
 
         if (imageRepository.existsById(image.getId())) {
-            throw new RecordNotFoundException(RECORD_NOT_FOUND, image.getId());
+            throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, image.getId());
         }
 
         ImageEntity updatedImage = imageRepository.save(map(image, ImageEntity.class));
@@ -99,31 +100,31 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public List<Image> findImagesByParentItemId(Long parentItemId) throws Exception {
+    public List<Image> findImagesByParentItemId(Long parentItemId) throws MapperException, RecordNotFoundException {
 
-        ParentItemEntity parentItem = parentItemRepository.findById(parentItemId).orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, parentItemId));
+        ParentItemEntity parentItem = parentItemRepository.findById(parentItemId).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, parentItemId));
 
         return transformCollection(parentItem.getParentImages(), Image.class, this::getParentImageDetails);
     }
 
     @Override
-    public void deleteImagesByParentItemId(Long parentItemId) throws Exception {
+    public void deleteImagesByParentItemId(Long parentItemId) throws MapperException {
 
-        ParentItemEntity parentItem = parentItemRepository.findById(parentItemId).orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, parentItemId));
+        ParentItemEntity parentItem = parentItemRepository.findById(parentItemId).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, parentItemId));
 
         if (parentItem.getParentImages() != null && !parentItem.getParentImages().isEmpty()) {
             parentImageRepository.deleteAll(parentItem.getParentImages());
         } else {
-            throw new RecordNotFoundException(RECORD_NOT_FOUND, parentItemId);
+            throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, parentItemId);
         }
 
     }
 
     @Override
-    public Image addImageToParentItem(Long parentItemId, Image image) throws Exception {
+    public Image addImageToParentItem(Long parentItemId, Image image) throws MapperException, RecordNotFoundException {
 
-        ParentItemEntity parentItemEntity = parentItemRepository.findById(parentItemId).orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, parentItemId));
-        ImageEntity imageEntity = imageRepository.findById(image.getId()).orElseThrow(() -> new RecordNotFoundException(RECORD_NOT_FOUND, parentItemId));
+        ParentItemEntity parentItemEntity = parentItemRepository.findById(parentItemId).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, parentItemId));
+        ImageEntity imageEntity = imageRepository.findById(image.getId()).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, parentItemId));
 
         ParentImageEntity parentImageEntity = new ParentImageEntity();
         parentImageEntity.setParentItem(parentItemEntity);
@@ -139,14 +140,14 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void removeImageFromParentItem(Long parentItemId, Long imageId) throws Exception {
+    public void removeImageFromParentItem(Long parentItemId, Long imageId) throws MapperException , RecordNotFoundException {
 
         ParentImageId parentImageId = new ParentImageId(parentItemId, imageId);
 
         if (parentImageRepository.existsById(parentImageId)) {
             parentImageRepository.deleteById(parentImageId);
         } else {
-            throw new RecordNotFoundException(PRODUCT_IMAGE_NOT_FOUND, parentItemId, imageId);
+            throw new RecordNotFoundException(ERROR_PRODUCT_IMAGE_NOT_FOUND, parentItemId, imageId);
         }
 
     }

@@ -1,5 +1,8 @@
 package com.apogee.product.services;
 
+import com.apogee.product.exceptions.DBException;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Benefit;
 import com.apogee.product.models.Sku;
 import com.apogee.product.models.Tag;
@@ -7,25 +10,25 @@ import java.util.List;
 
 public interface SkuService {
 
-    List<Sku> findAllSkus() throws Exception;
+    List<Sku> findAllSkus() throws MapperException;
 
-    Sku addSku(Sku sku) throws Exception;
+    Sku addSku(Sku sku) throws MapperException, RecordNotFoundException;
 
-    Sku updateSku(Sku sku) throws Exception;
+    Sku updateSku(Sku sku) throws MapperException, RecordNotFoundException;
 
-    Sku findSkuById(Long skuId) throws Exception;
+    Sku findSkuById(Long skuId) throws MapperException, RecordNotFoundException;
 
-    void deleteSkuById(Long skuId) throws Exception;
+    void deleteSkuById(Long skuId) throws MapperException, RecordNotFoundException;
 
-    Benefit addBenefitToSku(Long skuId, Benefit benefit) throws Exception;
+    Benefit addBenefitToSku(Long skuId, Benefit benefit) throws MapperException, RecordNotFoundException;
 
-    List<Benefit> getSkuBenefits(Long skuId) throws Exception;
+    List<Benefit> getSkuBenefits(Long skuId) throws MapperException;
 
-    void removeBenefitFromSku(Long skuId, Long benefitId) throws Exception;
+    void removeBenefitFromSku(Long skuId, Long benefitId) throws MapperException, RecordNotFoundException;
 
-    Sku assignTagToSku(Long skuId, Long tagId) throws Exception;
+    Sku assignTagToSku(Long skuId, Long tagId) throws MapperException, RecordNotFoundException, DBException;
 
-    List<Tag> getTagsForSku(Long skuId) throws Exception;
+    List<Tag> getTagsForSku(Long skuId) throws MapperException;
 
-    void removeTagFromSku(Long skuId, Long tagId) throws Exception;
+    void removeTagFromSku(Long skuId, Long tagId) throws MapperException, DBException;
 }
