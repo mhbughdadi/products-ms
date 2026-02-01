@@ -2,6 +2,7 @@ package com.apogee.product.services.impl;
 
 import com.apogee.product.entities.CurrencyEntity;
 import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.models.Currency;
 import com.apogee.product.repositories.CurrencyRepository;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ class CurrencyServiceImplTest {
     }
 
     @Test
-    void saveCurrency_savesAndReturns() throws Exception {
+    void saveCurrency_savesAndReturns() throws MapperException {
         Currency c = new Currency();
         c.setCode("USD");
 
@@ -47,7 +48,7 @@ class CurrencyServiceImplTest {
     }
 
     @Test
-    void findCurrency_returnsWhenFound() throws Exception {
+    void findCurrency_returnsWhenFound() throws MapperException, RecordNotFoundException {
         CurrencyEntity e = buildCurrencyEntity(2L, null);
         when(currencyRepository.findById(2L)).thenReturn(Optional.of(e));
 
@@ -63,7 +64,7 @@ class CurrencyServiceImplTest {
     }
 
     @Test
-    void findAllCurrencies_returnsList() throws Exception {
+    void findAllCurrencies_returnsList() throws MapperException {
         CurrencyEntity e = new CurrencyEntity();
         e.setCurrencyId(4L);
         when(currencyRepository.findAll()).thenReturn(List.of(e));
@@ -73,7 +74,7 @@ class CurrencyServiceImplTest {
     }
 
     @Test
-    void updateCurrency_savesAndReturns() throws Exception {
+    void updateCurrency_savesAndReturns() throws MapperException {
         Currency c = new Currency();
         c.setCurrencyId(5L);
         c.setCode("EUR");
@@ -85,7 +86,7 @@ class CurrencyServiceImplTest {
     }
 
     @Test
-    void deleteCurrency_deletesWhenFound() throws Exception {
+    void deleteCurrency_deletesWhenFound() throws MapperException, RecordNotFoundException {
         CurrencyEntity e = new CurrencyEntity();
         e.setCurrencyId(6L);
         when(currencyRepository.findById(6L)).thenReturn(Optional.of(e));

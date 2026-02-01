@@ -136,6 +136,19 @@ public class Utilities {
         return null;
     }
 
+    public static <S, R> R transform(S sourceObject, Class<R> destinationClass) throws MapperException {
+
+        if (sourceObject != null) {
+            try {
+
+                return Mapper.map(sourceObject, destinationClass);
+            } catch (Exception e) {
+                throw new MapperException(e.getMessage(), e);
+            }
+        }
+        return null;
+    }
+
     public static String formatAsJsonObject(Object object) {
         Gson gson = new Gson();
         return gson.toJson(object);

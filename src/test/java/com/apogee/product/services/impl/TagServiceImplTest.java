@@ -2,6 +2,7 @@ package com.apogee.product.services.impl;
 
 import com.apogee.product.entities.TagEntity;
 import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.models.Tag;
 import com.apogee.product.repositories.TagRepository;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class TagServiceImplTest {
     }
 
     @Test
-    void saveTag_savesAndReturns() throws Exception {
+    void saveTag_savesAndReturns() throws MapperException, RecordNotFoundException, com.apogee.product.exceptions.DBException {
         Tag input = new Tag();
         input.setName("T1");
 
@@ -50,7 +51,7 @@ class TagServiceImplTest {
     }
 
     @Test
-    void findTag_returnsWhenFound() throws Exception {
+    void findTag_returnsWhenFound() throws MapperException, RecordNotFoundException, com.apogee.product.exceptions.DBException {
         TagEntity e = buildTagEntity(5L, "Tag5");
 
         when(tagRepository.findById(5L)).thenReturn(Optional.of(e));
@@ -67,7 +68,7 @@ class TagServiceImplTest {
     }
 
     @Test
-    void findAllTags_returnsListOrEmpty() throws Exception {
+    void findAllTags_returnsListOrEmpty() throws MapperException, RecordNotFoundException, com.apogee.product.exceptions.DBException {
         TagEntity e = buildTagEntity(7L, null);
         when(tagRepository.findAll()).thenReturn(List.of(e));
 
@@ -81,7 +82,7 @@ class TagServiceImplTest {
     }
 
     @Test
-    void updateTag_updatesWhenExists() throws Exception {
+    void updateTag_updatesWhenExists() throws MapperException, RecordNotFoundException, com.apogee.product.exceptions.DBException {
         Tag t = new Tag();
         t.setId(2L);
         t.setName("U");
@@ -103,7 +104,7 @@ class TagServiceImplTest {
     }
 
     @Test
-    void deleteTag_deletesWhenFound() throws Exception {
+    void deleteTag_deletesWhenFound() throws MapperException, RecordNotFoundException, com.apogee.product.exceptions.DBException {
         TagEntity e = buildTagEntity(11L, null);
         when(tagRepository.findById(11L)).thenReturn(Optional.of(e));
 

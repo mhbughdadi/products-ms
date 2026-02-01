@@ -5,6 +5,8 @@ import com.apogee.product.dtos.output.AddProductResponseDto;
 import com.apogee.product.dtos.output.AllProductsResponseDto;
 import com.apogee.product.dtos.output.AllTagsResponseDto;
 import com.apogee.product.dtos.output.FindProductResponseDto;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Product;
 import com.apogee.product.models.Tag;
 import com.apogee.product.services.ProductService;
@@ -29,7 +31,7 @@ class ProductsBackingServiceTest {
     private ProductsBackingService backingService;
 
     @Test
-    void getAllProducts_mapsList() throws Exception {
+    void getAllProducts_mapsList() throws MapperException {
         Product p = new Product();
         p.setId(1L);
         p.setCode("P1");
@@ -40,11 +42,11 @@ class ProductsBackingServiceTest {
 
         assertNotNull(resp);
         assertEquals(1, resp.getProducts().size());
-        assertEquals(1L, resp.getProducts().get(0).getId());
+        assertEquals(1L, resp.getProducts().getFirst().getId());
     }
 
     @Test
-    void addProduct_and_getProductById_and_delete_and_update_flow() throws Exception {
+    void addProduct_and_getProductById_and_delete_and_update_flow() throws MapperException, RecordNotFoundException {
         ProductDto dto = new ProductDto();
         dto.setNameEn("X");
 
@@ -69,7 +71,7 @@ class ProductsBackingServiceTest {
     }
 
     @Test
-    void assign_remove_fetchTags() throws Exception {
+    void assign_remove_fetchTags() throws MapperException, RecordNotFoundException, com.apogee.product.exceptions.DBException {
         Tag t = new Tag();
         t.setId(99L);
 
@@ -93,7 +95,7 @@ class ProductsBackingServiceTest {
     }
 
     @Test
-    void getAllProducts_returnsEmpty_whenNoProducts() throws Exception {
+    void getAllProducts_returnsEmpty_whenNoProducts() throws MapperException {
         when(productService.findAllProducts()).thenReturn(List.of());
         AllProductsResponseDto resp = backingService.getAllProducts();
         assertNotNull(resp);
@@ -101,21 +103,24 @@ class ProductsBackingServiceTest {
     }
 
     @Test
-    void addProduct_propagatesException() throws Exception {
+    void addProduct_propagatesException() throws MapperException {
         ProductDto dto = new ProductDto();
         dto.setNameEn("X");
-        when(productService.addProduct(any(Product.class))).thenThrow(new RuntimeException("persist fail"));
-        assertThrows(RuntimeException.class, () -> backingService.addProduct(dto));
+        when(productService.addProduct(any(Product.class))).thenThrow(new MapperException("mapping fail"));
+
+        assertThrows(MapperException.class, () -> backingService.addProduct(dto));
     }
 
     @Test
-    void getProductById_propagatesException() throws Exception {
-        when(productService.findProductById(99L)).thenThrow(new RuntimeException("not found"));
-        assertThrows(RuntimeException.class, () -> backingService.getProductById(99L));
+    void getProductById_propagatesException() throws MapperException, RecordNotFoundException {
+        when(productService.findProductById(99L)).thenThrow(new MapperException("mapping fail")).thenThrow(new RecordNotFoundException("not found", 99L));
+
+        assertThrows(MapperException.class, () -> backingService.getProductById(99L));
+        assertThrows(RecordNotFoundException.class, () -> backingService.getProductById(99L));
     }
 
     @Test
-    void fetchProductTags_returnsEmpty_whenNoTags() throws Exception {
+    void fetchProductTags_returnsEmpty_whenNoTags() throws MapperException {
         when(productService.getTagsForProduct(50L)).thenReturn(List.of());
         AllTagsResponseDto resp = backingService.fetchProductTags(50L);
         assertNotNull(resp);

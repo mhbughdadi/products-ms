@@ -3,6 +3,8 @@ package com.apogee.product.backingservice;
 import com.apogee.product.dtos.inputs.ImageDto;
 import com.apogee.product.dtos.output.ImageResponseDto;
 import com.apogee.product.dtos.output.SuccessfulResponse;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Image;
 import com.apogee.product.services.ImageService;
 import org.junit.jupiter.api.Test;
@@ -26,7 +28,7 @@ class ImageBackingServiceTest {
     private ImageBackingService backingService;
 
     @Test
-    void add_update_and_get_and_delete() throws Exception {
+    void add_update_and_get_and_delete() throws MapperException, RecordNotFoundException {
         ImageDto dto = new ImageDto();
         dto.setUrl("u");
 
@@ -49,7 +51,7 @@ class ImageBackingServiceTest {
     }
 
     @Test
-    void addImages_and_getAll_and_getByParent_and_deleteByParent_and_addToParent_removeFromParent() throws Exception {
+    void addImages_and_getAll_and_getByParent_and_deleteByParent_and_addToParent_removeFromParent() throws MapperException, RecordNotFoundException {
         ImageDto dto = new ImageDto();
         dto.setUrl("i1");
 
@@ -88,13 +90,15 @@ class ImageBackingServiceTest {
     }
 
     @Test
-    void getImageById_propagatesException() throws Exception {
-        when(imageService.findImageById(123L)).thenThrow(new RuntimeException("not found"));
-        assertThrows(RuntimeException.class, () -> backingService.getImageById(123L));
+    void getImageById_propagatesException() throws MapperException, RecordNotFoundException {
+        when(imageService.findImageById(123L)).thenThrow(new RecordNotFoundException("not found", 123L)).thenThrow(new MapperException("map fail"));
+        assertThrows(RecordNotFoundException.class, () -> backingService.getImageById(123L));
+
+        assertThrows(MapperException.class, () -> backingService.getImageById(123L));
     }
 
     @Test
-    void addImages_handlesEmptyList() throws Exception {
+    void addImages_handlesEmptyList() throws MapperException {
         when(imageService.saveImages(anyList())).thenReturn(List.of());
         var resp = backingService.addImages(List.of());
         assertNotNull(resp);
@@ -102,7 +106,7 @@ class ImageBackingServiceTest {
     }
 
     @Test
-    void getImagesByParentItemId_returnsEmpty_whenNone() throws Exception {
+    void getImagesByParentItemId_returnsEmpty_whenNone() throws MapperException, RecordNotFoundException {
         when(imageService.findImagesByParentItemId(7L)).thenReturn(List.of());
         var resp = backingService.getImagesByParentItemId(7L);
         assertNotNull(resp);

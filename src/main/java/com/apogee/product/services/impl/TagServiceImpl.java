@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.apogee.product.constants.ProductsConstant.ERROR_RECORD_NOT_FOUND;
+import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Service
@@ -26,10 +27,10 @@ public class TagServiceImpl implements TagService {
     @Override
     public Tag saveTag(Tag tag) throws MapperException {
 
-        TagEntity transientTag = Mapper.map(tag, TagEntity.class);
+        TagEntity transientTag = transform(tag, TagEntity.class);
         TagEntity savedTag = tagRepository.save(transientTag);
 
-        return Mapper.map(savedTag, Tag.class);
+        return transform(savedTag, Tag.class);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class TagServiceImpl implements TagService {
         Optional<TagEntity> tagEntityOptional = tagRepository.findById(tagId);
 
         if (tagEntityOptional.isPresent()) {
-            return Mapper.map(tagEntityOptional.get(), Tag.class);
+            return transform(tagEntityOptional.get(), Tag.class);
         } else {
             throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, tagId);
         }
@@ -64,9 +65,9 @@ public class TagServiceImpl implements TagService {
             throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, tag.getId());
         }
 
-        TagEntity updatedTag = tagRepository.save(Mapper.map(tag, TagEntity.class));
+        TagEntity updatedTag = tagRepository.save(transform(tag, TagEntity.class));
 
-        return Mapper.map(updatedTag, Tag.class);
+        return transform(updatedTag, Tag.class);
     }
 
     @Override
@@ -77,6 +78,6 @@ public class TagServiceImpl implements TagService {
 
         tagRepository.deleteById(tagId);
 
-        return Mapper.map(toBeDeletedEntity, Tag.class);
+        return transform(toBeDeletedEntity, Tag.class);
     }
 }

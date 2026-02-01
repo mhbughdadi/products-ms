@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import static com.apogee.product.constants.ProductsConstant.NULL_STRING;
+import static com.apogee.product.constants.ProductsConstant.REQUEST_ID;
 import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 
 @Aspect
@@ -37,7 +38,7 @@ public class LoggerAspect {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String requestId = getUUID();
 
-        request.setAttribute("requestId", requestId);
+        request.setAttribute(REQUEST_ID, requestId);
 
         logRequestDetails(joinPoint, request, null, requestId);
 
@@ -49,7 +50,7 @@ public class LoggerAspect {
         logger = LogManager.getLogger(joinPoint.getSignature().getDeclaringTypeName());
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String requestId = (String) request.getAttribute("requestId");
+        String requestId = (String) request.getAttribute(REQUEST_ID);
 
         logRequestDetails(joinPoint, request, response, requestId);
 

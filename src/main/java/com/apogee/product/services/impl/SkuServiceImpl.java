@@ -64,7 +64,7 @@ public class SkuServiceImpl implements SkuService {
     @Override
     public Sku addSku(Sku sku) throws MapperException, RecordNotFoundException {
 
-        SkuEntity transientSku = Mapper.map(sku, SkuEntity.class);
+        SkuEntity transientSku = transform(sku, SkuEntity.class);
 
         ProductEntity productEntity = productRepository.findById(sku.getProductId())
                 .orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, sku.getProductId()));
@@ -111,7 +111,7 @@ public class SkuServiceImpl implements SkuService {
     public Benefit addBenefitToSku(Long skuId, Benefit benefit) throws MapperException , RecordNotFoundException {
 
         SkuEntity sku = skuRepository.findById(skuId).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, skuId));
-        BenefitEntity benefitEntity = Mapper.map(benefit, BenefitEntity.class);
+        BenefitEntity benefitEntity = transform(benefit, BenefitEntity.class);
         benefitEntity.setSku(sku);
 
         BenefitEntity savedBenefit = benefitRepository.save(benefitEntity);

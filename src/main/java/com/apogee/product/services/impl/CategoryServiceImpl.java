@@ -59,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category addCategory(Category category) throws MapperException, RecordNotFoundException {
 
-        CategoryEntity transientCategory = Mapper.map(category, CategoryEntity.class);
+        CategoryEntity transientCategory = transform(category, CategoryEntity.class);
 
         if (category.getParentId() != null) {
             CategoryEntity parentCategory = this.categoryRepository.findById(category.getParentId()).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, category.getParentId()));
@@ -96,7 +96,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category updateCategory(Category category) throws MapperException {
 
-        CategoryEntity updatedCurrency = this.categoryRepository.save(Mapper.map(category, CategoryEntity.class));
+        CategoryEntity updatedCurrency = this.categoryRepository.save(transform(category, CategoryEntity.class));
 
         return transform(updatedCurrency, Category.class, this::getCategory);
     }

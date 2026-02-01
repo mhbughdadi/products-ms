@@ -11,6 +11,9 @@ import com.apogee.product.models.Benefit;
 import com.apogee.product.models.Sku;
 import com.apogee.product.models.Tag;
 import com.apogee.product.services.SkuService;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.exceptions.DBException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,7 +35,7 @@ class SkuBackingServiceTest {
     private SkuBackingService backingService;
 
     @Test
-    void getAllSkus_and_add_and_get_and_update_and_delete() throws Exception {
+    void getAllSkus_and_add_and_get_and_update_and_delete() throws MapperException, RecordNotFoundException, DBException {
         Sku s = new Sku();
         s.setId(1L);
 
@@ -66,7 +69,7 @@ class SkuBackingServiceTest {
     }
 
     @Test
-    void assign_remove_and_fetchTags_and_benefits() throws Exception {
+    void assign_remove_and_fetchTags_and_benefits() throws MapperException, RecordNotFoundException, DBException {
         Tag t = new Tag();
         t.setId(77L);
 
@@ -106,7 +109,7 @@ class SkuBackingServiceTest {
     }
 
     @Test
-    void getAllSkus_returnsEmpty_whenNone() throws Exception {
+    void getAllSkus_returnsEmpty_whenNone() throws MapperException, RecordNotFoundException, DBException {
         when(skuService.findAllSkus()).thenReturn(List.of());
         var resp = backingService.getAllSkus();
         assertNotNull(resp);
@@ -114,13 +117,15 @@ class SkuBackingServiceTest {
     }
 
     @Test
-    void assignTag_propagatesException() throws Exception {
-        when(skuService.assignTagToSku(5L, 77L)).thenThrow(new RuntimeException("assign fail"));
-        assertThrows(RuntimeException.class, () -> backingService.assignTag(5L, 77L));
+    void assignTag_propagatesException() throws MapperException, RecordNotFoundException, DBException {
+        when(skuService.assignTagToSku(5L, 77L)).thenThrow(new MapperException("assign fail")).thenThrow(new RecordNotFoundException("not found")).thenThrow(new DBException("DB fail", null));
+        assertThrows(MapperException.class, () -> backingService.assignTag(5L, 77L));
+        assertThrows(RecordNotFoundException.class, () -> backingService.assignTag(5L, 77L));
+        assertThrows(DBException.class, () -> backingService.assignTag(5L, 77L));
     }
 
     @Test
-    void getSkuBenefits_returnsEmpty_whenNone() throws Exception {
+    void getSkuBenefits_returnsEmpty_whenNone() throws MapperException, RecordNotFoundException, DBException {
         when(skuService.getSkuBenefits(5L)).thenReturn(List.of());
         var resp = backingService.getSkuBenefits(5L);
         assertNotNull(resp);

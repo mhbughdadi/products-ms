@@ -10,6 +10,9 @@ import com.apogee.product.dtos.output.BenefitResponseDto;
 import com.apogee.product.dtos.output.Response;
 import com.apogee.product.dtos.output.SkuResponseDto;
 import com.apogee.product.dtos.output.SuccessfulResponse;
+import com.apogee.product.exceptions.DBException;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,7 +39,7 @@ public class SkuController {
     @Operation(summary = "Get all skus", description = "This endpoint retrieves all skus available in the system.", tags = {"skus"})
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllSkusResponseDto.class)))
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> allSkus() throws Exception {
+    public ResponseEntity<Response> allSkus() throws MapperException {
 
         AllSkusResponseDto response = skuBackingService.getAllSkus();
 
@@ -48,7 +51,7 @@ public class SkuController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> findSku(@PathVariable("skuId") Long skuId) throws Exception {
+    public ResponseEntity<Response> findSku(@PathVariable("skuId") Long skuId) throws MapperException, RecordNotFoundException {
 
         SkuResponseDto response = skuBackingService.getSkuById(skuId);
 
@@ -60,7 +63,7 @@ public class SkuController {
     @ApiResponse(responseCode = "200", description = "Sku added successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> addSku(@RequestBody SkuDto sku) throws Exception {
+    public ResponseEntity<Response> addSku(@RequestBody SkuDto sku) throws MapperException, RecordNotFoundException {
 
         SkuResponseDto response = skuBackingService.addSku(sku);
 
@@ -72,7 +75,7 @@ public class SkuController {
     @ApiResponse(responseCode = "200", description = "Sku updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> updateSku(@RequestBody SkuDto sku) throws Exception {
+    public ResponseEntity<Response> updateSku(@RequestBody SkuDto sku) throws MapperException, RecordNotFoundException {
 
         Response response = this.skuBackingService.updateSku(sku);
 
@@ -84,7 +87,7 @@ public class SkuController {
     @ApiResponse(responseCode = "200", description = "Sku deleted successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> deleteSku(@PathVariable("skuId") Long skuId) throws Exception {
+    public ResponseEntity<Response> deleteSku(@PathVariable("skuId") Long skuId) throws MapperException, RecordNotFoundException {
 
         this.skuBackingService.deleteSku(skuId);
 
@@ -96,7 +99,7 @@ public class SkuController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> assignTag(@PathVariable("skuId") Long skuId, @PathVariable("tagId") Long tagId) throws Exception {
+    public ResponseEntity<Response> assignTag(@PathVariable("skuId") Long skuId, @PathVariable("tagId") Long tagId) throws MapperException, RecordNotFoundException, DBException {
 
         SkuResponseDto response = skuBackingService.assignTag(skuId, tagId);
 
@@ -108,7 +111,7 @@ public class SkuController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> removeTag(@PathVariable("skuId") Long skuId, @PathVariable("tagId") Long tagId) throws Exception {
+    public ResponseEntity<Response> removeTag(@PathVariable("skuId") Long skuId, @PathVariable("tagId") Long tagId) throws MapperException, DBException {
 
         SuccessfulResponse response = skuBackingService.removeTag(skuId, tagId);
 
@@ -120,7 +123,7 @@ public class SkuController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllTagsResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> assignTag(@PathVariable("skuId") Long skuId) throws Exception {
+    public ResponseEntity<Response> assignTag(@PathVariable("skuId") Long skuId) throws MapperException {
 
         AllTagsResponseDto response = skuBackingService.fetchSkuTags(skuId);
 
@@ -133,7 +136,7 @@ public class SkuController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllBenefitResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> fetchSkuBenefits(@PathVariable("skuId") Long skuId) throws Exception {
+    public ResponseEntity<Response> fetchSkuBenefits(@PathVariable("skuId") Long skuId) throws MapperException {
 
         AllBenefitResponseDto response = skuBackingService.getSkuBenefits(skuId);
 
@@ -146,7 +149,7 @@ public class SkuController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BenefitResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> addSkuBenefit(@PathVariable("skuId") Long skuId, @RequestBody BenefitDto benefit) throws Exception {
+    public ResponseEntity<Response> addSkuBenefit(@PathVariable("skuId") Long skuId, @RequestBody BenefitDto benefit) throws MapperException, RecordNotFoundException {
 
         BenefitResponseDto response = skuBackingService.addSkuBenefit(skuId, benefit);
 
@@ -159,7 +162,7 @@ public class SkuController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> removeSkuBenefit(@PathVariable("skuId") Long skuId, @PathVariable("benefitId") Long benefitId) throws Exception {
+    public ResponseEntity<Response> removeSkuBenefit(@PathVariable("skuId") Long skuId, @PathVariable("benefitId") Long benefitId) throws MapperException, RecordNotFoundException {
 
         SuccessfulResponse response = skuBackingService.removeSkuBenefit(skuId, benefitId);
 

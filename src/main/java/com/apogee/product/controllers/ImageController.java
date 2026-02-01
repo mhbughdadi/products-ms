@@ -6,6 +6,8 @@ import com.apogee.product.dtos.output.AllImagesResponseDto;
 import com.apogee.product.dtos.output.Response;
 import com.apogee.product.dtos.output.ImageResponseDto;
 import com.apogee.product.dtos.output.SuccessfulResponse;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,7 +36,7 @@ public class ImageController {
     @ApiResponse(responseCode = "200", description = "Image added successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ImageResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> addImage(@RequestBody ImageDto imageDto) throws Exception {
+    public ResponseEntity<Response> addImage(@RequestBody ImageDto imageDto) throws MapperException, RecordNotFoundException {
 
         ImageResponseDto response = imageBackingService.addImage(imageDto);
 
@@ -47,7 +49,7 @@ public class ImageController {
     @ApiResponse(responseCode = "200", description = "Image updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ImageResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> updateImage(@RequestBody ImageDto imageDto) throws Exception {
+    public ResponseEntity<Response> updateImage(@RequestBody ImageDto imageDto) throws MapperException, RecordNotFoundException {
 
         ImageResponseDto response = imageBackingService.updateImage(imageDto);
 
@@ -58,7 +60,7 @@ public class ImageController {
     @Operation(summary = "Get all images", description = "This endpoint retrieves all images available in the system.", tags = {"images"})
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllImagesResponseDto.class)))
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<AllImagesResponseDto> getAllImages() throws Exception {
+    public ResponseEntity<AllImagesResponseDto> getAllImages() throws MapperException {
 
         AllImagesResponseDto response = imageBackingService.getAllImages();
 
@@ -70,7 +72,7 @@ public class ImageController {
     @ApiResponse(responseCode = "200", description = "Image deleted successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> deleteImage(@PathVariable("imageId") Long imageId) throws Exception {
+    public ResponseEntity<Response> deleteImage(@PathVariable("imageId") Long imageId) throws MapperException, RecordNotFoundException {
 
         SuccessfulResponse response = imageBackingService.deleteImageById(imageId);
 
@@ -82,7 +84,7 @@ public class ImageController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ImageResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> getImage(@PathVariable("imageId") Long imageId) throws Exception {
+    public ResponseEntity<Response> getImage(@PathVariable("imageId") Long imageId) throws MapperException, RecordNotFoundException {
 
         ImageResponseDto response = imageBackingService.getImageById(imageId);
 
@@ -93,7 +95,7 @@ public class ImageController {
     @Operation(summary = "Add multiple images", description = "Add a list of images to the system.", tags = {"images"})
     @ApiResponse(responseCode = "200", description = "Images added successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllImagesResponseDto.class)))
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<AllImagesResponseDto> addImages(@RequestBody List<ImageDto> imageDtos) throws Exception {
+    public ResponseEntity<AllImagesResponseDto> addImages(@RequestBody List<ImageDto> imageDtos) throws MapperException {
 
         AllImagesResponseDto response = imageBackingService.addImages(imageDtos);
 
@@ -104,7 +106,7 @@ public class ImageController {
     @Operation(summary = "Get images by parent item ID", description = "Retrieve all images for a given parent item.", tags = {"images"})
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllImagesResponseDto.class)))
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<AllImagesResponseDto> getImagesByParentItemId(@PathVariable("parentItemId") Long parentItemId) throws Exception {
+    public ResponseEntity<AllImagesResponseDto> getImagesByParentItemId(@PathVariable("parentItemId") Long parentItemId) throws MapperException, RecordNotFoundException {
 
         AllImagesResponseDto response = imageBackingService.getImagesByParentItemId(parentItemId);
 
@@ -115,7 +117,7 @@ public class ImageController {
     @Operation(summary = "Delete images by parent item ID", description = "Delete all images for a given parent item.", tags = {"images"})
     @ApiResponse(responseCode = "200", description = "Images deleted successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<SuccessfulResponse> deleteImagesByParentItemId(@PathVariable("parentItemId") Long parentItemId) throws Exception {
+    public ResponseEntity<SuccessfulResponse> deleteImagesByParentItemId(@PathVariable("parentItemId") Long parentItemId) throws MapperException {
 
         SuccessfulResponse response = imageBackingService.deleteImagesByParentItemId(parentItemId);
 
@@ -126,7 +128,7 @@ public class ImageController {
     @Operation(summary = "Add image to parent item", description = "Add a single image to a parent item.", tags = {"images"})
     @ApiResponse(responseCode = "200", description = "Image added successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ImageResponseDto.class)))
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<ImageResponseDto> addImageToParentItem(@PathVariable("parentItemId") Long parentItemId, @RequestBody ImageDto imageDto) throws Exception {
+    public ResponseEntity<ImageResponseDto> addImageToParentItem(@PathVariable("parentItemId") Long parentItemId, @RequestBody ImageDto imageDto) throws MapperException, RecordNotFoundException {
 
         ImageResponseDto response = imageBackingService.addImageToParentItem(parentItemId, imageDto);
 
@@ -137,7 +139,7 @@ public class ImageController {
     @Operation(summary = "Remove image from parent item", description = "Remove a specific image from a parent item.", tags = {"images"})
     @ApiResponse(responseCode = "200", description = "Image removed successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<SuccessfulResponse> removeImageFromParentItem(@PathVariable("parentItemId") Long parentItemId, @PathVariable("imageId") Long imageId) throws Exception {
+    public ResponseEntity<SuccessfulResponse> removeImageFromParentItem(@PathVariable("parentItemId") Long parentItemId, @PathVariable("imageId") Long imageId) throws MapperException, RecordNotFoundException {
 
         SuccessfulResponse response = imageBackingService.removeImageFromParentItem(parentItemId, imageId);
 

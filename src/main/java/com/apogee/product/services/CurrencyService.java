@@ -1,19 +1,52 @@
 package com.apogee.product.services;
 
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Currency;
 
 import java.util.List;
 
 public interface CurrencyService {
 
-    Currency saveCurrency(Currency currency) throws Exception;
+    /**
+     * Save currency
+     * @param currency model
+     * @return saved currency
+     * @throws MapperException mapping failure
+     */
+    Currency saveCurrency(Currency currency) throws MapperException;
 
-    Currency findCurrency(Long currencyId) throws Exception;
+    /**
+     * Find currency
+     * @param currencyId id
+     * @return currency
+     * @throws MapperException mapping failure
+     * @throws RecordNotFoundException when not found
+     */
+    Currency findCurrency(Long currencyId) throws MapperException, RecordNotFoundException;
 
-    List<Currency> findAllCurrencies() throws Exception;
+    /**
+     * Return all currencies
+     * @return list
+     * @throws MapperException mapping failure
+     */
+    List<Currency> findAllCurrencies() throws MapperException;
 
-    Currency UpdateCurrency(Currency currency) throws Exception;
+    /**
+     * Update currency
+     * @param currency model
+     * @return updated currency
+     * @throws MapperException mapping failure
+     */
+    Currency UpdateCurrency(Currency currency) throws MapperException;
 
-    Currency deleteCurrency(Long currencyId) throws Exception;
+    /**
+     * Delete currency
+     * @param currencyId id
+     * @return deleted currency
+     * @throws MapperException mapping failure
+     * @throws RecordNotFoundException when not found
+     */
+    Currency deleteCurrency(Long currencyId) throws MapperException, RecordNotFoundException;
 
 }

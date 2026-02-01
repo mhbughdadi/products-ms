@@ -20,7 +20,6 @@ import java.util.List;
 
 import static com.apogee.product.constants.ProductsConstant.ERROR_PRODUCT_IMAGE_NOT_FOUND;
 import static com.apogee.product.constants.ProductsConstant.ERROR_RECORD_NOT_FOUND;
-import static com.apogee.product.utilities.Mapper.map;
 import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
@@ -72,7 +71,7 @@ public class ImageServiceImpl implements ImageService {
             throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, image.getId());
         }
 
-        ImageEntity updatedImage = imageRepository.save(map(image, ImageEntity.class));
+        ImageEntity updatedImage = imageRepository.save(transform(image, ImageEntity.class));
 
         return transform(updatedImage, Image.class, this::getImage);
     }
@@ -94,7 +93,7 @@ public class ImageServiceImpl implements ImageService {
             throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, image.getId());
         }
 
-        ImageEntity updatedImage = imageRepository.save(map(image, ImageEntity.class));
+        ImageEntity updatedImage = imageRepository.save(transform(image, ImageEntity.class));
 
         return transform(updatedImage, Image.class, this::getImage);
     }

@@ -4,6 +4,7 @@ import com.apogee.product.entities.CategoryEntity;
 import com.apogee.product.entities.TagEntity;
 import com.apogee.product.exceptions.DBException;
 import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.models.Category;
 import com.apogee.product.models.Tag;
 import com.apogee.product.repositories.CategoryRepository;
@@ -78,7 +79,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void findAllCategories_shouldReturnHierarchicalCategories_whenRootAndSubCategoriesExist() throws Exception {
+    void findAllCategories_shouldReturnHierarchicalCategories_whenRootAndSubCategoriesExist() throws MapperException, RecordNotFoundException, DBException {
 
         when(categoryRepository.findAllRootCategoriesWithSubCategories()).thenReturn(categoryEntities);
 
@@ -103,7 +104,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void findAllCategories_shouldReturnEmptyList_whenNoRootCategoriesExist() throws Exception {
+    void findAllCategories_shouldReturnEmptyList_whenNoRootCategoriesExist() throws MapperException, RecordNotFoundException, DBException {
 
         when(categoryRepository.findAllRootCategoriesWithSubCategories()).thenReturn(Collections.emptyList());
 
@@ -116,13 +117,13 @@ class CategoryServiceImplTest {
     @Test
     void givenRepositoryThrowsException_whenFindAllCategories_thenExceptionPropagated() {
 
-        when(categoryRepository.findAllRootCategoriesWithSubCategories()).thenThrow(new RuntimeException("mapping exception"));
+        when(categoryRepository.findAllRootCategoriesWithSubCategories()).thenThrow(new MapperException("mapping exception"));
 
-        assertThrows(RuntimeException.class, () -> this.categoryService.findAllCategories());
+        assertThrows(MapperException.class, () -> this.categoryService.findAllCategories());
     }
 
     @Test
-    void findAllCategories_returnsCategoriesWithTags_whenTagsAreAssigned() throws Exception {
+    void findAllCategories_returnsCategoriesWithTags_whenTagsAreAssigned() throws MapperException, RecordNotFoundException, DBException {
         when(categoryRepository.findAllRootCategoriesWithSubCategories()).thenReturn(categoryEntities);
 
         List<Category> categories = this.categoryService.findAllCategories();
@@ -135,7 +136,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void findCategoryByID_returnsCategory_whenCategoryExists() throws Exception {
+    void findCategoryByID_returnsCategory_whenCategoryExists() throws MapperException, RecordNotFoundException, DBException {
         CategoryEntity entity = this.buildCategoryEntityObject(1L, "CAT001", "Electronics", "إلكترونيات", "Category for electronic products", "فئة للمنتجات الإلكترونية", true, null);
 
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(entity));
@@ -154,7 +155,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void addCategory_savesAndReturnsCategory_whenValidCategoryProvided_withoutParent() throws Exception {
+    void addCategory_savesAndReturnsCategory_whenValidCategoryProvided_withoutParent() throws MapperException, RecordNotFoundException, DBException {
         // input model
         Category toAdd = new Category();
         toAdd.setCode("NEW");
@@ -174,7 +175,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void addCategory_savesAndReturnsCategory_whenValidCategoryProvided_withParent() throws Exception {
+    void addCategory_savesAndReturnsCategory_whenValidCategoryProvided_withParent() throws MapperException, RecordNotFoundException, DBException {
         // input model with parent
         Category toAdd = new Category();
         toAdd.setCode("NEW");
@@ -196,7 +197,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void deleteCategoryById_deletesAndReturnsCategory_whenCategoryExists() throws Exception {
+    void deleteCategoryById_deletesAndReturnsCategory_whenCategoryExists() throws MapperException, RecordNotFoundException, DBException {
         CategoryEntity entity = this.buildCategoryEntityObject(5L, "DEL", "ToDelete", "", "desc", "", true, null);
 
         when(categoryRepository.findById(5L)).thenReturn(Optional.of(entity));
@@ -215,7 +216,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void updateCategory_savesAndReturnsUpdatedCategory() throws Exception {
+    void updateCategory_savesAndReturnsUpdatedCategory() throws MapperException, RecordNotFoundException, DBException {
         Category toUpdate = new Category();
         toUpdate.setId(2L);
         toUpdate.setCode("UPD");
@@ -240,7 +241,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void assignTagToCategory_successfulAssignment() throws Exception {
+    void assignTagToCategory_successfulAssignment() throws MapperException, RecordNotFoundException, DBException {
         TagEntity tagEntity = new TagEntity();
         tagEntity.setId(10L);
         tagEntity.setName("T1");
@@ -267,7 +268,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void getTagsForCategory_returnsTags() throws Exception {
+    void getTagsForCategory_returnsTags() throws MapperException, RecordNotFoundException, DBException {
         TagEntity tag1 = buildTagEntity(100L, "Tag100");
 
         when(tagRepository.findByItemsId(5L)).thenReturn(List.of(tag1));
@@ -287,7 +288,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void removeTagFromCategory_success_removesTagAndSaves() throws Exception {
+    void removeTagFromCategory_success_removesTagAndSaves() throws MapperException, RecordNotFoundException, DBException {
         TagEntity t1 = buildTagEntity(200L, null);
         TagEntity t2 = buildTagEntity(201L, null);
 

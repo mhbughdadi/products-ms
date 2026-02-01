@@ -104,7 +104,7 @@ This project provided a **custom Mapper utility** for object mapping between ent
 **Example usage:**
 ```java
 // Simple mapping
-ProductDto dto = Mapper.map(productEntity, ProductDto.class);
+ProductDto dto = transform(productEntity, ProductDto.class);
 
 // Custom mapping with callback
 ProductDto dto = Utilities.transform(productEntity, ProductDto.class, (src, dest) -> {

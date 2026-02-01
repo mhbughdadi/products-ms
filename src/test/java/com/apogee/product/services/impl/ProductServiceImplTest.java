@@ -4,6 +4,7 @@ import com.apogee.product.entities.ProductEntity;
 import com.apogee.product.entities.TagEntity;
 import com.apogee.product.exceptions.DBException;
 import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.models.Product;
 import com.apogee.product.models.Tag;
 import com.apogee.product.repositories.ProductRepository;
@@ -68,7 +69,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void findAllProducts_returnsMappedList_whenProductsExist() throws Exception {
+    void findAllProducts_returnsMappedList_whenProductsExist() throws MapperException, RecordNotFoundException, DBException {
         List<ProductEntity> list = new ArrayList<>();
         list.add(buildProductEntity(1L));
         when(productRepository.findAll()).thenReturn(list);
@@ -77,11 +78,11 @@ class ProductServiceImplTest {
 
         assertNotNull(products);
         assertEquals(1, products.size());
-        assertEquals(1L, products.get(0).getId());
+        assertEquals(1L, products.getFirst().getId());
     }
 
     @Test
-    void findAllProducts_returnsEmpty_whenNoProducts() throws Exception {
+    void findAllProducts_returnsEmpty_whenNoProducts() throws MapperException, RecordNotFoundException, DBException {
         when(productRepository.findAll()).thenReturn(Collections.emptyList());
 
         List<Product> products = productService.findAllProducts();
@@ -91,7 +92,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void addProduct_savesAndReturnsProduct() throws Exception {
+    void addProduct_savesAndReturnsProduct() throws MapperException, RecordNotFoundException, DBException {
         Product input = new Product();
         input.setNameEn("New");
 
@@ -106,7 +107,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void updateProduct_updatesWhenExists() throws Exception {
+    void updateProduct_updatesWhenExists() throws MapperException, RecordNotFoundException, DBException {
         Product p = new Product();
         p.setId(2L);
         p.setNameEn("U");
@@ -136,7 +137,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void findProductById_returnsWhenFound() throws Exception {
+    void findProductById_returnsWhenFound() throws MapperException, RecordNotFoundException, DBException {
         ProductEntity e = buildProductEntity(5L);
         when(productRepository.findById(5L)).thenReturn(Optional.of(e));
 
@@ -153,7 +154,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void deleteProductById_deletesWhenExists() throws Exception {
+    void deleteProductById_deletesWhenExists() throws MapperException, RecordNotFoundException, DBException {
         when(productRepository.existsById(3L)).thenReturn(true);
 
         productService.deleteProductById(3L);
@@ -174,7 +175,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void assignTagToProduct_successAssignsTag() throws Exception {
+    void assignTagToProduct_successAssignsTag() throws MapperException, RecordNotFoundException, DBException {
         TagEntity t = buildTagEntity(10L, "T");
 
         ProductEntity p = buildProductEntity(1L);
@@ -189,11 +190,11 @@ class ProductServiceImplTest {
         assertNotNull(out);
         assertNotNull(out.getTags());
         assertEquals(1, out.getTags().size());
-        assertEquals(10L, out.getTags().get(0).getId());
+        assertEquals(10L, out.getTags().getFirst().getId());
     }
 
     @Test
-    void getTagsForProduct_returnsTags() throws Exception {
+    void getTagsForProduct_returnsTags() throws MapperException, RecordNotFoundException, DBException {
         TagEntity t = buildTagEntity(100L, "Tag100");
 
         when(tagRepository.findByItemsId(5L)).thenReturn(List.of(t));
@@ -202,11 +203,11 @@ class ProductServiceImplTest {
 
         assertNotNull(tags);
         assertEquals(1, tags.size());
-        assertEquals(100L, tags.get(0).getId());
+        assertEquals(100L, tags.getFirst().getId());
     }
 
     @Test
-    void removeTagFromProduct_successRemovesTag() throws Exception {
+    void removeTagFromProduct_successRemovesTag() throws MapperException, RecordNotFoundException, DBException {
         TagEntity t1 = buildTagEntity(200L, null);
         ProductEntity p = buildProductEntity(1L);
         List<TagEntity> tags = new ArrayList<>();
@@ -227,6 +228,6 @@ class ProductServiceImplTest {
     @Test
     void removeTagFromProduct_throwsWhenNotFound() {
         when(productRepository.findByIdAndTagsId(1L, 90L)).thenReturn(Optional.empty());
-        assertThrows(DBException.class, () -> productService.removeTagFromProduct(1L, 90L));
+        assertThrows(RecordNotFoundException.class, () -> productService.removeTagFromProduct(1L, 90L));
     }
 }

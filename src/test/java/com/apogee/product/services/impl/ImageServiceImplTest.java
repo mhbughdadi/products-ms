@@ -7,6 +7,8 @@ import com.apogee.product.models.Image;
 import com.apogee.product.repositories.ImageRepository;
 import com.apogee.product.repositories.ParentImageRepository;
 import com.apogee.product.repositories.ParentItemRepository;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -56,7 +58,7 @@ class ImageServiceImplTest {
     }
 
     @Test
-    void findAllImages_returnsListOrEmpty() throws Exception {
+    void findAllImages_returnsListOrEmpty() throws MapperException {
         ImageEntity e = buildImageEntity(1L);
         when(imageRepository.findAll()).thenReturn(List.of(e));
 
@@ -70,7 +72,7 @@ class ImageServiceImplTest {
     }
 
     @Test
-    void saveImages_savesAndReturns() throws Exception {
+    void saveImages_savesAndReturns() throws MapperException {
         Image img = new Image();
         img.setId(5L);
         List<Image> imgs = List.of(img);
@@ -84,7 +86,7 @@ class ImageServiceImplTest {
     }
 
     @Test
-    void findImageById_returnsWhenFound() throws Exception {
+    void findImageById_returnsWhenFound() throws MapperException, RecordNotFoundException {
         ImageEntity e = new ImageEntity();
         e.setId(9L);
         when(imageRepository.findById(9L)).thenReturn(Optional.of(e));
@@ -97,7 +99,7 @@ class ImageServiceImplTest {
     @Test
     void findImageById_throwsWhenNotFound() {
         when(imageRepository.findById(99L)).thenReturn(Optional.empty());
-        assertThrows(Exception.class, () -> imageService.findImageById(99L));
+        assertThrows(RecordNotFoundException.class, () -> imageService.findImageById(99L));
     }
 
     @Test
@@ -105,13 +107,13 @@ class ImageServiceImplTest {
         Image i = new Image();
         i.setId(4L);
         when(imageRepository.existsById(4L)).thenReturn(false);
-        assertThrows(Exception.class, () -> imageService.updateImage(i));
+        assertThrows(RecordNotFoundException.class, () -> imageService.updateImage(i));
     }
 
     @Test
     void deleteImageById_throwsWhenNotExists() {
         when(imageRepository.existsById(20L)).thenReturn(false);
-        assertThrows(Exception.class, () -> imageService.deleteImageById(20L));
+        assertThrows(RecordNotFoundException.class, () -> imageService.deleteImageById(20L));
     }
 
     @Test
@@ -119,11 +121,11 @@ class ImageServiceImplTest {
         Image i = new Image();
         i.setId(6L);
         when(imageRepository.existsById(6L)).thenReturn(true);
-        assertThrows(Exception.class, () -> imageService.saveImage(i));
+        assertThrows(RecordNotFoundException.class, () -> imageService.saveImage(i));
     }
 
     @Test
-    void findImagesByParentItemId_returnsWhenParentExists() throws Exception {
+    void findImagesByParentItemId_returnsWhenParentExists() throws MapperException, RecordNotFoundException {
         ProductEntity parent = new ProductEntity();
         parent.setId(2L);
         ParentImageEntity pi = new ParentImageEntity();
@@ -139,7 +141,7 @@ class ImageServiceImplTest {
 
         List<Image> out = imageService.findImagesByParentItemId(2L);
         assertEquals(1, out.size());
-        assertEquals(7L, out.get(0).getId());
+        assertEquals(7L, out.getFirst().getId());
     }
 
     @Test
@@ -149,11 +151,11 @@ class ImageServiceImplTest {
         parent.setParentImages(new ArrayList<>());
         when(parentItemRepository.findById(3L)).thenReturn(Optional.of(parent));
 
-        assertThrows(Exception.class, () -> imageService.deleteImagesByParentItemId(3L));
+        assertThrows(RecordNotFoundException.class, () -> imageService.deleteImagesByParentItemId(3L));
     }
 
     @Test
-    void addImageToParentItem_savesAssociation() throws Exception {
+    void addImageToParentItem_savesAssociation() throws MapperException, RecordNotFoundException {
         ProductEntity parent = new ProductEntity();
         parent.setId(4L);
         when(parentItemRepository.findById(4L)).thenReturn(Optional.of(parent));
@@ -180,6 +182,6 @@ class ImageServiceImplTest {
     @Test
     void removeImageFromParentItem_throwsWhenNotExists() {
         when(parentImageRepository.existsById(any())).thenReturn(false);
-        assertThrows(Exception.class, () -> imageService.removeImageFromParentItem(5L, 6L));
+        assertThrows(RecordNotFoundException.class, () -> imageService.removeImageFromParentItem(5L, 6L));
     }
 }

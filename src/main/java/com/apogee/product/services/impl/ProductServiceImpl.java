@@ -53,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product addProduct(Product product) throws MapperException {
 
-        ProductEntity transientProduct = Mapper.map(product, ProductEntity.class);
+        ProductEntity transientProduct = transform(product, ProductEntity.class);
 
         ProductEntity savedEntity = productRepository.save(transientProduct);
 
@@ -65,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (this.productRepository.existsById(product.getId())) {
 
-            ProductEntity productEntity = Mapper.map(product, ProductEntity.class);
+            ProductEntity productEntity = transform(product, ProductEntity.class);
 
             return transform(this.productRepository.save(productEntity), Product.class, this::getProduct);
         } else {

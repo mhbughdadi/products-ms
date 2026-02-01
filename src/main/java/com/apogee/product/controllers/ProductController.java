@@ -3,6 +3,9 @@ package com.apogee.product.controllers;
 import com.apogee.product.backingservice.ProductsBackingService;
 import com.apogee.product.dtos.inputs.ProductDto;
 import com.apogee.product.dtos.output.*;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.exceptions.DBException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +25,7 @@ public class ProductController {
     @Operation(summary = "Get all products", description = "This endpoint retrieves all products available in the system.", tags = {"products"})
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllProductsResponseDto.class)))
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> allProducts() throws Exception {
+    public ResponseEntity<Response> allProducts() throws MapperException {
 
         AllProductsResponseDto response = productsBackingService.getAllProducts();
 
@@ -34,7 +37,7 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = FindProductResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> findProduct(@PathVariable("productId") Long productId) throws Exception {
+    public ResponseEntity<Response> findProduct(@PathVariable("productId") Long productId) throws MapperException, RecordNotFoundException {
 
         FindProductResponseDto response = productsBackingService.getProductById(productId);
 
@@ -46,7 +49,7 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "Product added successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AddProductResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> addProduct(@RequestBody ProductDto product) throws Exception {
+    public ResponseEntity<Response> addProduct(@RequestBody ProductDto product) throws MapperException {
 
         AddProductResponseDto response = productsBackingService.addProduct(product);
 
@@ -58,7 +61,7 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "Product updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AddProductResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> updateProduct(@RequestBody ProductDto product) throws Exception {
+    public ResponseEntity<Response> updateProduct(@RequestBody ProductDto product) throws MapperException, RecordNotFoundException {
 
         Response response = this.productsBackingService.updateProduct(product);
 
@@ -70,7 +73,7 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "Product deleted successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> deleteProduct(@PathVariable("productId") Long productId) throws Exception {
+    public ResponseEntity<Response> deleteProduct(@PathVariable("productId") Long productId) throws MapperException, RecordNotFoundException {
 
         this.productsBackingService.deleteProduct(productId);
 
@@ -82,7 +85,7 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AddProductResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> assignTag(@PathVariable("productId") Long productId, @PathVariable("tagId") Long tagId) throws Exception {
+    public ResponseEntity<Response> assignTag(@PathVariable("productId") Long productId, @PathVariable("tagId") Long tagId) throws MapperException, RecordNotFoundException, DBException {
 
         AddProductResponseDto response = productsBackingService.assignTag(productId, tagId);
 
@@ -94,7 +97,7 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> removeTag(@PathVariable("productId") Long productId, @PathVariable("tagId") Long tagId) throws Exception {
+    public ResponseEntity<Response> removeTag(@PathVariable("productId") Long productId, @PathVariable("tagId") Long tagId) throws MapperException, RecordNotFoundException {
 
         SuccessfulResponse response = productsBackingService.removeTag(productId, tagId);
 
@@ -106,7 +109,7 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllTagsResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> assignTag(@PathVariable("productId") Long productId) throws Exception {
+    public ResponseEntity<Response> assignTag(@PathVariable("productId") Long productId) throws MapperException {
 
         AllTagsResponseDto response = productsBackingService.fetchProductTags(productId);
 

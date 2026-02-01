@@ -3,6 +3,7 @@ package com.apogee.product.backingservice;
 import com.apogee.product.dtos.inputs.CurrencyDto;
 import com.apogee.product.dtos.output.AllCurrenciesResponseDto;
 import com.apogee.product.dtos.output.CurrencyResponseDto;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Currency;
 import com.apogee.product.services.CurrencyService;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,7 @@ class CurrenciesBackingServiceTest {
 
     @Test
     void getCurrencyById_propagatesException() throws Exception {
-        when(currencyService.findCurrency(99L)).thenThrow(new RuntimeException("no currency"));
-        assertThrows(RuntimeException.class, () -> backingService.getCurrencyById(99L));
+        when(currencyService.findCurrency(99L)).thenThrow(new RecordNotFoundException("no currency", 99L));
+        assertThrows(RecordNotFoundException.class, () -> backingService.getCurrencyById(99L));
     }
 }
