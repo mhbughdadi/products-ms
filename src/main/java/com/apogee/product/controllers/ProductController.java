@@ -1,6 +1,6 @@
 package com.apogee.product.controllers;
 
-import com.apogee.product.backingService.ProductsBackingService;
+import com.apogee.product.backingservice.ProductsBackingService;
 import com.apogee.product.dtos.inputs.ProductDto;
 import com.apogee.product.dtos.output.*;
 import io.swagger.v3.oas.annotations.Operation;

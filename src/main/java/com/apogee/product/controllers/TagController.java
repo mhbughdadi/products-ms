@@ -1,6 +1,6 @@
 package com.apogee.product.controllers;
 
-import com.apogee.product.backingService.TagBackingService;
+import com.apogee.product.backingservice.TagBackingService;
 import com.apogee.product.dtos.inputs.TagDto;
 import com.apogee.product.dtos.output.AllTagsResponseDto;
 import com.apogee.product.dtos.output.TagResponseDto;

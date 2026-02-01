@@ -1,4 +1,4 @@
-package com.apogee.product.backingService;
+package com.apogee.product.backingservice;
 
 import com.apogee.product.dtos.output.CurrencyResponseDto;
 import com.apogee.product.dtos.output.AllCurrenciesResponseDto;

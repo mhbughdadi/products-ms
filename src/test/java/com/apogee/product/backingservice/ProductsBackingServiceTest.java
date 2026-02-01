@@ -1,11 +1,10 @@
-package com.apogee.product.backingService;
+package com.apogee.product.backingservice;
 
 import com.apogee.product.dtos.inputs.ProductDto;
 import com.apogee.product.dtos.output.AddProductResponseDto;
 import com.apogee.product.dtos.output.AllProductsResponseDto;
 import com.apogee.product.dtos.output.AllTagsResponseDto;
 import com.apogee.product.dtos.output.FindProductResponseDto;
-import com.apogee.product.dtos.output.SuccessfulResponse;
 import com.apogee.product.models.Product;
 import com.apogee.product.models.Tag;
 import com.apogee.product.services.ProductService;

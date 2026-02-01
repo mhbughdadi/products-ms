@@ -1,6 +1,6 @@
 package com.apogee.product.controllers;
 
-import com.apogee.product.backingService.ImageBackingService;
+import com.apogee.product.backingservice.ImageBackingService;
 import com.apogee.product.dtos.inputs.ImageDto;
 import com.apogee.product.dtos.output.AllImagesResponseDto;
 import com.apogee.product.dtos.output.Response;

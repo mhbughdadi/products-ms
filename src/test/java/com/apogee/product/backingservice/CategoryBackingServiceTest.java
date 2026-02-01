@@ -1,7 +1,6 @@
-package com.apogee.product.backingService;
+package com.apogee.product.backingservice;
 
 import com.apogee.product.dtos.inputs.CategoryDto;
-import com.apogee.product.dtos.inputs.TagDto;
 import com.apogee.product.dtos.output.AllCategoriesResponseDto;
 import com.apogee.product.dtos.output.AllTagsResponseDto;
 import com.apogee.product.dtos.output.CategoryResponseDto;

@@ -1,6 +1,6 @@
 package com.apogee.product.controllers;
 
-import com.apogee.product.backingService.CurrenciesBackingService;
+import com.apogee.product.backingservice.CurrenciesBackingService;
 import com.apogee.product.dtos.inputs.CurrencyDto;
 import com.apogee.product.dtos.output.AllCurrenciesResponseDto;
 import com.apogee.product.dtos.output.CurrencyResponseDto;

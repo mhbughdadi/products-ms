@@ -1,6 +1,6 @@
 package com.apogee.product.controllers;
 
-import com.apogee.product.backingService.SkuBackingService;
+import com.apogee.product.backingservice.SkuBackingService;
 import com.apogee.product.dtos.inputs.BenefitDto;
 import com.apogee.product.dtos.inputs.SkuDto;
 import com.apogee.product.dtos.output.AllBenefitResponseDto;
