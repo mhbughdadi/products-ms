@@ -2,15 +2,15 @@ package com.apogee.product.aop;
 
 import com.apogee.product.constants.ProductsConstant;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.MapMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.message.StringMapMessage;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,54 +25,77 @@ import static com.apogee.product.constants.ProductsConstant.NULL_STRING;
 import static com.apogee.product.constants.ProductsConstant.REQUEST_ID;
 import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 
+@Slf4j
 @Aspect
 @Component
 public class LoggerAspect {
 
-    Logger logger = LogManager.getLogger(LoggerAspect.class);
 
     @Before("execution(* com.apogee.product.controllers.ProductController.*(..))")
     void logRequestInformation(JoinPoint joinPoint) {
 
-        logger = LogManager.getLogger(joinPoint.getSignature().getDeclaringTypeName());
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String requestId = getUUID();
 
-        request.setAttribute(REQUEST_ID, requestId);
-
-        logRequestDetails(joinPoint, request, null, requestId);
+        logRequestDetails(joinPoint, request, null);
 
     }
 
     @AfterReturning(pointcut = "execution(* com.apogee.product.controllers..*(..))", returning = "response")
     public void logResponseDetails(JoinPoint joinPoint, Object response) {
 
-        logger = LogManager.getLogger(joinPoint.getSignature().getDeclaringTypeName());
-
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String requestId = (String) request.getAttribute(REQUEST_ID);
 
-        logRequestDetails(joinPoint, request, response, requestId);
+        logRequestDetails(joinPoint, request, response);
 
     }
 
-    private void logRequestDetails(JoinPoint joinPoint, HttpServletRequest request, Object response, String requestId) {
+    @AfterThrowing(pointcut = "execution(* com.apogee.product.controllers..*(..))", throwing = "exception")
+    public void logExceptionDetails(JoinPoint joinPoint, Throwable exception, HttpServletRequest request) {
 
-       MapMessage<StringMapMessage, String> mapMessage = new StringMapMessage();
+        logExceptionDetails(joinPoint, request, exception);
+    }
+
+    private void logExceptionDetails(JoinPoint joinPoint, HttpServletRequest request, Throwable exception) {
+
+        // Use StringMapMessage which implements MapMessage<String,String> to avoid ClassCastException
+        StringMapMessage mapMessage = new StringMapMessage();
         Date now = new Date();
-
-        mapMessage.put(ProductsConstant.URL, request.getRequestURL().toString());
-        mapMessage.put(ProductsConstant.HTTP_METHOD, request.getMethod());
-        mapMessage.put(ProductsConstant.QUERY_PARAMS, formatAsJsonObject(getQueryParams(request)));
         String requestBody = getRequestBody(joinPoint);
-        mapMessage.put(ProductsConstant.REQUEST_BODY, requestBody != null ? requestBody : NULL_STRING);
-        mapMessage.put(ProductsConstant.TIMESTAMP, now.toString());
-        mapMessage.put(ProductsConstant.PATH_VARIABLES, getPathVariables(joinPoint));
-        mapMessage.put(ProductsConstant.HEADERS, formatAsJsonObject(getHeaders(request)));
-        mapMessage.put(ProductsConstant.REQUEST_ID, requestId != null ? requestId : NULL_STRING);
-        mapMessage.put(ProductsConstant.RESPONSE_BODY, response != null ? formatAsJsonObject(response) : NULL_STRING);
+        String requestId = MDC.get(REQUEST_ID);
 
-        logger.debug(mapMessage);
+        mapMessage.with(ProductsConstant.URL, request.getRequestURL().toString()).
+                with(ProductsConstant.HTTP_METHOD, request.getMethod())
+                .with(ProductsConstant.QUERY_PARAMS, formatAsJsonObject(getQueryParams(request)))
+                .with(ProductsConstant.REQUEST_BODY, requestBody != null ? requestBody : NULL_STRING)
+                .with(ProductsConstant.TIMESTAMP, now.toString())
+                .with(ProductsConstant.PATH_VARIABLES, getPathVariables(joinPoint))
+                .with(ProductsConstant.HEADERS, formatAsJsonObject(getHeaders(request)))
+                .with(ProductsConstant.REQUEST_ID, requestId != null ? requestId : NULL_STRING)
+                .with(ProductsConstant.EXCEPTION_MESSAGE, exception.getMessage() != null ? exception.getMessage() : NULL_STRING)
+                .with(ProductsConstant.EXCEPTION_STACKTRACE, Arrays.toString(exception.getStackTrace()));
+
+        log.error(mapMessage.asString());
+    }
+
+    private void logRequestDetails(JoinPoint joinPoint, HttpServletRequest request, Object response) {
+
+        // Use StringMapMessage consistently
+        StringMapMessage mapMessage = new StringMapMessage();
+        Date now = new Date();
+        String requestBody = getRequestBody(joinPoint);
+        String requestId = MDC.get(REQUEST_ID);
+
+        mapMessage.with(ProductsConstant.URL, request.getRequestURL().toString()).
+                with(ProductsConstant.HTTP_METHOD, request.getMethod())
+                .with(ProductsConstant.QUERY_PARAMS, formatAsJsonObject(getQueryParams(request)))
+                .with(ProductsConstant.REQUEST_BODY, requestBody != null ? requestBody : NULL_STRING)
+                .with(ProductsConstant.TIMESTAMP, now.toString())
+                .with(ProductsConstant.PATH_VARIABLES, getPathVariables(joinPoint))
+                .with(ProductsConstant.HEADERS, formatAsJsonObject(getHeaders(request)))
+                .with(ProductsConstant.REQUEST_ID, requestId != null ? requestId : NULL_STRING)
+                .with(ProductsConstant.RESPONSE_BODY, response != null ? formatAsJsonObject(response) : NULL_STRING);
+
+        log.debug(mapMessage.asString());
     }
 
 
@@ -147,10 +170,5 @@ public class LoggerAspect {
         Method method = signature.getMethod();
 
         return method.getParameterAnnotations();
-    }
-
-    private String getUUID() {
-
-        return UUID.randomUUID().toString();
     }
 }

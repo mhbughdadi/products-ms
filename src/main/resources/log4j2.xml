@@ -8,7 +8,12 @@
 
         <!-- Socket Appender to send logs to Logstash -->
         <Socket name="LogstashAppender" host="logstash" port="5044">
-            <JsonLayout complete="false" compact="true" eventEol="true"/>
+            <JsonLayout
+                    complete="false"
+                    compact="true"
+                    eventEol="true"
+                    properties="true"
+                    stacktraceAsString="true"/>
         </Socket>
     </Appenders>
 
@@ -22,6 +27,10 @@
             <AppenderRef ref="LogstashAppender"/>
         </Logger>
         <Logger name="com.apogee.product" level="debug">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="LogstashAppender"/>
+        </Logger>
+        <Logger name="com.apogee.product" level="error">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="LogstashAppender"/>
         </Logger>

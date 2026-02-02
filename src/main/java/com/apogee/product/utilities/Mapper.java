@@ -1,5 +1,10 @@
 package com.apogee.product.utilities;
 
+import com.apogee.product.exceptions.MapperException;
+
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -8,6 +13,7 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 
 public class Mapper {
@@ -25,10 +32,13 @@ public class Mapper {
             String.class, UUID.class, BigDecimal.class, BigInteger.class
     );
     private static final Map<Class<?>, Constructor<?>> CONSTRUCTOR_CACHE = new ConcurrentHashMap<>();
-    private static final Map<Class<?>, Field[]> FIELD_CACHE = new ConcurrentHashMap<>();
     private static final Map<Class<?>, Enum<?>[]> ENUM_CACHE = new ConcurrentHashMap<>();
-    private static final Map<Class<?>, Map<String, Field>> DESTINATION_FIELD_MAP_CACHE = new ConcurrentHashMap<>();
+    // cache property descriptors (bean properties) to use getters/setters instead of direct field access
+    private static final Map<Class<?>, Map<String, PropertyDescriptor>> PROP_DESCRIPTOR_CACHE = new ConcurrentHashMap<>();
 
+    private Mapper() {
+        // private constructor to prevent instantiation
+    }
 
     public static <S, D> D map(S source, Class<D> destinationClass) throws Exception {
 
@@ -42,34 +52,65 @@ public class Mapper {
 
         D destinationObj = getNewDestinationInstance(destinationClass);
 
-        Field[] sourceFields = FIELD_CACHE.computeIfAbsent(source.getClass(), Class::getDeclaredFields);
-        Field[] destinationFields = FIELD_CACHE.computeIfAbsent(destinationClass, Class::getDeclaredFields);
+        // Use bean property descriptors (getters/setters) to avoid accessibility bypass.
+        Map<String, PropertyDescriptor> sourceProps = getPropertyDescriptorMap(source.getClass());
+        Map<String, PropertyDescriptor> destinationPropertyDescriptors = getPropertyDescriptorMap(destinationClass);
 
-        Map<String, Field> destinationFieldMap = getDestinationFieldMap(destinationClass);
+        // iterate over source properties
+        for (Map.Entry<String, PropertyDescriptor> entry : sourceProps.entrySet()) {
+            String propName = entry.getKey();
+            PropertyDescriptor sourcePd = entry.getValue();
 
-        // iterating on source field list.
-        for (Field sourceField : sourceFields) {
+            if (sourcePd.getReadMethod() == null) {
+                continue; // nothing to read
+            }
 
-            sourceField.setAccessible(true);
-            Object sourceValue = sourceField.get(source);
+            Object sourceValue = sourcePd.getReadMethod().invoke(source);
 
-            Field destinationField = destinationFieldMap.get(sourceField.getName());
-            if (null == destinationField) {
+            PropertyDescriptor destinationPropertyDescriptor = destinationPropertyDescriptors.get(propName);
+            if (destinationPropertyDescriptor == null || destinationPropertyDescriptor.getWriteMethod() == null) {
+                continue; // no place to write
+            }
+
+            // Try to get the corresponding declared Field on destination to inspect generic types where needed
+            Field destField = null;
+            try {
+                destField = destinationClass.getDeclaredField(propName);
+            } catch (NoSuchFieldException ignored) {
+                // if not present as a declared field, we may still have a writable property; try to use property type
+            }
+
+            Class<?> sourceType = sourcePd.getPropertyType();
+
+            if (sourceValue == null) {
+                Class<?> destinationPropType = destinationPropertyDescriptor.getPropertyType();
+                if (Collection.class.isAssignableFrom(destinationPropType)) {
+                    destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, createCollectionInstance(destinationPropType));
+                } else if (Map.class.isAssignableFrom(destinationPropType)) {
+                    destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, createMapInstance(destinationPropType));
+                }
                 continue;
             }
 
-            if (isSimpleField(sourceField.getType())) {
 
-                destinationField.set(destinationObj, sourceValue);
-            } else if (Collection.class.isAssignableFrom(sourceField.getType())) {
-
-                destinationField.set(destinationObj, mapCollection(sourceValue, destinationField));
-            } else if (Map.class.isAssignableFrom(sourceField.getType())) {
-
-                destinationField.set(destinationObj, mapMap(sourceValue, destinationField));
+            if (isSimpleField(sourceType)) {
+                destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, sourceValue);
+            } else if (Collection.class.isAssignableFrom(sourceType)) {
+                // need Field to determine generic destination element type
+                if (destField != null) {
+                    Object mappedCollection = mapCollection(sourceValue, destField);
+                    destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, mappedCollection);
+                }
+            } else if (Map.class.isAssignableFrom(sourceType)) {
+                if (destField != null) {
+                    Object mappedMap = mapMap(sourceValue, destField);
+                    destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, mappedMap);
+                }
             } else {
-
-                destinationField.set(destinationObj, map(sourceValue, destinationField.getType()));
+                // nested object
+                Class<?> nestedDestClass = destField != null ? destField.getType() : destinationPropertyDescriptor.getPropertyType();
+                Object mapped = map(sourceValue, nestedDestClass);
+                destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, mapped);
             }
         }
 
@@ -90,7 +131,7 @@ public class Mapper {
                 }
             }
 
-            throw new IllegalArgumentException(
+            throw new MapperException(
                     "No matching enum constant for " + sourceEnum.name() +
                             " in " + destinationClass.getName()
             );
@@ -101,7 +142,7 @@ public class Mapper {
             // Allow Enum -> ordinal
             return (D) Integer.valueOf(sourceEnum.ordinal());
         } else {
-            throw new IllegalArgumentException(
+            throw new MapperException(
                     "Cannot map enum type " + source.getClass().getName() +
                             " to non-enum type " + destinationClass.getName()
             );
@@ -134,19 +175,16 @@ public class Mapper {
 
     }
 
-    private static <D> D getNewDestinationInstance(Class<D> destinationClass) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    private static <D> D getNewDestinationInstance(Class<D> destinationClass) throws InvocationTargetException, InstantiationException, IllegalAccessException {
 
         // getting reference to the destination class constructor from cache or creating a new one.
         @SuppressWarnings("unchecked")
         Constructor<D> constructor = (Constructor<D>) CONSTRUCTOR_CACHE.computeIfAbsent(destinationClass, cls -> {
             try {
-                @SuppressWarnings("unchecked")
-                Constructor<D> construct = (Constructor<D>) cls.getDeclaredConstructor();
-                construct.setAccessible(true);
-
-                return construct;
+                // prefer public no-arg constructor
+                return cls.getDeclaredConstructor();
             } catch (Exception e) {
-                throw new RuntimeException("No default constructor found for class: " + cls.getName(), e);
+                throw new MapperException("No default constructor found for class: " + cls.getName(), e);
             }
         });
 
@@ -154,15 +192,15 @@ public class Mapper {
         return constructor.newInstance();
     }
 
-    private static Map<String, Field> getDestinationFieldMap(Class<?> destinationClass) {
-        return DESTINATION_FIELD_MAP_CACHE.computeIfAbsent(destinationClass, cls -> {
-            Field[] fields = FIELD_CACHE.computeIfAbsent(cls, Class::getDeclaredFields);
-            Map<String, Field> fieldMap = new HashMap<>();
-            for (Field field : fields) {
-                field.setAccessible(true);
-                fieldMap.put(field.getName(), field);
+    private static Map<String, PropertyDescriptor> getPropertyDescriptorMap(Class<?> cls) {
+        return PROP_DESCRIPTOR_CACHE.computeIfAbsent(cls, c -> {
+            Map<String, PropertyDescriptor> map = new HashMap<>();
+            try {
+                map = Arrays.stream(Introspector.getBeanInfo(c).getPropertyDescriptors()).filter(propertyDescriptor -> !"class".equals(propertyDescriptor.getName())).collect(Collectors.toMap(PropertyDescriptor::getName, pd -> pd));
+            } catch (IntrospectionException e) {
+                throw new MapperException("Failed to introspect class: " + c.getName(), e);
             }
-            return fieldMap;
+            return map;
         });
     }
 
@@ -228,7 +266,7 @@ public class Mapper {
             return new HashSet<>();
         } else {
 
-            throw new RuntimeException("Not Supported Collection Type: " + type.getName());
+            throw new MapperException("Not Supported Collection Type: " + type.getName());
         }
     }
 
@@ -237,7 +275,7 @@ public class Mapper {
         if (Map.class.isAssignableFrom(type)) {
             return new HashMap<>();
         } else {
-            throw new RuntimeException("Not Supported Map Type: " + type.getName());
+            throw new MapperException("Not Supported Map Type: " + type.getName());
         }
     }
 

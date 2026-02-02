@@ -17,6 +17,9 @@ public interface ProductsConstant {
     String PATH_VARIABLES = "pathVariables";
     String HEADERS = "headers";
     String REQUEST_ID = "requestId";
+    String X_REQUEST_ID = "X-Request-Id";
     String RESPONSE_BODY = "responseBody";
     String NULL_STRING = "null";
+    String EXCEPTION_MESSAGE = "exceptionMessage";
+    String EXCEPTION_STACKTRACE = "exceptionStacktrace";
 }
