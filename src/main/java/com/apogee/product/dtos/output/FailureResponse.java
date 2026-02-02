@@ -4,10 +4,14 @@ import com.apogee.product.enums.Status;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+
 @Setter
 @Getter
 public class FailureResponse extends Response {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final static int FAILURE_CODE = -1;
 
     public FailureResponse() {

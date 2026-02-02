@@ -1,10 +1,13 @@
-package com.apogee.product.backingService;
+package com.apogee.product.backingservice;
 
 import com.apogee.product.dtos.inputs.TagDto;
 import com.apogee.product.dtos.output.AllTagsResponseDto;
 import com.apogee.product.dtos.output.TagResponseDto;
 import com.apogee.product.models.Tag;
 import com.apogee.product.services.TagService;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.exceptions.DBException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,7 +29,7 @@ class TagBackingServiceTest {
     private TagBackingService backingService;
 
     @Test
-    void add_update_delete_and_getAll_getById() throws Exception {
+    void add_update_delete_and_getAll_getById() throws MapperException, RecordNotFoundException, DBException {
         TagDto dto = new TagDto();
         dto.setName("N");
 
@@ -57,7 +60,7 @@ class TagBackingServiceTest {
     }
 
     @Test
-    void getAllTags_returnsEmpty_whenNoTags() throws Exception {
+    void getAllTags_returnsEmpty_whenNoTags() throws MapperException, RecordNotFoundException, DBException {
         when(tagService.findAllTags()).thenReturn(List.of());
         AllTagsResponseDto all = backingService.getAllTags();
         assertNotNull(all);
@@ -65,8 +68,8 @@ class TagBackingServiceTest {
     }
 
     @Test
-    void getTagById_propagatesException() throws Exception {
-        when(tagService.findTag(99L)).thenThrow(new RuntimeException("not found"));
-        assertThrows(RuntimeException.class, () -> backingService.getTagById(99L));
+    void getTagById_propagatesException() throws MapperException, RecordNotFoundException, DBException {
+        when(tagService.findTag(99L)).thenThrow(new RecordNotFoundException("not found"));
+        assertThrows(RecordNotFoundException.class, () -> backingService.getTagById(99L));
     }
 }

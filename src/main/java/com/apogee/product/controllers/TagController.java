@@ -1,10 +1,13 @@
 package com.apogee.product.controllers;
 
-import com.apogee.product.backingService.TagBackingService;
+import com.apogee.product.backingservice.TagBackingService;
 import com.apogee.product.dtos.inputs.TagDto;
 import com.apogee.product.dtos.output.AllTagsResponseDto;
 import com.apogee.product.dtos.output.TagResponseDto;
 import com.apogee.product.dtos.output.Response;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.exceptions.DBException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,7 +34,7 @@ public class TagController {
     @ApiResponse(responseCode = "200", description = "Tag added successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TagResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> addTag(@RequestBody TagDto tagDto) throws Exception {
+    public ResponseEntity<Response> addTag(@RequestBody TagDto tagDto) throws MapperException, RecordNotFoundException, DBException {
 
         TagResponseDto response = tagBackingService.addTag(tagDto);
 
@@ -44,7 +47,7 @@ public class TagController {
     @ApiResponse(responseCode = "200", description = "Tag updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TagResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> updateTag(@RequestBody TagDto tagDto) throws Exception {
+    public ResponseEntity<Response> updateTag(@RequestBody TagDto tagDto) throws MapperException, RecordNotFoundException, DBException {
 
         TagResponseDto response = tagBackingService.updateTag(tagDto);
 
@@ -55,7 +58,7 @@ public class TagController {
     @Operation(summary = "Get all tags", description = "This endpoint retrieves all tags available in the system.", tags = {"tags"})
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AllTagsResponseDto.class)))
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<AllTagsResponseDto> getAllCategories() throws Exception {
+    public ResponseEntity<AllTagsResponseDto> getAllCategories() throws MapperException {
 
         AllTagsResponseDto response = tagBackingService.getAllTags();
 
@@ -67,7 +70,7 @@ public class TagController {
     @ApiResponse(responseCode = "200", description = "Tag deleted successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TagResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> deleteTag(@PathVariable("tagId") Long tagId) throws Exception {
+    public ResponseEntity<Response> deleteTag(@PathVariable("tagId") Long tagId) throws MapperException, RecordNotFoundException, DBException {
 
         TagResponseDto response = tagBackingService.deleteTagById(tagId);
 
@@ -79,7 +82,7 @@ public class TagController {
     @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TagResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
     @ApiResponse(responseCode = "500", ref = "#/components/schemas/FailureResponse")
-    public ResponseEntity<Response> getTag(@PathVariable("tagId") Long tagId) throws Exception {
+    public ResponseEntity<Response> getTag(@PathVariable("tagId") Long tagId) throws MapperException, RecordNotFoundException {
 
         TagResponseDto response = tagBackingService.getTagById(tagId);
 

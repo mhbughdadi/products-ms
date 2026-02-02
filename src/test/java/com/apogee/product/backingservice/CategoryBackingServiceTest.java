@@ -1,11 +1,13 @@
-package com.apogee.product.backingService;
+package com.apogee.product.backingservice;
 
 import com.apogee.product.dtos.inputs.CategoryDto;
-import com.apogee.product.dtos.inputs.TagDto;
 import com.apogee.product.dtos.output.AllCategoriesResponseDto;
 import com.apogee.product.dtos.output.AllTagsResponseDto;
 import com.apogee.product.dtos.output.CategoryResponseDto;
 import com.apogee.product.dtos.output.SuccessfulResponse;
+import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.DBException;
 import com.apogee.product.models.Category;
 import com.apogee.product.models.Tag;
 import com.apogee.product.services.CategoryService;
@@ -30,7 +32,7 @@ class CategoryBackingServiceTest {
     private CategoryBackingService backingService;
 
     @Test
-    void addCategory_mapsDtoAndReturnsDto() throws Exception {
+    void addCategory_mapsDtoAndReturnsDto() throws MapperException, RecordNotFoundException {
         CategoryDto input = new CategoryDto();
         input.setCode("C1");
 
@@ -48,7 +50,7 @@ class CategoryBackingServiceTest {
     }
 
     @Test
-    void getAllCategories_transformsModelsToDtos() throws Exception {
+    void getAllCategories_transformsModelsToDtos() throws MapperException {
         Category c = new Category();
         c.setId(1L);
         c.setCode("ROOT");
@@ -64,12 +66,12 @@ class CategoryBackingServiceTest {
 
         assertNotNull(resp);
         assertEquals(1, resp.getCategories().size());
-        assertEquals(1L, resp.getCategories().get(0).getId());
-        assertEquals(1, resp.getCategories().get(0).getSubCategories().size());
+        assertEquals(1L, resp.getCategories().getFirst().getId());
+        assertEquals(1, resp.getCategories().getFirst().getSubCategories().size());
     }
 
     @Test
-    void getCategoryById_mapsModelToDto() throws Exception {
+    void getCategoryById_mapsModelToDto() throws MapperException, RecordNotFoundException {
         Category model = new Category();
         model.setId(7L);
         model.setCode("C7");
@@ -83,7 +85,7 @@ class CategoryBackingServiceTest {
     }
 
     @Test
-    void assignTag_and_fetchTags_and_removeTag_behaveAsExpected() throws Exception {
+    void assignTag_and_fetchTags_and_removeTag_behaveAsExpected() throws MapperException, RecordNotFoundException, DBException {
         Tag tag = new Tag();
         tag.setId(11L);
         tag.setName("T1");
@@ -103,14 +105,14 @@ class CategoryBackingServiceTest {
         AllTagsResponseDto tagsResp = backingService.fetchCategoryTags(1L);
         assertNotNull(tagsResp.getTags());
         assertEquals(1, tagsResp.getTags().size());
-        assertEquals(11L, tagsResp.getTags().get(0).getId());
+        assertEquals(11L, tagsResp.getTags().getFirst().getId());
 
         SuccessfulResponse removed = backingService.removeTag(1L, 11L);
         assertNotNull(removed);
     }
 
     @Test
-    void deleteCategoryById_mapsReturnedModel() throws Exception {
+    void deleteCategoryById_mapsReturnedModel() throws MapperException, RecordNotFoundException {
         Category deleted = new Category();
         deleted.setId(3L);
         deleted.setCode("DEL");
@@ -122,21 +124,21 @@ class CategoryBackingServiceTest {
     }
 
     @Test
-    void deleteCategoryById_propagatesException() throws Exception {
-        when(categoryService.deleteCategoryById(99L)).thenThrow(new RuntimeException("db gone"));
-        assertThrows(RuntimeException.class, () -> backingService.deleteCategoryById(99L));
+    void deleteCategoryById_propagatesException() throws MapperException, RecordNotFoundException {
+        when(categoryService.deleteCategoryById(99L)).thenThrow(new RecordNotFoundException("db gone", 99L));
+        assertThrows(RecordNotFoundException.class, () -> backingService.deleteCategoryById(99L));
     }
 
     @Test
-    void addCategory_propagatesException() throws Exception {
+    void addCategory_propagatesException() throws MapperException, RecordNotFoundException {
         CategoryDto dto = new CategoryDto();
         dto.setCode("X");
-        when(categoryService.addCategory(any(Category.class))).thenThrow(new RuntimeException("save failed"));
-        assertThrows(RuntimeException.class, () -> backingService.addCategory(dto));
+        when(categoryService.addCategory(any(Category.class))).thenThrow(new RecordNotFoundException("save failed", 0L));
+        assertThrows(RecordNotFoundException.class, () -> backingService.addCategory(dto));
     }
 
     @Test
-    void getAllCategories_returnsEmptyList_whenServiceReturnsEmpty() throws Exception {
+    void getAllCategories_returnsEmptyList_whenServiceReturnsEmpty() throws MapperException {
         when(categoryService.findAllCategories()).thenReturn(List.of());
         AllCategoriesResponseDto resp = backingService.getAllCategories();
         assertNotNull(resp);
@@ -144,13 +146,13 @@ class CategoryBackingServiceTest {
     }
 
     @Test
-    void assignTag_propagatesRecordNotFound() throws Exception {
+    void assignTag_propagatesRecordNotFound() throws MapperException, RecordNotFoundException, DBException {
         when(categoryService.assignTagToCategory(1L, 10L)).thenThrow(new com.apogee.product.exceptions.RecordNotFoundException("record.not.found", 1L));
         assertThrows(com.apogee.product.exceptions.RecordNotFoundException.class, () -> backingService.assignTag(1L, 10L));
     }
 
     @Test
-    void fetchCategoryTags_returnsEmptyList_whenNoTags() throws Exception {
+    void fetchCategoryTags_returnsEmptyList_whenNoTags() throws MapperException {
         when(categoryService.getTagsForCategory(5L)).thenReturn(List.of());
         AllTagsResponseDto resp = backingService.fetchCategoryTags(5L);
         assertNotNull(resp);

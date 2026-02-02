@@ -1,5 +1,8 @@
 package com.apogee.product.services;
 
+import com.apogee.product.exceptions.DBException;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Benefit;
 import com.apogee.product.models.Sku;
 import com.apogee.product.models.Tag;
@@ -7,25 +10,100 @@ import java.util.List;
 
 public interface SkuService {
 
-    List<Sku> findAllSkus() throws Exception;
+    /**
+     * Return all SKUs
+     * @return list of SKUs
+     * @throws MapperException mapping failure
+     */
+    List<Sku> findAllSkus() throws MapperException;
 
-    Sku addSku(Sku sku) throws Exception;
+    /**
+     * Persist a SKU
+     * @param sku input model
+     * @return saved SKU
+     * @throws MapperException mapping failure
+     * @throws RecordNotFoundException when referenced product not found
+     */
+    Sku addSku(Sku sku) throws MapperException, RecordNotFoundException;
 
-    Sku updateSku(Sku sku) throws Exception;
+    /**
+     * Update a SKU
+     * @param sku model
+     * @return updated SKU
+     * @throws MapperException mapping failure
+     * @throws RecordNotFoundException when SKU not found or product missing
+     */
+    Sku updateSku(Sku sku) throws MapperException, RecordNotFoundException;
 
-    Sku findSkuById(Long skuId) throws Exception;
+    /**
+     * Find a SKU by id
+     * @param skuId id
+     * @return SKU model
+     * @throws MapperException mapping failure
+     * @throws RecordNotFoundException when not found
+     */
+    Sku findSkuById(Long skuId) throws MapperException, RecordNotFoundException;
 
-    void deleteSkuById(Long skuId) throws Exception;
+    /**
+     * Delete a SKU
+     * @param skuId id
+     * @throws MapperException mapping failure
+     * @throws RecordNotFoundException when not found
+     */
+    void deleteSkuById(Long skuId) throws MapperException, RecordNotFoundException;
 
-    Benefit addBenefitToSku(Long skuId, Benefit benefit) throws Exception;
+    /**
+     * Add a benefit to a SKU
+     * @param skuId id
+     * @param benefit benefit model
+     * @return saved Benefit
+     * @throws MapperException mapping failure
+     * @throws RecordNotFoundException when SKU not found
+     */
+    Benefit addBenefitToSku(Long skuId, Benefit benefit) throws MapperException, RecordNotFoundException;
 
-    List<Benefit> getSkuBenefits(Long skuId) throws Exception;
+    /**
+     * Get benefits for a SKU
+     * @param skuId id
+     * @return list of benefits
+     * @throws MapperException mapping failure
+     */
+    List<Benefit> getSkuBenefits(Long skuId) throws MapperException;
 
-    void removeBenefitFromSku(Long skuId, Long benefitId) throws Exception;
+    /**
+     * Remove a benefit from a SKU
+     * @param skuId id
+     * @param benefitId id
+     * @throws MapperException mapping failure
+     * @throws RecordNotFoundException when benefit/sku association not found
+     */
+    void removeBenefitFromSku(Long skuId, Long benefitId) throws MapperException, RecordNotFoundException;
 
-    Sku assignTagToSku(Long skuId, Long tagId) throws Exception;
+    /**
+     * Assign a tag to a SKU
+     * @param skuId id
+     * @param tagId id
+     * @return updated SKU
+     * @throws MapperException mapping failure
+     * @throws RecordNotFoundException when sku or tag not found
+     * @throws DBException on duplicate assignment
+     */
+    Sku assignTagToSku(Long skuId, Long tagId) throws MapperException, RecordNotFoundException, DBException;
 
-    List<Tag> getTagsForSku(Long skuId) throws Exception;
+    /**
+     * Get tags for a SKU
+     * @param skuId id
+     * @return list of Tag models
+     * @throws MapperException mapping failure
+     */
+    List<Tag> getTagsForSku(Long skuId) throws MapperException;
 
-    void removeTagFromSku(Long skuId, Long tagId) throws Exception;
+    /**
+     * Remove a tag from a SKU
+     * @param skuId id
+     * @param tagId id
+     * @throws MapperException mapping failure
+     * @throws DBException when tag assignment not found
+     */
+    void removeTagFromSku(Long skuId, Long tagId) throws MapperException, DBException;
 }

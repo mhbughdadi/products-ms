@@ -1,4 +1,4 @@
-package com.apogee.product.backingService;
+package com.apogee.product.backingservice;
 
 import com.apogee.product.dtos.output.AllImagesResponseDto;
 import com.apogee.product.dtos.inputs.ImageDto;
@@ -7,11 +7,14 @@ import com.apogee.product.dtos.output.SuccessfulResponse;
 import com.apogee.product.models.Image;
 import com.apogee.product.services.ImageService;
 import com.apogee.product.utilities.Mapper;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Service
@@ -20,29 +23,29 @@ public class ImageBackingService {
     @Autowired
     private ImageService imageService;
 
-    public ImageResponseDto addImage(ImageDto imageDto) throws Exception {
+    public ImageResponseDto addImage(ImageDto imageDto) throws MapperException, RecordNotFoundException {
 
         ImageResponseDto response = new ImageResponseDto();
 
-        Image savedImage = this.imageService.saveImage(Mapper.map(imageDto, Image.class));
+        Image savedImage = this.imageService.saveImage(transform(imageDto, Image.class));
 
-        response.setImage(Mapper.map(savedImage, ImageDto.class));
+        response.setImage(transform(savedImage, ImageDto.class));
 
         return response;
     }
 
-    public ImageResponseDto updateImage(ImageDto imageDto) throws Exception {
+    public ImageResponseDto updateImage(ImageDto imageDto) throws MapperException, RecordNotFoundException {
 
         ImageResponseDto response = new ImageResponseDto();
 
-        Image updatedImage = this.imageService.updateImage(Mapper.map(imageDto, Image.class));
+        Image updatedImage = this.imageService.updateImage(transform(imageDto, Image.class));
 
-        response.setImage(Mapper.map(updatedImage, ImageDto.class));
+        response.setImage(transform(updatedImage, ImageDto.class));
 
         return response;
     }
 
-    public SuccessfulResponse deleteImageById(Long imageId) throws Exception {
+    public SuccessfulResponse deleteImageById(Long imageId) throws MapperException, RecordNotFoundException {
 
         SuccessfulResponse response = new SuccessfulResponse();
 
@@ -51,7 +54,7 @@ public class ImageBackingService {
         return response;
     }
 
-    public AllImagesResponseDto getAllImages() throws Exception {
+    public AllImagesResponseDto getAllImages() throws MapperException {
 
         AllImagesResponseDto response = new AllImagesResponseDto();
 
@@ -64,19 +67,19 @@ public class ImageBackingService {
         return response;
     }
 
-    public ImageResponseDto getImageById(Long imageId) throws Exception {
+    public ImageResponseDto getImageById(Long imageId) throws MapperException, RecordNotFoundException {
 
         ImageResponseDto response = new ImageResponseDto();
 
         Image image = this.imageService.findImageById(imageId);
 
-        response.setImage(Mapper.map(image, ImageDto.class));
+        response.setImage(transform(image, ImageDto.class));
 
         return response;
 
     }
 
-    public AllImagesResponseDto addImages(List<ImageDto> imageDtos) throws Exception {
+    public AllImagesResponseDto addImages(List<ImageDto> imageDtos) throws MapperException {
 
         AllImagesResponseDto response = new AllImagesResponseDto();
 
@@ -90,7 +93,7 @@ public class ImageBackingService {
         return response;
     }
 
-    public AllImagesResponseDto getImagesByParentItemId(Long productId) throws Exception {
+    public AllImagesResponseDto getImagesByParentItemId(Long productId) throws MapperException, RecordNotFoundException {
 
         AllImagesResponseDto response = new AllImagesResponseDto();
 
@@ -102,7 +105,7 @@ public class ImageBackingService {
         return response;
     }
 
-    public SuccessfulResponse deleteImagesByParentItemId(Long productId) throws Exception {
+    public SuccessfulResponse deleteImagesByParentItemId(Long productId) throws MapperException {
 
         SuccessfulResponse response = new SuccessfulResponse();
 
@@ -111,18 +114,18 @@ public class ImageBackingService {
         return response;
     }
 
-    public ImageResponseDto addImageToParentItem(Long parentItemId, ImageDto imageDto) throws Exception {
+    public ImageResponseDto addImageToParentItem(Long parentItemId, ImageDto imageDto) throws MapperException, RecordNotFoundException {
 
         ImageResponseDto response = new ImageResponseDto();
 
-        Image savedImage = this.imageService.addImageToParentItem(parentItemId, Mapper.map(imageDto, Image.class));
+        Image savedImage = this.imageService.addImageToParentItem(parentItemId, transform(imageDto, Image.class));
 
-        response.setImage(Mapper.map(savedImage, ImageDto.class));
+        response.setImage(transform(savedImage, ImageDto.class));
 
         return response;
     }
 
-    public SuccessfulResponse removeImageFromParentItem(Long parentItemId, Long imageId) throws Exception {
+    public SuccessfulResponse removeImageFromParentItem(Long parentItemId, Long imageId) throws MapperException, RecordNotFoundException {
 
         SuccessfulResponse response = new SuccessfulResponse();
 

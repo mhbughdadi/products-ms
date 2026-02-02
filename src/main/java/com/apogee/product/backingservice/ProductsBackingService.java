@@ -1,4 +1,4 @@
-package com.apogee.product.backingService;
+package com.apogee.product.backingservice;
 
 import com.apogee.product.dtos.inputs.TagDto;
 import com.apogee.product.dtos.output.*;
@@ -9,12 +9,16 @@ import com.apogee.product.models.Product;
 import com.apogee.product.services.CurrencyService;
 import com.apogee.product.services.ImageService;
 import com.apogee.product.services.ProductService;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.exceptions.DBException;
 import com.apogee.product.utilities.Utilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Service
@@ -29,7 +33,7 @@ public class ProductsBackingService {
     @Autowired
     private CurrencyService currencyService;
 
-    public AllProductsResponseDto getAllProducts() throws Exception {
+    public AllProductsResponseDto getAllProducts() throws MapperException {
 
         AllProductsResponseDto response = new AllProductsResponseDto();
 
@@ -39,54 +43,54 @@ public class ProductsBackingService {
         return response;
     }
 
-    public AddProductResponseDto addProduct(ProductDto productDto) throws Exception {
+    public AddProductResponseDto addProduct(ProductDto productDto) throws MapperException {
 
         AddProductResponseDto response = new AddProductResponseDto();
 
-        Product product = Mapper.map(productDto, Product.class);
+        Product product = transform(productDto, Product.class);
         Product savedProduct = productService.addProduct(product);
-        response.setProduct(Mapper.map(savedProduct, ProductOutputDto.class));
+        response.setProduct(transform(savedProduct, ProductOutputDto.class));
 
         return response;
     }
 
-    public FindProductResponseDto getProductById(Long productId) throws Exception {
+    public FindProductResponseDto getProductById(Long productId) throws MapperException, RecordNotFoundException {
 
         FindProductResponseDto response = new FindProductResponseDto();
 
         Product product = productService.findProductById(productId);
-        response.setProduct(Mapper.map(product, ProductOutputDto.class));
+        response.setProduct(transform(product, ProductOutputDto.class));
 
         return response;
     }
 
-    public void deleteProduct(Long productId) throws Exception {
+    public void deleteProduct(Long productId) throws MapperException, RecordNotFoundException {
 
         this.productService.deleteProductById(productId);
     }
 
-    public AddProductResponseDto updateProduct(ProductDto product) throws Exception {
+    public AddProductResponseDto updateProduct(ProductDto product) throws MapperException, RecordNotFoundException {
 
         AddProductResponseDto response = new AddProductResponseDto();
 
-        Product updatedProduct = this.productService.updateProduct(Mapper.map(product, Product.class));
-        response.setProduct(Mapper.map(updatedProduct, ProductOutputDto.class));
+        Product updatedProduct = this.productService.updateProduct(transform(product, Product.class));
+        response.setProduct(transform(updatedProduct, ProductOutputDto.class));
 
         return response;
     }
 
-    public AddProductResponseDto assignTag(Long productId, Long tagId) throws Exception {
+    public AddProductResponseDto assignTag(Long productId, Long tagId) throws MapperException, RecordNotFoundException, DBException {
 
         AddProductResponseDto response = new AddProductResponseDto();
 
         Product product = this.productService.assignTagToProduct(productId, tagId);
 
-        response.setProduct(Mapper.map(product, ProductOutputDto.class));
+        response.setProduct(transform(product, ProductOutputDto.class));
 
         return response;
     }
 
-    public SuccessfulResponse removeTag(Long productId, Long tagId) throws Exception {
+    public SuccessfulResponse removeTag(Long productId, Long tagId) throws MapperException, RecordNotFoundException {
 
         SuccessfulResponse response = new SuccessfulResponse();
 
@@ -95,7 +99,7 @@ public class ProductsBackingService {
         return response;
     }
 
-    public AllTagsResponseDto fetchProductTags(Long productId) throws Exception {
+    public AllTagsResponseDto fetchProductTags(Long productId) throws MapperException {
 
         AllTagsResponseDto response = new AllTagsResponseDto();
 

@@ -3,6 +3,7 @@ package com.apogee.product.services.impl;
 import com.apogee.product.entities.ProductEntity;
 import com.apogee.product.entities.TagEntity;
 import com.apogee.product.exceptions.DBException;
+import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Tag;
 import com.apogee.product.repositories.TagRepository;
@@ -20,6 +21,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.apogee.product.constants.ProductsConstant.ERROR_CATEGORY_TAG_ALREADY_EXISTS;
+import static com.apogee.product.constants.ProductsConstant.ERROR_Product_TAG_NOT_FOUND;
+import static com.apogee.product.constants.ProductsConstant.ERROR_RECORD_NOT_FOUND;
 import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
@@ -34,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
     private TagRepository tagRepository;
 
     @Override
-    public List<Product> findAllProducts() throws Exception {
+    public List<Product> findAllProducts() throws MapperException {
 
         List<ProductEntity> productEntities = productRepository.findAll();
 
@@ -47,9 +51,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product addProduct(Product product) throws Exception {
+    public Product addProduct(Product product) throws MapperException {
 
-        ProductEntity transientProduct = Mapper.map(product, ProductEntity.class);
+        ProductEntity transientProduct = transform(product, ProductEntity.class);
 
         ProductEntity savedEntity = productRepository.save(transientProduct);
 
@@ -57,46 +61,46 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product updateProduct(Product product) throws Exception {
+    public Product updateProduct(Product product) throws MapperException, RecordNotFoundException {
 
         if (this.productRepository.existsById(product.getId())) {
 
-            ProductEntity productEntity = Mapper.map(product, ProductEntity.class);
+            ProductEntity productEntity = transform(product, ProductEntity.class);
 
             return transform(this.productRepository.save(productEntity), Product.class, this::getProduct);
         } else {
-            throw new RecordNotFoundException("record.not.found", product.getId());
+            throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, product.getId());
         }
     }
 
     @Override
-    public Product findProductById(Long productId) throws Exception {
+    public Product findProductById(Long productId) throws MapperException, RecordNotFoundException {
 
         Optional<ProductEntity> productEntityOptional = this.productRepository.findById(productId);
 
-        return transform(productEntityOptional.orElseThrow(() -> new RecordNotFoundException("record.not.found", productId)), Product.class, this::getProduct);
+        return transform(productEntityOptional.orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, productId)), Product.class, this::getProduct);
     }
 
     @Override
-    public void deleteProductById(Long productId) throws Exception {
+    public void deleteProductById(Long productId) throws MapperException , RecordNotFoundException {
 
         if (this.productRepository.existsById(productId)) {
 
             this.productRepository.deleteById(productId);
         } else {
-            throw new RecordNotFoundException("record.not.found", productId);
+            throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, productId);
         }
     }
 
     @Override
-    public Product assignTagToProduct(Long productId, Long tagId) throws Exception {
+    public Product assignTagToProduct(Long productId, Long tagId) throws MapperException, RecordNotFoundException, DBException {
 
         productRepository.findByIdAndTagsId(productId, tagId).ifPresent(existingAssignment -> {
-            throw new DBException("errors.duplicate.record", ProductEntity.class, productId, tagId);
+            throw new DBException(ERROR_CATEGORY_TAG_ALREADY_EXISTS, ProductEntity.class, productId, tagId);
         });
 
-        TagEntity tag = tagRepository.findById(tagId).orElseThrow(() -> new RecordNotFoundException("Tag not found", tagId));
-        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new RecordNotFoundException("Product not found", productId));
+        TagEntity tag = tagRepository.findById(tagId).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, tagId));
+        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, productId));
         product.getTags().add(tag);
 
         ProductEntity savedProduct = productRepository.save(product);
@@ -105,7 +109,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Tag> getTagsForProduct(Long productId) throws Exception {
+    public List<Tag> getTagsForProduct(Long productId) throws MapperException {
 
         List<TagEntity> assignments = tagRepository.findByItemsId(productId);
 
@@ -113,11 +117,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void removeTagFromProduct(Long productId, Long tagId) throws Exception {
+    public void removeTagFromProduct(Long productId, Long tagId) throws MapperException, RecordNotFoundException {
 
         ProductEntity found = productRepository.findByIdAndTagsId(productId, tagId)
                 .orElseThrow(
-                        () -> new DBException("errors.not.found", ProductEntity.class, productId, tagId)
+                        () -> new RecordNotFoundException(ERROR_Product_TAG_NOT_FOUND, productId, tagId)
                 );
 
         found.setTags(found.getTags().stream().filter(t -> !t.getId().equals(tagId)).collect(Collectors.toCollection(ArrayList::new)));
@@ -125,7 +129,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(found);
     }
 
-    private Product getProduct(ProductEntity productEntity, Product model) throws Exception {
+    private Product getProduct(ProductEntity productEntity, Product model) throws MapperException {
 
         model.setId(productEntity.getId());
         model.setTags(transformCollection(productEntity.getTags(), Tag.class, this::getTag));

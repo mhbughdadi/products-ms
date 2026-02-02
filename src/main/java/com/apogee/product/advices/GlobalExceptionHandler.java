@@ -2,7 +2,11 @@ package com.apogee.product.advices;
 
 import com.apogee.product.dtos.output.FailureResponse;
 import com.apogee.product.exceptions.DBException;
+import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,23 +18,33 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RecordNotFoundException.class)
     public ResponseEntity<FailureResponse> handleResourceNotFound(RecordNotFoundException ex) {
 
-        FailureResponse errorResponse = new FailureResponse(
-                this.getMessageFromBundle(ex.getMessage(), Locale.ENGLISH, ex.getRecordId().toString()),
-                this.getMessageFromBundle(ex.getMessage(), Locale.of("ar"), ex.getRecordId().toString()));
+        FailureResponse errorResponse = new FailureResponse();
+        if (ex.getRecordId() != null) {
+            errorResponse = new FailureResponse(
+                    this.getMessageFromBundle(ex.getMessage(), Locale.ENGLISH, ex.getRecordId().toString()),
+                    this.getMessageFromBundle(ex.getMessage(), Locale.of("ar"), ex.getRecordId().toString()));
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+        if (ex.getRecordIds() != null && ex.getRecordIds().length > 0) {
+            errorResponse = new FailureResponse(
+                    this.getMessageFromBundle(ex.getMessage(), Locale.ENGLISH, toObjectArray(ex.getRecordIds())),
+                    this.getMessageFromBundle(ex.getMessage(), Locale.forLanguageTag("ar"), toObjectArray(ex.getRecordIds())));
+        }
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     private String getMessageFromBundle(String key, Locale locale, Object... args) {
 
         try {
             ResourceBundle bundle = ResourceBundle.getBundle("errors", locale);
-            return MessageFormat.format(bundle.getString(key),args);
+            return MessageFormat.format(bundle.getString(key), args);
         } catch (Exception e) {
             return key;
         }
@@ -43,7 +57,17 @@ public class GlobalExceptionHandler {
                 this.getMessageFromBundle(ex.getMessage(), Locale.ENGLISH, toObjectArray(ex.getRecordIds())),
                 this.getMessageFromBundle(ex.getMessage(), Locale.forLanguageTag("ar"), toObjectArray(ex.getRecordIds()))
         );
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({MapperException.class})
+    public ResponseEntity<FailureResponse> handleMapperException(MapperException ex, HttpServletRequest request) {
+
+        FailureResponse errorResponse = new FailureResponse(
+                this.getMessageFromBundle(ex.getMessage(), Locale.ENGLISH),
+                this.getMessageFromBundle(ex.getMessage(), Locale.forLanguageTag("ar"))
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.apogee.product.backingService;
+package com.apogee.product.backingservice;
 
 import com.apogee.product.dtos.inputs.BenefitDto;
 import com.apogee.product.dtos.inputs.SkuDto;
@@ -18,11 +18,15 @@ import com.apogee.product.services.ImageService;
 import com.apogee.product.services.SkuService;
 import com.apogee.product.utilities.Mapper;
 import com.apogee.product.utilities.Utilities;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.exceptions.DBException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Service
@@ -37,7 +41,7 @@ public class SkuBackingService {
     @Autowired
     private CurrencyService currencyService;
 
-    public AllSkusResponseDto getAllSkus() throws Exception {
+    public AllSkusResponseDto getAllSkus() throws MapperException {
 
         AllSkusResponseDto response = new AllSkusResponseDto();
 
@@ -47,54 +51,54 @@ public class SkuBackingService {
         return response;
     }
 
-    public SkuResponseDto addSku(SkuDto productDto) throws Exception {
+    public SkuResponseDto addSku(SkuDto productDto) throws MapperException, RecordNotFoundException {
 
         SkuResponseDto response = new SkuResponseDto();
 
-        Sku product = Mapper.map(productDto, Sku.class);
+        Sku product = transform(productDto, Sku.class);
         Sku savedSku = skuService.addSku(product);
-        response.setSku(Mapper.map(savedSku, SkuOutputDto.class));
+        response.setSku(transform(savedSku, SkuOutputDto.class));
 
         return response;
     }
 
-    public SkuResponseDto getSkuById(Long productId) throws Exception {
+    public SkuResponseDto getSkuById(Long productId) throws MapperException, RecordNotFoundException {
 
         SkuResponseDto response = new SkuResponseDto();
 
         Sku product = skuService.findSkuById(productId);
-        response.setSku(Mapper.map(product, SkuOutputDto.class));
+        response.setSku(transform(product, SkuOutputDto.class));
 
         return response;
     }
 
-    public void deleteSku(Long productId) throws Exception {
+    public void deleteSku(Long productId) throws MapperException, RecordNotFoundException {
 
         this.skuService.deleteSkuById(productId);
     }
 
-    public SkuResponseDto updateSku(SkuDto product) throws Exception {
+    public SkuResponseDto updateSku(SkuDto product) throws MapperException, RecordNotFoundException {
 
         SkuResponseDto response = new SkuResponseDto();
 
-        Sku updatedSku = this.skuService.updateSku(Mapper.map(product, Sku.class));
-        response.setSku(Mapper.map(updatedSku, SkuOutputDto.class));
+        Sku updatedSku = this.skuService.updateSku(transform(product, Sku.class));
+        response.setSku(transform(updatedSku, SkuOutputDto.class));
 
         return response;
     }
 
-    public SkuResponseDto assignTag(Long productId, Long tagId) throws Exception {
+    public SkuResponseDto assignTag(Long productId, Long tagId) throws MapperException, RecordNotFoundException, DBException {
 
         SkuResponseDto response = new SkuResponseDto();
 
         Sku product = this.skuService.assignTagToSku(productId, tagId);
 
-        response.setSku(Mapper.map(product, SkuOutputDto.class));
+        response.setSku(transform(product, SkuOutputDto.class));
 
         return response;
     }
 
-    public SuccessfulResponse removeTag(Long productId, Long tagId) throws Exception {
+    public SuccessfulResponse removeTag(Long productId, Long tagId) throws MapperException, DBException {
 
         SuccessfulResponse response = new SuccessfulResponse();
 
@@ -103,7 +107,7 @@ public class SkuBackingService {
         return response;
     }
 
-    public AllTagsResponseDto fetchSkuTags(Long productId) throws Exception {
+    public AllTagsResponseDto fetchSkuTags(Long productId) throws MapperException {
 
         AllTagsResponseDto response = new AllTagsResponseDto();
 
@@ -114,20 +118,20 @@ public class SkuBackingService {
         return response;
     }
 
-    public BenefitResponseDto addSkuBenefit(Long skuId, BenefitDto benefitDto) throws Exception {
+    public BenefitResponseDto addSkuBenefit(Long skuId, BenefitDto benefitDto) throws MapperException, RecordNotFoundException {
 
         BenefitResponseDto response = new BenefitResponseDto();
 
-        Benefit benefitModel = Mapper.map(benefitDto, Benefit.class);
+        Benefit benefitModel = transform(benefitDto, Benefit.class);
 
         benefitModel = skuService.addBenefitToSku(skuId, benefitModel);
 
-        response.setBenefit(Mapper.map(benefitModel, BenefitDto.class));
+        response.setBenefit(transform(benefitModel, BenefitDto.class));
 
         return response;
     }
 
-    public AllBenefitResponseDto getSkuBenefits(Long skuId) throws Exception {
+    public AllBenefitResponseDto getSkuBenefits(Long skuId) throws MapperException {
 
         AllBenefitResponseDto response = new AllBenefitResponseDto();
 
@@ -138,7 +142,7 @@ public class SkuBackingService {
         return response;
     }
 
-    public SuccessfulResponse removeSkuBenefit(Long skuId, Long benefitId) throws Exception {
+    public SuccessfulResponse removeSkuBenefit(Long skuId, Long benefitId) throws MapperException, RecordNotFoundException {
 
         SuccessfulResponse response = new SuccessfulResponse();
 

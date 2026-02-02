@@ -1,6 +1,7 @@
 package com.apogee.product.services.impl;
 
 import com.apogee.product.entities.CurrencyEntity;
+import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.utilities.Mapper;
 import com.apogee.product.models.Currency;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.apogee.product.constants.ProductsConstant.ERROR_RECORD_NOT_FOUND;
+import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Transactional
@@ -24,28 +27,28 @@ public class CurrencyServiceImpl implements CurrencyService {
 
 
     @Override
-    public Currency saveCurrency(Currency currency) throws Exception {
+    public Currency saveCurrency(Currency currency) throws MapperException {
 
-        var currencyEntity = Mapper.map(currency, CurrencyEntity.class);
+        var currencyEntity = transform(currency, CurrencyEntity.class);
 
         var savedEntity = currencyRepository.save(currencyEntity);
 
-        return Mapper.map(savedEntity, Currency.class);
+        return transform(savedEntity, Currency.class);
 
     }
 
     @Override
-    public Currency findCurrency(Long currencyId) throws Exception {
+    public Currency findCurrency(Long currencyId) throws MapperException, RecordNotFoundException {
 
         Optional<CurrencyEntity> currencyOpt = this.currencyRepository.findById(currencyId);
 
-        CurrencyEntity foundCurrencyEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException("record.not.found", currencyId));
+        CurrencyEntity foundCurrencyEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, currencyId));
 
-        return Mapper.map(foundCurrencyEntity, Currency.class);
+        return transform(foundCurrencyEntity, Currency.class);
     }
 
     @Override
-    public List<Currency> findAllCurrencies() throws Exception {
+    public List<Currency> findAllCurrencies() throws MapperException {
 
         List<CurrencyEntity> foundCurrencies = this.currencyRepository.findAll();
 
@@ -53,22 +56,22 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     @Override
-    public Currency UpdateCurrency(Currency currency) throws Exception {
+    public Currency UpdateCurrency(Currency currency) throws MapperException {
 
-        CurrencyEntity updatedCurrency = this.currencyRepository.save(Mapper.map(currency, CurrencyEntity.class));
+        CurrencyEntity updatedCurrency = this.currencyRepository.save(transform(currency, CurrencyEntity.class));
 
-        return Mapper.map(updatedCurrency, Currency.class);
+        return transform(updatedCurrency, Currency.class);
     }
 
     @Override
-    public Currency deleteCurrency(Long currencyId) throws Exception {
+    public Currency deleteCurrency(Long currencyId) throws MapperException, RecordNotFoundException {
 
         Optional<CurrencyEntity> currencyOpt = this.currencyRepository.findById(currencyId);
 
-        CurrencyEntity toBeDeletedEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException("record.not.found", currencyId));
+        CurrencyEntity toBeDeletedEntity = currencyOpt.orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, currencyId));
 
         this.currencyRepository.deleteById(currencyId);
 
-        return Mapper.map(toBeDeletedEntity, Currency.class);
+        return transform(toBeDeletedEntity, Currency.class);
     }
 }

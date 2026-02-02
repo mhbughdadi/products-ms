@@ -1,5 +1,6 @@
 package com.apogee.product.utilities;
 
+import com.apogee.product.exceptions.MapperException;
 import com.google.gson.Gson;
 import org.springframework.util.function.ThrowingBiFunction;
 import org.springframework.util.function.ThrowingFunction;
@@ -18,16 +19,16 @@ public class Utilities {
      * @param <S>              the type of the source objects
      * @param <R>              the type of the destination objects
      * @return a list of transformed destination objects
-     * @throws Exception if any error occurs during the mapping process
+     * @throws MapperException if any error occurs during the mapping process
      */
-    public static <S, R> List<R> transformCollection(Collection<S> sourceCollection, ThrowingFunction<S, R> mappingFunction) throws Exception {
+    public static <S, R> List<R> transformCollection(Collection<S> sourceCollection, ThrowingFunction<S, R> mappingFunction) throws MapperException {
 
         if (sourceCollection != null && !sourceCollection.isEmpty()) {
             return sourceCollection.stream().map(element -> {
                 try {
                     return mappingFunction.apply(element);
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new MapperException(e.getMessage(), e);
                 }
             }).toList();
         }
@@ -42,16 +43,16 @@ public class Utilities {
      * @param <S>              the type of the source objects
      * @param <R>              the type of the destination objects
      * @return a list of transformed destination objects
-     * @throws Exception if any error occurs during the mapping process
+     * @throws MapperException if any error occurs during the mapping process
      */
-    public static <S, R> List<R> transformCollection(Collection<S> sourceCollection, Class<R> destinationClass) throws Exception {
+    public static <S, R> List<R> transformCollection(Collection<S> sourceCollection, Class<R> destinationClass) throws MapperException {
 
         if (sourceCollection != null && !sourceCollection.isEmpty()) {
             return sourceCollection.stream().map(element -> {
                 try {
                     return Mapper.map(element, destinationClass);
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new MapperException(e.getMessage(), e);
                 }
             }).toList();
         }
@@ -69,9 +70,9 @@ public class Utilities {
      * @param <S>                   the type of the source objects
      * @param <R>                   the type of the destination objects
      * @return a list of transformed destination objects after applying the complementary function
-     * @throws Exception if any error occurs during the mapping or function application process
+     * @throws MapperException if any error occurs during the mapping or function application process
      */
-    public static <S, R> List<R> transformCollection(Collection<S> sourceCollection, Class<R> destinationClass, ThrowingBiFunction<S, R, R> complementaryFunction) throws Exception {
+    public static <S, R> List<R> transformCollection(Collection<S> sourceCollection, Class<R> destinationClass, ThrowingBiFunction<S, R, R> complementaryFunction) throws MapperException {
 
         if (sourceCollection != null && !sourceCollection.isEmpty()) {
             return sourceCollection.stream().map(element -> {
@@ -80,7 +81,7 @@ public class Utilities {
 
                     return complementaryFunction != null ? complementaryFunction.apply(element, mapped) : mapped;
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new MapperException(e.getMessage(), e);
                 }
             }).toList();
         }
@@ -96,10 +97,10 @@ public class Utilities {
      * @param <S>                   the type of the source objects
      * @param <R>                   the type of the destination objects
      * @return a list of transformed destination objects after applying the complementary function
-     * @throws Exception if any error occurs during the mapping or function application process
+     * @throws MapperException if any error occurs during the mapping or function application process
      */
     @Deprecated()
-    public static <S, R> List<R> transformCollection(Collection<S> sourceCollection, ThrowingFunction<S, R> mappingFunction, ThrowingBiFunction<S, R, R> complementaryFunction) throws Exception {
+    public static <S, R> List<R> transformCollection(Collection<S> sourceCollection, ThrowingFunction<S, R> mappingFunction, ThrowingBiFunction<S, R, R> complementaryFunction) throws MapperException {
 
         List<R> destinationCollection = transformCollection(sourceCollection, mappingFunction);
 
@@ -111,7 +112,7 @@ public class Utilities {
                 try {
                     result.add(complementaryFunction.apply(sourceElement, destinationElement));
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new MapperException(e.getMessage(), e);
                 }
                 i++;
             }
@@ -121,7 +122,7 @@ public class Utilities {
         }
     }
 
-    public static <S, R> R transform(S sourceObject, Class<R> destinationClass, ThrowingBiFunction<S, R, R> complementaryFunction) throws Exception {
+    public static <S, R> R transform(S sourceObject, Class<R> destinationClass, ThrowingBiFunction<S, R, R> complementaryFunction) throws MapperException {
 
         if (sourceObject != null) {
             try {
@@ -129,7 +130,20 @@ public class Utilities {
 
                 return complementaryFunction != null ? complementaryFunction.apply(sourceObject, mapped) : mapped;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new MapperException(e.getMessage(), e);
+            }
+        }
+        return null;
+    }
+
+    public static <S, R> R transform(S sourceObject, Class<R> destinationClass) throws MapperException {
+
+        if (sourceObject != null) {
+            try {
+
+                return Mapper.map(sourceObject, destinationClass);
+            } catch (Exception e) {
+                throw new MapperException(e.getMessage(), e);
             }
         }
         return null;

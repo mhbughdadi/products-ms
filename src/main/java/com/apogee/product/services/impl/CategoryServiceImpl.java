@@ -3,6 +3,7 @@ package com.apogee.product.services.impl;
 import com.apogee.product.entities.CategoryEntity;
 import com.apogee.product.entities.TagEntity;
 import com.apogee.product.exceptions.DBException;
+import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Tag;
 import com.apogee.product.repositories.TagRepository;
@@ -20,6 +21,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.apogee.product.constants.ProductsConstant.ERROR_CATEGORY_TAG_ALREADY_EXISTS;
+import static com.apogee.product.constants.ProductsConstant.ERROR_CATEGORY_TAG_NOT_FOUND;
+import static com.apogee.product.constants.ProductsConstant.ERROR_RECORD_NOT_FOUND;
 import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
@@ -35,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public List<Category> findAllCategories() throws Exception {
+    public List<Category> findAllCategories() throws MapperException {
 
         List<CategoryEntity> categoryEntities = categoryRepository.findAllRootCategoriesWithSubCategories();
 
@@ -53,12 +57,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category addCategory(Category category) throws Exception {
+    public Category addCategory(Category category) throws MapperException, RecordNotFoundException {
 
-        CategoryEntity transientCategory = Mapper.map(category, CategoryEntity.class);
+        CategoryEntity transientCategory = transform(category, CategoryEntity.class);
 
         if (category.getParentId() != null) {
-            CategoryEntity parentCategory = this.categoryRepository.findById(category.getParentId()).orElseThrow(() -> new RecordNotFoundException("record.not.found", category.getParentId()));
+            CategoryEntity parentCategory = this.categoryRepository.findById(category.getParentId()).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, category.getParentId()));
             transientCategory.setParent(parentCategory);
         }
         CategoryEntity savedCategory = categoryRepository.save(transientCategory);
@@ -67,22 +71,22 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category findCategoryByID(Long categoryId) throws Exception {
+    public Category findCategoryByID(Long categoryId) throws MapperException, RecordNotFoundException {
 
         Optional<CategoryEntity> categoryEntityOptional = this.categoryRepository.findById(categoryId);
         if (categoryEntityOptional.isPresent()) {
             return transform(categoryEntityOptional.get(), Category.class, this::getCategory);
         } else {
-            throw new RecordNotFoundException("record.not.found", categoryId);
+            throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, categoryId);
         }
     }
 
     @Override
-    public Category deleteCategoryById(Long categoryId) throws Exception {
+    public Category deleteCategoryById(Long categoryId) throws MapperException, RecordNotFoundException {
 
         Optional<CategoryEntity> categoryEntity = this.categoryRepository.findById(categoryId);
 
-        CategoryEntity toBeDeletedEntity = categoryEntity.orElseThrow(() -> new RecordNotFoundException("record.not.found", categoryId));
+        CategoryEntity toBeDeletedEntity = categoryEntity.orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, categoryId));
 
         this.categoryRepository.deleteById(categoryId);
 
@@ -90,14 +94,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category updateCategory(Category category) throws Exception {
+    public Category updateCategory(Category category) throws MapperException {
 
-        CategoryEntity updatedCurrency = this.categoryRepository.save(Mapper.map(category, CategoryEntity.class));
+        CategoryEntity updatedCurrency = this.categoryRepository.save(transform(category, CategoryEntity.class));
 
         return transform(updatedCurrency, Category.class, this::getCategory);
     }
 
-    private Category addCategoryIdAndParentId(CategoryEntity categoryEntity, Category category) throws Exception {
+    private Category addCategoryIdAndParentId(CategoryEntity categoryEntity, Category category) throws MapperException {
 
         if (categoryEntity != null && category != null) {
             category.setId(categoryEntity.getId());
@@ -110,14 +114,14 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public Category assignTagToCategory(Long categoryId, Long tagId) throws Exception {
+    public Category assignTagToCategory(Long categoryId, Long tagId) throws MapperException, RecordNotFoundException, DBException {
 
         categoryRepository.findByIdAndTagsId(categoryId, tagId).ifPresent(existingAssignment -> {
-            throw new DBException("errors.duplicate.record", CategoryEntity.class, categoryId, tagId);
+            throw new DBException(ERROR_CATEGORY_TAG_ALREADY_EXISTS, CategoryEntity.class, categoryId, tagId);
         });
 
-        TagEntity tag = tagRepository.findById(tagId).orElseThrow(() -> new RecordNotFoundException("Tag not found", tagId));
-        CategoryEntity category = categoryRepository.findById(categoryId).orElseThrow(() -> new RecordNotFoundException("Product not found", categoryId));
+        TagEntity tag = tagRepository.findById(tagId).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, tagId));
+        CategoryEntity category = categoryRepository.findById(categoryId).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, categoryId));
 
         category.getTags().add(tag);
         category = categoryRepository.save(category);
@@ -126,7 +130,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Tag> getTagsForCategory(Long categoryId) throws Exception {
+    public List<Tag> getTagsForCategory(Long categoryId) throws MapperException {
 
         List<TagEntity> assignments = tagRepository.findByItemsId(categoryId);
 
@@ -135,11 +139,11 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public void removeTagFromCategory(Long categoryId, Long tagId) throws Exception {
+    public void removeTagFromCategory(Long categoryId, Long tagId) throws MapperException, DBException {
 
         CategoryEntity found = categoryRepository.findByIdAndTagsId(categoryId, tagId)
                 .orElseThrow(
-                        () -> new DBException("errors.categories.tags.not.found", CategoryEntity.class, categoryId, tagId)
+                        () -> new DBException(ERROR_CATEGORY_TAG_NOT_FOUND, CategoryEntity.class, categoryId, tagId)
                 );
 
         found.setTags(found.getTags().stream()
@@ -149,7 +153,7 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.save(found);
     }
 
-    private Category getCategory(CategoryEntity entity, Category model) throws Exception {
+    private Category getCategory(CategoryEntity entity, Category model) throws MapperException {
 
         model.setId(entity.getId());
         model.setTags(transformCollection(entity.getTags(), Tag.class, this::getTag));

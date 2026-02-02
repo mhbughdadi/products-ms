@@ -5,6 +5,7 @@ import com.apogee.product.entities.ProductEntity;
 import com.apogee.product.entities.SkuEntity;
 import com.apogee.product.entities.TagEntity;
 import com.apogee.product.exceptions.DBException;
+import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Benefit;
 import com.apogee.product.models.Sku;
@@ -25,6 +26,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.apogee.product.constants.ProductsConstant.ERROR_CATEGORY_TAG_ALREADY_EXISTS;
+import static com.apogee.product.constants.ProductsConstant.ERROR_RECORD_NOT_FOUND;
+import static com.apogee.product.constants.ProductsConstant.ERROR_SKU_TAG_NOT_FOUND;
 import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
 
@@ -45,7 +49,7 @@ public class SkuServiceImpl implements SkuService {
     private ProductRepository productRepository;
 
     @Override
-    public List<Sku> findAllSkus() throws Exception {
+    public List<Sku> findAllSkus() throws MapperException {
 
         List<SkuEntity> skuEntities = skuRepository.findAll();
 
@@ -58,12 +62,12 @@ public class SkuServiceImpl implements SkuService {
     }
 
     @Override
-    public Sku addSku(Sku sku) throws Exception {
+    public Sku addSku(Sku sku) throws MapperException, RecordNotFoundException {
 
-        SkuEntity transientSku = Mapper.map(sku, SkuEntity.class);
+        SkuEntity transientSku = transform(sku, SkuEntity.class);
 
         ProductEntity productEntity = productRepository.findById(sku.getProductId())
-                .orElseThrow(() -> new RecordNotFoundException("Product not found", sku.getProductId()));
+                .orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, sku.getProductId()));
         transientSku.setProduct(productEntity);
 
         SkuEntity savedEntity = skuRepository.save(transientSku);
@@ -72,10 +76,10 @@ public class SkuServiceImpl implements SkuService {
     }
 
     @Override
-    public Sku updateSku(Sku sku) throws Exception {
+    public Sku updateSku(Sku sku) throws MapperException, RecordNotFoundException {
 
         if (!this.skuRepository.existsById(sku.getId()) || sku.getProductId() == null) {
-            throw new RecordNotFoundException("record.not.found", sku.getId());
+            throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, sku.getId());
         }
 
         SkuEntity skuEntity = transform(sku, SkuEntity.class, this::setSkuId);
@@ -84,30 +88,30 @@ public class SkuServiceImpl implements SkuService {
     }
 
     @Override
-    public Sku findSkuById(Long skuId) throws Exception {
+    public Sku findSkuById(Long skuId) throws MapperException , RecordNotFoundException {
 
         Optional<SkuEntity> skuEntityOptional = this.skuRepository.findById(skuId);
 
-        return transform(skuEntityOptional.orElseThrow(() -> new RecordNotFoundException("record.not.found", skuId)), Sku.class, this::getSku);
+        return transform(skuEntityOptional.orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, skuId)), Sku.class, this::getSku);
     }
 
     @Override
-    public void deleteSkuById(Long skuId) throws Exception {
+    public void deleteSkuById(Long skuId) throws MapperException, RecordNotFoundException {
 
         if (this.skuRepository.existsById(skuId)) {
 
             this.benefitRepository.deleteBySkuId(skuId);
             this.skuRepository.deleteById(skuId);
         } else {
-            throw new RecordNotFoundException("record.not.found", skuId);
+            throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, skuId);
         }
     }
 
     @Override
-    public Benefit addBenefitToSku(Long skuId, Benefit benefit) throws Exception {
+    public Benefit addBenefitToSku(Long skuId, Benefit benefit) throws MapperException , RecordNotFoundException {
 
-        SkuEntity sku = skuRepository.findById(skuId).orElseThrow(() -> new RecordNotFoundException("Sku not found", skuId));
-        BenefitEntity benefitEntity = Mapper.map(benefit, BenefitEntity.class);
+        SkuEntity sku = skuRepository.findById(skuId).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, skuId));
+        BenefitEntity benefitEntity = transform(benefit, BenefitEntity.class);
         benefitEntity.setSku(sku);
 
         BenefitEntity savedBenefit = benefitRepository.save(benefitEntity);
@@ -116,7 +120,7 @@ public class SkuServiceImpl implements SkuService {
     }
 
     @Override
-    public List<Benefit> getSkuBenefits(Long skuId) throws Exception {
+    public List<Benefit> getSkuBenefits(Long skuId) throws MapperException {
 
         List<BenefitEntity> benefits = benefitRepository.findBySkuId(skuId);
 
@@ -124,11 +128,11 @@ public class SkuServiceImpl implements SkuService {
     }
 
     @Override
-    public void removeBenefitFromSku(Long skuId, Long benefitId) throws Exception {
+    public void removeBenefitFromSku(Long skuId, Long benefitId) throws MapperException, RecordNotFoundException {
 
         SkuEntity found = skuRepository.findByIdAndBenefitsId(skuId, benefitId)
                 .orElseThrow(
-                        () -> new DBException("errors.not.found", SkuEntity.class, skuId, benefitId)
+                        () -> new DBException(ERROR_RECORD_NOT_FOUND, SkuEntity.class, skuId, benefitId)
                 );
 
         found.setBenefits(found.getBenefits().stream().filter(t -> !t.getId().equals(benefitId)).collect(Collectors.toCollection(ArrayList::new)));
@@ -138,14 +142,14 @@ public class SkuServiceImpl implements SkuService {
     }
 
     @Override
-    public Sku assignTagToSku(Long skuId, Long tagId) throws Exception {
+    public Sku assignTagToSku(Long skuId, Long tagId) throws MapperException, RecordNotFoundException, DBException {
 
         skuRepository.findByIdAndTagsId(skuId, tagId).ifPresent(existingAssignment -> {
-            throw new DBException("errors.duplicate.record", SkuEntity.class, skuId, tagId);
+            throw new DBException(ERROR_CATEGORY_TAG_ALREADY_EXISTS, SkuEntity.class, skuId, tagId);
         });
 
-        TagEntity tag = tagRepository.findById(tagId).orElseThrow(() -> new RecordNotFoundException("Tag not found", tagId));
-        SkuEntity product = skuRepository.findById(skuId).orElseThrow(() -> new RecordNotFoundException("Sku not found", skuId));
+        TagEntity tag = tagRepository.findById(tagId).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, tagId));
+        SkuEntity product = skuRepository.findById(skuId).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, skuId));
         product.getTags().add(tag);
 
         SkuEntity savedSku = skuRepository.save(product);
@@ -154,7 +158,7 @@ public class SkuServiceImpl implements SkuService {
     }
 
     @Override
-    public List<Tag> getTagsForSku(Long skuId) throws Exception {
+    public List<Tag> getTagsForSku(Long skuId) throws MapperException {
 
         List<TagEntity> assignments = tagRepository.findByItemsId(skuId);
 
@@ -162,11 +166,11 @@ public class SkuServiceImpl implements SkuService {
     }
 
     @Override
-    public void removeTagFromSku(Long skuId, Long tagId) throws Exception {
+    public void removeTagFromSku(Long skuId, Long tagId) throws MapperException, DBException {
 
         SkuEntity found = skuRepository.findByIdAndTagsId(skuId, tagId)
                 .orElseThrow(
-                        () -> new DBException("errors.not.found", SkuEntity.class, skuId, tagId)
+                        () -> new DBException(ERROR_SKU_TAG_NOT_FOUND, SkuEntity.class, skuId, tagId)
                 );
 
         found.setTags(found.getTags().stream().filter(t -> !t.getId().equals(tagId)).collect(Collectors.toCollection(ArrayList::new)));
@@ -184,7 +188,7 @@ public class SkuServiceImpl implements SkuService {
         return model;
     }
 
-    private Sku getSku(SkuEntity skuEntity, Sku model) throws Exception {
+    private Sku getSku(SkuEntity skuEntity, Sku model) throws MapperException {
 
         model.setId(skuEntity.getId());
         model.setTags(transformCollection(skuEntity.getTags(), Tag.class, this::getTag));

@@ -6,6 +6,7 @@ import com.apogee.product.entities.SkuEntity;
 import com.apogee.product.entities.TagEntity;
 import com.apogee.product.exceptions.DBException;
 import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.models.Benefit;
 import com.apogee.product.models.Sku;
 import com.apogee.product.models.Tag;
@@ -77,7 +78,7 @@ class SkuServiceImplTest {
     }
 
     @Test
-    void findAllSkus_returnsMappedList_whenExists() throws Exception {
+    void findAllSkus_returnsMappedList_whenExists() throws MapperException, RecordNotFoundException, DBException {
         List<SkuEntity> list = new ArrayList<>();
         list.add(buildSkuEntity(1L));
         when(skuRepository.findAll()).thenReturn(list);
@@ -98,7 +99,7 @@ class SkuServiceImplTest {
     }
 
     @Test
-    void addSku_savesWhenProductExists() throws Exception {
+    void addSku_savesWhenProductExists() throws MapperException, RecordNotFoundException, DBException {
         Sku s = new Sku();
         s.setProductId(1L);
         SkuEntity saved = buildSkuEntity(10L);
@@ -123,7 +124,7 @@ class SkuServiceImplTest {
     }
 
     @Test
-    void findSkuById_returnsWhenFound() throws Exception {
+    void findSkuById_returnsWhenFound() throws MapperException, RecordNotFoundException, DBException {
         SkuEntity e = buildSkuEntity(7L);
         when(skuRepository.findById(7L)).thenReturn(Optional.of(e));
 
@@ -133,7 +134,7 @@ class SkuServiceImplTest {
     }
 
     @Test
-    void deleteSkuById_deletesWhenExists() throws Exception {
+    void deleteSkuById_deletesWhenExists() throws MapperException, RecordNotFoundException, DBException {
         when(skuRepository.existsById(3L)).thenReturn(true);
 
         skuService.deleteSkuById(3L);
@@ -156,7 +157,7 @@ class SkuServiceImplTest {
     }
 
     @Test
-    void addBenefitToSku_savesBenefit() throws Exception {
+    void addBenefitToSku_savesBenefit() throws MapperException, RecordNotFoundException, DBException {
         Benefit b = new Benefit();
         b.setKeyEn("B");
         SkuEntity sku = buildSkuEntity(1L);
@@ -168,7 +169,7 @@ class SkuServiceImplTest {
     }
 
     @Test
-    void getSkuBenefits_returnsList() throws Exception {
+    void getSkuBenefits_returnsList() throws MapperException, RecordNotFoundException, DBException {
         BenefitEntity be = buildBenefitEntity(8L, 2L);
         when(benefitRepository.findBySkuId(2L)).thenReturn(List.of(be));
 
@@ -189,7 +190,7 @@ class SkuServiceImplTest {
     }
 
     @Test
-    void assignTagToSku_successAssigns() throws Exception {
+    void assignTagToSku_successAssigns() throws MapperException, RecordNotFoundException, DBException {
         TagEntity t = buildTagEntity(10L, null);
         SkuEntity sku = buildSkuEntity(1L);
         sku.setTags(new ArrayList<>());
@@ -201,11 +202,11 @@ class SkuServiceImplTest {
         Sku out = skuService.assignTagToSku(1L, 10L);
         assertNotNull(out);
         assertEquals(1, out.getTags().size());
-        assertEquals(10L, out.getTags().get(0).getId());
+        assertEquals(10L, out.getTags().getFirst().getId());
     }
 
     @Test
-    void getTagsForSku_returnsList() throws Exception {
+    void getTagsForSku_returnsList() throws MapperException, RecordNotFoundException, DBException {
         TagEntity t = buildTagEntity(100L, null);
         when(tagRepository.findByItemsId(5L)).thenReturn(List.of(t));
 

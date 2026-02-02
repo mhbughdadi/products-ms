@@ -1,10 +1,12 @@
 package com.apogee.product.controllers;
 
-import com.apogee.product.backingService.CurrenciesBackingService;
+import com.apogee.product.backingservice.CurrenciesBackingService;
 import com.apogee.product.dtos.inputs.CurrencyDto;
 import com.apogee.product.dtos.output.AllCurrenciesResponseDto;
 import com.apogee.product.dtos.output.CurrencyResponseDto;
 import com.apogee.product.dtos.output.Response;
+import com.apogee.product.exceptions.MapperException;
+import com.apogee.product.exceptions.RecordNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,7 +30,7 @@ public class CurrencyController {
 
     @PostMapping("/currencies")
     @Operation(summary = "Add a new currency", description = "This endpoint allows you to add a new currency to the system.")
-    public ResponseEntity<Response> addCurrency(@RequestBody CurrencyDto currency) throws Exception {
+    public ResponseEntity<Response> addCurrency(@RequestBody CurrencyDto currency) throws MapperException {
 
         CurrencyResponseDto response = currenciesBackingService.addCurrency(currency);
 
@@ -37,7 +39,7 @@ public class CurrencyController {
 
     @PutMapping("/currencies")
     @Operation(summary = "Update an existing currency", description = "This endpoint allows you to update an existing currency in the system.")
-    public ResponseEntity<Response> updateCurrency(@RequestBody CurrencyDto currency) throws Exception {
+    public ResponseEntity<Response> updateCurrency(@RequestBody CurrencyDto currency) throws MapperException {
 
         CurrencyResponseDto response = currenciesBackingService.updateCurrency(currency);
 
@@ -62,7 +64,7 @@ public class CurrencyController {
                             schema = @Schema(implementation = Response.class)
                     )
             )})
-    public ResponseEntity<AllCurrenciesResponseDto> getAllCurrencies() throws Exception {
+    public ResponseEntity<AllCurrenciesResponseDto> getAllCurrencies() throws MapperException {
 
         AllCurrenciesResponseDto response = currenciesBackingService.getAllCurrencies();
 
@@ -71,7 +73,7 @@ public class CurrencyController {
 
     @DeleteMapping("/currencies/{currencyId}")
     @Operation(summary = "Delete a currency", description = "This endpoint allows you to delete a currency by its ID.")
-    public ResponseEntity<Response> deleteCurrency(@PathVariable("currencyId") Long currencyId) throws Exception {
+    public ResponseEntity<Response> deleteCurrency(@PathVariable("currencyId") Long currencyId) throws MapperException, RecordNotFoundException {
 
         CurrencyResponseDto response = currenciesBackingService.deleteCurrency(currencyId);
 
@@ -80,7 +82,7 @@ public class CurrencyController {
 
     @GetMapping("/currencies/{currencyId}")
     @Operation(summary = "Get a currency by ID", description = "This endpoint retrieves a specific currency by its ID.")
-    public ResponseEntity<Response> getCurrency(@PathVariable("currencyId") Long currencyId) throws Exception {
+    public ResponseEntity<Response> getCurrency(@PathVariable("currencyId") Long currencyId) throws MapperException, RecordNotFoundException {
 
         CurrencyResponseDto response = currenciesBackingService.getCurrencyById(currencyId);
 
