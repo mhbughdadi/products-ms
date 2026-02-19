@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="DEBUG" monitorInterval="30" delay="60">
+<Configuration status="WARN" monitorInterval="30">
+
     <Appenders>
-        <!-- Console Appender for Local Debugging (Optional) -->
+
+        <!-- Console (pretty text for local dev) -->
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
+<!--            <JsonTemplateLayout eventTemplateUri="classpath:logstash-template.json"/>-->
         </Console>
 
-        <!-- Socket Appender to send logs to Logstash -->
-        <Socket name="LogstashAppender" host="logstash" port="5044">
-            <JsonLayout
-                    complete="false"
-                    compact="true"
-                    eventEol="true"
-                    properties="true"
-                    stacktraceAsString="true"/>
+        <!-- Logstash Socket (JSON structured) -->
+        <Socket name="LogstashAppender" host="logstash" port="5044" protocol="tcp">
+            <JsonTemplateLayout eventTemplateUri="classpath:logstash-template.json"/>
         </Socket>
+
     </Appenders>
 
     <Loggers>
-        <!-- Root Logger -->
+
+        <Logger name="org.springframework.web" level="info"/>
+        <Logger name="org.hibernate" level="warn"/>
+
+        <!-- your app -->
+        <Logger name="com.apogee.product" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="LogstashAppender"/>
+        </Logger>
+
+        <!-- Root -->
         <Root level="info">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="LogstashAppender"/>
         </Root>
-        <Logger name="org.springframework.web" level="debug">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="LogstashAppender"/>
-        </Logger>
-        <Logger name="com.apogee.product" level="debug">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="LogstashAppender"/>
-        </Logger>
-        <Logger name="com.apogee.product" level="error">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="LogstashAppender"/>
-        </Logger>
+
     </Loggers>
+
 </Configuration>

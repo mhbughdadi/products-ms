@@ -22,4 +22,6 @@ public interface ProductsConstant {
     String NULL_STRING = "null";
     String EXCEPTION_MESSAGE = "exceptionMessage";
     String EXCEPTION_STACKTRACE = "exceptionStacktrace";
+    String STATUS = "status";
+    String DURATION_MS = "durationMs";
 }

@@ -67,6 +67,7 @@ public class GlobalExceptionHandler {
                 this.getMessageFromBundle(ex.getMessage(), Locale.ENGLISH),
                 this.getMessageFromBundle(ex.getMessage(), Locale.forLanguageTag("ar"))
         );
+        errorResponse.setRequestId(request.getHeader("X-Request-ID"));
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
