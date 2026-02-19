@@ -32,7 +32,7 @@ import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 public class LoggerAspect {
 
     @Around("within(com.apogee.product.controllers..*)")
-    public Object logApi(ProceedingJoinPoint joinPoint) {
+    public Object logApi(ProceedingJoinPoint joinPoint) throws Throwable {
 
         long start = System.currentTimeMillis();
 
@@ -78,7 +78,7 @@ public class LoggerAspect {
                             ex.getMessage() != null ? ex.getMessage() : NULL_STRING);
 
             log.error(message, ex);
-            return response;
+            throw ex;
         }
     }
 
