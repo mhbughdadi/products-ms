@@ -7,7 +7,7 @@ import org.slf4j.MDC;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 
 import static com.apogee.product.constants.ProductsConstant.REQUEST_ID;
 
@@ -20,13 +20,13 @@ public class Response implements Serializable {
 
     private int code;
     private ErrorMessage error;
-    private Date timeStamp = new Date();
+    private String timeStamp ;
     private Status status;
     private String requestId = MDC.get(REQUEST_ID);
 
     public Response(int code, Status status) {
         this.code = code;
         this.status = status;
-        this.timeStamp = getTimeStamp();
+        this.timeStamp = Instant.now().toString();
     }
 }

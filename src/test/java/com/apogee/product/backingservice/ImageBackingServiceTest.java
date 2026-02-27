@@ -31,6 +31,7 @@ class ImageBackingServiceTest {
     void add_update_and_get_and_delete() throws MapperException, RecordNotFoundException {
         ImageDto dto = new ImageDto();
         dto.setUrl("u");
+        dto.setActive(true);
 
         Image saved = new Image();
         saved.setId(77L);

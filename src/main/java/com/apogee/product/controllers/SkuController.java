@@ -24,9 +24,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -70,7 +69,7 @@ public class SkuController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/skus")
+    @PutMapping("/skus")
     @Operation(summary = "Update an existing sku", description = "This endpoint allows you to update an existing sku in the system.", tags = {"skus"})
     @ApiResponse(responseCode = "200", description = "Sku updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SkuResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
@@ -82,7 +81,7 @@ public class SkuController {
         return new ResponseEntity<>(response, HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/skus/{skuId}")
+    @DeleteMapping( "/skus/{skuId}")
     @Operation(summary = "Delete a sku", description = "This endpoint allows you to delete a sku from the system by its ID.", tags = {"skus"})
     @ApiResponse(responseCode = "200", description = "Sku deleted successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")

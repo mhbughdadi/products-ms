@@ -12,7 +12,7 @@ public class FailureResponse extends Response {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    private final static int FAILURE_CODE = -1;
+    private static final int FAILURE_CODE = -1;
 
     public FailureResponse() {
         super(FAILURE_CODE, Status.FAILURE);
