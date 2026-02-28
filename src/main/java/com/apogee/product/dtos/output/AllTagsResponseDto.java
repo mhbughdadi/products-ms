@@ -13,5 +13,5 @@ public class AllTagsResponseDto extends SuccessfulResponse {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    List<TagDto> tags;
+    private List<TagDto> tags;
 }
