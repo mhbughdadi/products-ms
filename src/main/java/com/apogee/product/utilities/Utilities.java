@@ -107,7 +107,6 @@ public final class Utilities {
      * @return a list of transformed destination objects after applying the complementary function
      * @throws MapperException if any error occurs during the mapping or function application process
      */
-    @Deprecated(since = "22/2/2026", forRemoval = true)
     public static <S, R> List<R> transformCollection(Collection<S> sourceCollection, ThrowingFunction<S, R> mappingFunction, ThrowingBiFunction<S, R, R> complementaryFunction) throws MapperException {
 
         List<R> destinationCollection = transformCollection(sourceCollection, mappingFunction);
