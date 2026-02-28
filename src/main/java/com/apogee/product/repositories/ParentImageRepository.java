@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface ParentImageRepository extends JpaRepository<ParentImageEntity, ParentImageId> {
 
-    List<ParentImageEntity> findAllById_ParentItemId(Long parentItemId);
-    void deleteAllById_ParentItemId(Long itemId);
-    boolean existsById_ParentItemId(Long parentItemId);
+    List<ParentImageEntity> findAllByIdParentItemId(Long parentItemId);
+    void deleteAllByIdParentItemId(Long itemId);
+    boolean existsByIdParentItemId(Long parentItemId);
 }

@@ -96,9 +96,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category updateCategory(Category category) throws MapperException {
 
-        CategoryEntity updatedCurrency = this.categoryRepository.save(transform(category, CategoryEntity.class));
+        CategoryEntity updatedCategory = this.categoryRepository.save(transform(category, CategoryEntity.class));
 
-        return transform(updatedCurrency, Category.class, this::getCategory);
+        return transform(updatedCategory, Category.class, this::getCategory);
     }
 
     private Category addCategoryIdAndParentId(CategoryEntity categoryEntity, Category category) throws MapperException {
