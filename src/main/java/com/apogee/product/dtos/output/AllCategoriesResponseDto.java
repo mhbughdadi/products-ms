@@ -13,5 +13,5 @@ public class AllCategoriesResponseDto extends SuccessfulResponse {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    List<CategoryDto> categories;
+    private List<CategoryDto> categories;
 }
