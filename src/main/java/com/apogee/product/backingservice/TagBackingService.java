@@ -5,7 +5,6 @@ import com.apogee.product.dtos.output.AllTagsResponseDto;
 import com.apogee.product.dtos.output.TagResponseDto;
 import com.apogee.product.models.Tag;
 import com.apogee.product.services.TagService;
-import com.apogee.product.utilities.Mapper;
 import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.exceptions.DBException;

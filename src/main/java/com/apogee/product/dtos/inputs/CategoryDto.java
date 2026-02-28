@@ -5,13 +5,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Setter
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CategoryDto {
+public class CategoryDto implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private String descriptionAr;
     private String descriptionEn;

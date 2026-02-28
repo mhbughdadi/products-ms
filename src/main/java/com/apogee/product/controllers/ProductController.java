@@ -56,7 +56,7 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/products")
+    @PutMapping("/products")
     @Operation(summary = "Update an existing product", description = "This endpoint allows you to update an existing product in the system.", tags = {"products"})
     @ApiResponse(responseCode = "200", description = "Product updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AddProductResponseDto.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")
@@ -68,7 +68,7 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/products/{productId}")
+    @DeleteMapping( "/products/{productId}")
     @Operation(summary = "Delete a product", description = "This endpoint allows you to delete a product from the system by its ID.", tags = {"products"})
     @ApiResponse(responseCode = "200", description = "Product deleted successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessfulResponse.class)))
     @ApiResponse(responseCode = "404", ref = "#/components/schemas/FailureResponse")

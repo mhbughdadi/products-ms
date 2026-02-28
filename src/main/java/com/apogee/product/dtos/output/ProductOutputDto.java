@@ -5,12 +5,17 @@ import com.apogee.product.enums.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 @Setter
 @Getter
-public class ProductOutputDto {
+public class ProductOutputDto implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private Long id;
     private String nameEn;

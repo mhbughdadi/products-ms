@@ -6,7 +6,6 @@ import com.apogee.product.dtos.output.ImageResponseDto;
 import com.apogee.product.dtos.output.SuccessfulResponse;
 import com.apogee.product.models.Image;
 import com.apogee.product.services.ImageService;
-import com.apogee.product.utilities.Mapper;
 import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,6 @@
 package com.apogee.product.models;
 
 import com.apogee.product.enums.ProductStatus;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import lombok.Getter;
 import lombok.Setter;
 

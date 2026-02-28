@@ -13,10 +13,8 @@ import com.apogee.product.dtos.output.SuccessfulResponse;
 import com.apogee.product.models.Benefit;
 import com.apogee.product.models.Sku;
 import com.apogee.product.models.Tag;
-import com.apogee.product.services.CurrencyService;
 import com.apogee.product.services.ImageService;
 import com.apogee.product.services.SkuService;
-import com.apogee.product.utilities.Mapper;
 import com.apogee.product.utilities.Utilities;
 import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
@@ -37,9 +35,6 @@ public class SkuBackingService {
 
     @Autowired
     private ImageService imageService;
-
-    @Autowired
-    private CurrencyService currencyService;
 
     public AllSkusResponseDto getAllSkus() throws MapperException {
 

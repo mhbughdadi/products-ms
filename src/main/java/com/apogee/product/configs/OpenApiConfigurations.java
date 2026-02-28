@@ -13,23 +13,23 @@ import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.apogee.product.configs.openAPIConstants.API_DESCRIPTION;
-import static com.apogee.product.configs.openAPIConstants.API_TITLE;
-import static com.apogee.product.configs.openAPIConstants.API_VERSION;
-import static com.apogee.product.configs.openAPIConstants.BEARER_AUTH;
-import static com.apogee.product.configs.openAPIConstants.BEARER_FORMAT;
-import static com.apogee.product.configs.openAPIConstants.DESC_FAILURE;
-import static com.apogee.product.configs.openAPIConstants.DESC_INTERNAL_ERROR;
-import static com.apogee.product.configs.openAPIConstants.DESC_NOT_FOUND;
-import static com.apogee.product.configs.openAPIConstants.MEDIA_TYPE_JSON;
-import static com.apogee.product.configs.openAPIConstants.REF_FAILURE_RESPONSE;
-import static com.apogee.product.configs.openAPIConstants.REF_FAILURE_RESPONSE_DTO;
-import static com.apogee.product.configs.openAPIConstants.RESPONSE_FAILURE;
-import static com.apogee.product.configs.openAPIConstants.RESPONSE_INTERNAL_ERROR;
-import static com.apogee.product.configs.openAPIConstants.RESPONSE_NOT_FOUND;
-import static com.apogee.product.configs.openAPIConstants.SCHEMA_FAILURE_RESPONSE_DTO;
-import static com.apogee.product.configs.openAPIConstants.SCHEME_BEARER;
-import static com.apogee.product.configs.openAPIConstants.SERVER_ROOT;
+import static com.apogee.product.configs.OpenApiConstants.API_DESCRIPTION;
+import static com.apogee.product.configs.OpenApiConstants.API_TITLE;
+import static com.apogee.product.configs.OpenApiConstants.API_VERSION;
+import static com.apogee.product.configs.OpenApiConstants.BEARER_AUTH;
+import static com.apogee.product.configs.OpenApiConstants.BEARER_FORMAT;
+import static com.apogee.product.configs.OpenApiConstants.DESC_FAILURE;
+import static com.apogee.product.configs.OpenApiConstants.DESC_INTERNAL_ERROR;
+import static com.apogee.product.configs.OpenApiConstants.DESC_NOT_FOUND;
+import static com.apogee.product.configs.OpenApiConstants.MEDIA_TYPE_JSON;
+import static com.apogee.product.configs.OpenApiConstants.REF_FAILURE_RESPONSE;
+import static com.apogee.product.configs.OpenApiConstants.REF_FAILURE_RESPONSE_DTO;
+import static com.apogee.product.configs.OpenApiConstants.RESPONSE_FAILURE;
+import static com.apogee.product.configs.OpenApiConstants.RESPONSE_INTERNAL_ERROR;
+import static com.apogee.product.configs.OpenApiConstants.RESPONSE_NOT_FOUND;
+import static com.apogee.product.configs.OpenApiConstants.SCHEMA_FAILURE_RESPONSE_DTO;
+import static com.apogee.product.configs.OpenApiConstants.SCHEME_BEARER;
+import static com.apogee.product.configs.OpenApiConstants.SERVER_ROOT;
 
 @Configuration
 public class OpenApiConfigurations {

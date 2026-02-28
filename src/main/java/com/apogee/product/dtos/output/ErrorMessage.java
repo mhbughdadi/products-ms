@@ -3,9 +3,15 @@ package com.apogee.product.dtos.output;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 @Setter
 @Getter
-public class ErrorMessage{
+public class ErrorMessage implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private String message;
     private String messageAr;

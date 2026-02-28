@@ -31,9 +31,9 @@ public class CategoryBackingService {
 
         CategoryResponseDto response = new CategoryResponseDto();
 
-        Category savedCurrency = this.categoryService.addCategory(transform(categoryDto, Category.class));
+        Category savedCategory = this.categoryService.addCategory(transform(categoryDto, Category.class));
 
-        response.setCategory(transform(savedCurrency, CategoryDto.class));
+        response.setCategory(transform(savedCategory, CategoryDto.class));
 
         return response;
     }
@@ -42,9 +42,9 @@ public class CategoryBackingService {
 
         CategoryResponseDto response = new CategoryResponseDto();
 
-        Category savedCurrency = this.categoryService.updateCategory(transform(categoryDto, Category.class));
+        Category updatedCategory = this.categoryService.updateCategory(transform(categoryDto, Category.class));
 
-        response.setCategory(transform(savedCurrency, CategoryDto.class));
+        response.setCategory(transform(updatedCategory, CategoryDto.class));
 
         return response;
     }

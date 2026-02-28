@@ -3,10 +3,8 @@ package com.apogee.product.backingservice;
 import com.apogee.product.dtos.inputs.TagDto;
 import com.apogee.product.dtos.output.*;
 import com.apogee.product.models.Tag;
-import com.apogee.product.utilities.Mapper;
 import com.apogee.product.dtos.inputs.ProductDto;
 import com.apogee.product.models.Product;
-import com.apogee.product.services.CurrencyService;
 import com.apogee.product.services.ImageService;
 import com.apogee.product.services.ProductService;
 import com.apogee.product.exceptions.MapperException;
@@ -30,8 +28,6 @@ public class ProductsBackingService {
     @Autowired
     private ImageService imageService;
 
-    @Autowired
-    private CurrencyService currencyService;
 
     public AllProductsResponseDto getAllProducts() throws MapperException {
 

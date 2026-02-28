@@ -26,14 +26,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 
-public class Mapper {
+public final class Mapper {
 
     private static final Set<Class<?>> SIMPLE_TYPES = Set.of(
             String.class, UUID.class, BigDecimal.class, BigInteger.class
     );
     private static final Map<Class<?>, Constructor<?>> CONSTRUCTOR_CACHE = new ConcurrentHashMap<>();
     private static final Map<Class<?>, Enum<?>[]> ENUM_CACHE = new ConcurrentHashMap<>();
-    // cache property descriptors (bean properties) to use getters/setters instead of direct field access
     private static final Map<Class<?>, Map<String, PropertyDescriptor>> PROP_DESCRIPTOR_CACHE = new ConcurrentHashMap<>();
 
     private Mapper() {
@@ -58,63 +57,98 @@ public class Mapper {
 
         // iterate over source properties
         for (Map.Entry<String, PropertyDescriptor> entry : sourceProps.entrySet()) {
-            String propName = entry.getKey();
-            PropertyDescriptor sourcePd = entry.getValue();
-
-            if (sourcePd.getReadMethod() == null) {
-                continue; // nothing to read
-            }
-
-            Object sourceValue = sourcePd.getReadMethod().invoke(source);
-
-            PropertyDescriptor destinationPropertyDescriptor = destinationPropertyDescriptors.get(propName);
-            if (destinationPropertyDescriptor == null || destinationPropertyDescriptor.getWriteMethod() == null) {
-                continue; // no place to write
-            }
-
-            // Try to get the corresponding declared Field on destination to inspect generic types where needed
-            Field destField = null;
-            try {
-                destField = destinationClass.getDeclaredField(propName);
-            } catch (NoSuchFieldException ignored) {
-                // if not present as a declared field, we may still have a writable property; try to use property type
-            }
-
-            Class<?> sourceType = sourcePd.getPropertyType();
-
-            if (sourceValue == null) {
-                Class<?> destinationPropType = destinationPropertyDescriptor.getPropertyType();
-                if (Collection.class.isAssignableFrom(destinationPropType)) {
-                    destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, createCollectionInstance(destinationPropType));
-                } else if (Map.class.isAssignableFrom(destinationPropType)) {
-                    destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, createMapInstance(destinationPropType));
-                }
-                continue;
-            }
-
-
-            if (isSimpleField(sourceType)) {
-                destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, sourceValue);
-            } else if (Collection.class.isAssignableFrom(sourceType)) {
-                // need Field to determine generic destination element type
-                if (destField != null) {
-                    Object mappedCollection = mapCollection(sourceValue, destField);
-                    destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, mappedCollection);
-                }
-            } else if (Map.class.isAssignableFrom(sourceType)) {
-                if (destField != null) {
-                    Object mappedMap = mapMap(sourceValue, destField);
-                    destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, mappedMap);
-                }
-            } else {
-                // nested object
-                Class<?> nestedDestClass = destField != null ? destField.getType() : destinationPropertyDescriptor.getPropertyType();
-                Object mapped = map(sourceValue, nestedDestClass);
-                destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, mapped);
-            }
+            processProperty(source, destinationClass, entry, destinationPropertyDescriptors, destinationObj);
         }
 
         return destinationObj;
+    }
+
+    private static <S, D> void processProperty(S source, Class<D> destinationClass, Map.Entry<String, PropertyDescriptor> entry, Map<String, PropertyDescriptor> destinationPropertyDescriptors, D destinationObj) throws Exception {
+        String propName = entry.getKey();
+        PropertyDescriptor sourcePd = entry.getValue();
+
+        if (sourcePd.getReadMethod() == null) {
+            return;
+        }
+
+        Object sourceValue = sourcePd.getReadMethod().invoke(source);
+
+        PropertyDescriptor destinationPropertyDescriptor = destinationPropertyDescriptors.get(propName);
+        if (destinationPropertyDescriptor == null || destinationPropertyDescriptor.getWriteMethod() == null) {
+            return;
+        }
+
+        handleProperty(destinationClass, destinationObj, propName, sourcePd, sourceValue, destinationPropertyDescriptor);
+    }
+
+    private static <D> void handleProperty(Class<D> destinationClass, D destinationObj, String propName, PropertyDescriptor sourcePd, Object sourceValue, PropertyDescriptor destinationPropertyDescriptor) throws Exception {
+
+        Field destField = findField(destinationClass, propName);
+
+        if (destField == null) {
+            return; // skip if no corresponding field found in destination class
+        }
+
+        Class<?> sourceType = sourcePd.getPropertyType();
+
+        if (sourceValue == null) {
+            handleNullValue(destinationObj, destinationPropertyDescriptor);
+            return;
+        }
+
+        if (isSimpleField(sourceType)) {
+            destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, sourceValue);
+        } else if (Collection.class.isAssignableFrom(sourceType)) {
+
+            handleCollectionValue(destinationObj, sourceValue, destinationPropertyDescriptor, destField);
+        } else if (Map.class.isAssignableFrom(sourceType)) {
+
+            handleMapValue(destinationObj, sourceValue, destinationPropertyDescriptor, destField);
+        } else {
+
+            handleNestedObjectValue(destinationObj, sourceValue, destinationPropertyDescriptor, destField);
+        }
+    }
+
+    private static Field findField(Class<?> clazz, String fieldName) {
+        Class<?> current = clazz;
+
+        while (current != null && current != Object.class) {
+            try {
+                return current.getDeclaredField(fieldName);
+            } catch (NoSuchFieldException ignored) {
+                current = current.getSuperclass();
+            }
+        }
+
+        return null;
+    }
+
+    private static <D> void handleNestedObjectValue(D destinationObj, Object sourceValue, PropertyDescriptor destinationPropertyDescriptor, Field destField) throws Exception {
+        Class<?> nestedDestClass = destField.getType();
+        Object mapped = map(sourceValue, nestedDestClass);
+        destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, mapped);
+    }
+
+    private static <D> void handleMapValue(D destinationObj, Object sourceValue, PropertyDescriptor destinationPropertyDescriptor, Field destField) throws Exception {
+        Object mappedMap = mapMap(sourceValue, destField);
+        destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, mappedMap);
+    }
+
+    private static <D> void handleCollectionValue(D destinationObj, Object sourceValue, PropertyDescriptor destinationPropertyDescriptor, Field destField) throws Exception {
+        Object mappedCollection = mapCollection(sourceValue, destField);
+        destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, mappedCollection);
+    }
+
+    private static <D> void handleNullValue(D destinationObj, PropertyDescriptor destinationPropertyDescriptor) throws IllegalAccessException, InvocationTargetException {
+        Class<?> destinationPropType = destinationPropertyDescriptor.getPropertyType();
+        if (Collection.class.isAssignableFrom(destinationPropType)) {
+            destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, createCollectionInstance(destinationPropType));
+        } else if (Map.class.isAssignableFrom(destinationPropType)) {
+            destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, createMapInstance(destinationPropType));
+        } else {
+            destinationPropertyDescriptor.getWriteMethod().invoke(destinationObj, (Object) null);
+        }
     }
 
     private static <S, D> D mapEnum(S source, Class<D> destinationClass) {
@@ -151,12 +185,13 @@ public class Mapper {
 
     private static Collection<Object> mapCollection(Object sourceValue, Field destinationField) throws Exception {
 
+        Collection<Object> destinationCollection = createCollectionInstance(destinationField.getType());
+
         if (sourceValue == null) {
-            return null;
+            return destinationCollection;
         }
 
         Collection<?> sourceValueCollection = (Collection<?>) sourceValue;
-        Collection<Object> destinationCollection = createCollectionInstance(destinationField.getType());
 
         Class<?> genericType = getGenericType(destinationField);
 

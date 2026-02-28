@@ -7,7 +7,6 @@ import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Tag;
 import com.apogee.product.repositories.TagRepository;
-import com.apogee.product.utilities.Mapper;
 import com.apogee.product.models.Product;
 import com.apogee.product.repositories.ProductRepository;
 import com.apogee.product.services.ProductService;
@@ -22,7 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.apogee.product.constants.ProductsConstant.ERROR_CATEGORY_TAG_ALREADY_EXISTS;
-import static com.apogee.product.constants.ProductsConstant.ERROR_Product_TAG_NOT_FOUND;
+import static com.apogee.product.constants.ProductsConstant.ERROR_PRODUCT_TAG_NOT_FOUND;
 import static com.apogee.product.constants.ProductsConstant.ERROR_RECORD_NOT_FOUND;
 import static com.apogee.product.utilities.Utilities.transform;
 import static com.apogee.product.utilities.Utilities.transformCollection;
@@ -121,7 +120,7 @@ public class ProductServiceImpl implements ProductService {
 
         ProductEntity found = productRepository.findByIdAndTagsId(productId, tagId)
                 .orElseThrow(
-                        () -> new RecordNotFoundException(ERROR_Product_TAG_NOT_FOUND, productId, tagId)
+                        () -> new RecordNotFoundException(ERROR_PRODUCT_TAG_NOT_FOUND, productId, tagId)
                 );
 
         found.setTags(found.getTags().stream().filter(t -> !t.getId().equals(tagId)).collect(Collectors.toCollection(ArrayList::new)));
