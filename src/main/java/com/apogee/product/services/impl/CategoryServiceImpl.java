@@ -1,13 +1,15 @@
 package com.apogee.product.services.impl;
 
+import com.apogee.product.entities.CategoryClosureEntity;
+import com.apogee.product.entities.CategoryClosureId;
 import com.apogee.product.entities.CategoryEntity;
 import com.apogee.product.entities.TagEntity;
 import com.apogee.product.exceptions.DBException;
 import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Tag;
+import com.apogee.product.repositories.CategoryClosureRepository;
 import com.apogee.product.repositories.TagRepository;
-import com.apogee.product.utilities.Mapper;
 import com.apogee.product.models.Category;
 import com.apogee.product.repositories.CategoryRepository;
 import com.apogee.product.services.CategoryService;
@@ -37,20 +39,50 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private TagRepository tagRepository;
 
+    @Autowired
+    private CategoryClosureRepository categoryClosureRepository;
+
 
     @Override
     public List<Category> findAllCategories() throws MapperException {
 
-        List<CategoryEntity> categoryEntities = categoryRepository.findAllRootCategoriesWithSubCategories();
+        List<Long> mainCategoriesIds = this.categoryClosureRepository.findMainCategories();
+        List<CategoryEntity> categoryEntities = categoryRepository.findAllById(mainCategoriesIds);
 
         if (!categoryEntities.isEmpty()) {
             return transformCollection(categoryEntities, Category.class, ((categoryEntity, category) -> {
-                category = this.addCategoryIdAndParentId(categoryEntity, category);
+                category = this.addCategoryId(categoryEntity, category);
 
-                category.setSubCategories(transformCollection(categoryEntity.getSubCategories(), Category.class, this::addCategoryIdAndParentId));
-
+                category.setSubCategories(this.findDescendants(category.getId()));
                 return category;
             }));
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<Category> findDescendants(Long ancestorId) throws MapperException {
+        List<Long> ancestorsIds = categoryClosureRepository.findDescendants(ancestorId);
+
+
+        if (!ancestorsIds.isEmpty()) {
+            List<CategoryEntity> categoryEntities = categoryRepository.findAllById(ancestorsIds);
+
+            return transformCollection(categoryEntities, Category.class, this::getCategory);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<Category> findAncestors() throws MapperException {
+        List<Long> descendantsIds = categoryClosureRepository.findDescendants(1L);
+
+        if (!descendantsIds.isEmpty()) {
+            List<CategoryEntity> categoryEntities = categoryRepository.findAllById(descendantsIds);
+
+            return transformCollection(categoryEntities, Category.class, this::getCategory);
         } else {
             return Collections.emptyList();
         }
@@ -62,11 +94,17 @@ public class CategoryServiceImpl implements CategoryService {
         CategoryEntity transientCategory = transform(category, CategoryEntity.class);
 
         if (category.getParentId() != null) {
-            CategoryEntity parentCategory = this.categoryRepository.findById(category.getParentId()).orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, category.getParentId()));
-            transientCategory.setParent(parentCategory);
+            if (!this.categoryRepository.existsById(category.getParentId())) {
+                throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, category.getParentId());
+            }
         }
         CategoryEntity savedCategory = categoryRepository.save(transientCategory);
-
+        if(savedCategory.getParentId() != null) {
+           Optional<Integer> parentDepthOptional = this.categoryClosureRepository.findParentDepth(savedCategory.getParentId());
+            parentDepthOptional.ifPresent(parentDepth -> saveCategoryClosure(savedCategory.getParentId(), savedCategory.getId(), parentDepth + 1));
+        }else{
+            saveCategoryClosure(savedCategory.getId(), savedCategory.getId(), 0);
+        }
         return transform(savedCategory, Category.class, this::getCategory);
     }
 
@@ -74,9 +112,15 @@ public class CategoryServiceImpl implements CategoryService {
     public Category findCategoryByID(Long categoryId) throws MapperException, RecordNotFoundException {
 
         Optional<CategoryEntity> categoryEntityOptional = this.categoryRepository.findById(categoryId);
+
         if (categoryEntityOptional.isPresent()) {
-            return transform(categoryEntityOptional.get(), Category.class, this::getCategory);
+
+            Category category = transform(categoryEntityOptional.get(), Category.class, this::getCategory);
+            category.setSubCategories(this.findDescendants(categoryId));
+
+            return category;
         } else {
+
             throw new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, categoryId);
         }
     }
@@ -88,6 +132,8 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryEntity toBeDeletedEntity = categoryEntity.orElseThrow(() -> new RecordNotFoundException(ERROR_RECORD_NOT_FOUND, categoryId));
 
+        this.categoryClosureRepository.deleteByIdDescendantId(toBeDeletedEntity.getId());
+        this.categoryClosureRepository.deleteByIdAncestorId(toBeDeletedEntity.getId());
         this.categoryRepository.deleteById(categoryId);
 
         return transform(toBeDeletedEntity, Category.class, this::getCategory);
@@ -96,16 +142,23 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category updateCategory(Category category) throws MapperException {
 
+        Optional<CategoryEntity> existingCategoryEntityOptional = this.categoryRepository.findById(category.getId());
+        existingCategoryEntityOptional.ifPresent( existingCategory -> {
+            if(category.getParentId() == null ){
+                saveCategoryClosure(category.getId(), category.getId(), 0);
+            }else if(!category.getParentId().equals(existingCategory.getParentId())){
+                this.categoryClosureRepository.deleteByIdDescendantId(category.getId());
+                saveCategoryClosure(category.getParentId(), category.getId(), 1);
+            }
+        });
         CategoryEntity updatedCategory = this.categoryRepository.save(transform(category, CategoryEntity.class));
 
         return transform(updatedCategory, Category.class, this::getCategory);
     }
 
-    private Category addCategoryIdAndParentId(CategoryEntity categoryEntity, Category category) throws MapperException {
+    private Category addCategoryId(CategoryEntity categoryEntity, Category category) throws MapperException {
 
         if (categoryEntity != null && category != null) {
-            category.setId(categoryEntity.getId());
-            category.setParentId(categoryEntity.getParent() != null ? categoryEntity.getParent().getId() : null);
             category.setTags(transformCollection(categoryEntity.getTags(), Tag.class, this::getTag));
         }
 
@@ -155,11 +208,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     private Category getCategory(CategoryEntity entity, Category model) throws MapperException {
 
-        model.setId(entity.getId());
+//        model.setId(entity.getId());
         model.setTags(transformCollection(entity.getTags(), Tag.class, this::getTag));
-        if (entity.getParent() != null) {
-            model.setParentId(entity.getParent().getId());
-        }
+
         return model;
     }
 
@@ -169,6 +220,20 @@ public class CategoryServiceImpl implements CategoryService {
         tag.setDescription(tagEntity.getDescription());
         tag.setDescriptionAr(tagEntity.getDescriptionAr());
         return tag;
+    }
+
+    private void saveCategoryClosure(Long ancestorId, Long descendantId, int depth) {
+
+        CategoryClosureEntity closureEntity = new CategoryClosureEntity();
+        CategoryClosureId closureId = new CategoryClosureId();
+
+        closureId.setAncestorId(ancestorId);
+        closureId.setDescendantId(descendantId);
+
+        closureEntity.setId(closureId);
+        closureEntity.setDepth(depth);
+
+        categoryClosureRepository.save(closureEntity);
     }
 
 }

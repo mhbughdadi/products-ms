@@ -17,6 +17,10 @@ public interface CategoryService {
      */
     List<Category> findAllCategories() throws MapperException;
 
+    List<Category> findDescendants(Long ancestorId) throws MapperException;
+
+    List<Category> findAncestors() throws MapperException;
+
     /**
      * Add a category (optionally with parent)
      * @param product category model
