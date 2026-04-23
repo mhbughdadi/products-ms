@@ -17,7 +17,6 @@
     <properties>
         <java.version>21</java.version>
         <lombok.version>1.18.30</lombok.version>
-        <dozer.version>8.5.1</dozer.version>
         <swagger.version>2.5.0</swagger.version>
         <sonar.projectKey>products-ms</sonar.projectKey>
         <sonar.projectName>products-ms</sonar.projectName>

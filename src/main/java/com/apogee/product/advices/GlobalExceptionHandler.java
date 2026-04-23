@@ -24,9 +24,12 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import static com.apogee.product.aop.AOPUtilities.formatAsJsonObject;
+import static com.apogee.product.aop.AOPUtilities.getHeaders;
+import static com.apogee.product.aop.AOPUtilities.getPathVariables;
+import static com.apogee.product.aop.AOPUtilities.getQueryParams;
 import static com.apogee.product.constants.ProductsConstant.NULL_STRING;
 import static com.apogee.product.constants.ProductsConstant.REQUEST_ID;
-import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 
 @ControllerAdvice
 @Log4j2
@@ -98,10 +101,10 @@ public class GlobalExceptionHandler {
         StringMapMessage message = new StringMapMessage()
                 .with(ProductsConstant.URL, request.getRequestURL().toString())
                 .with(ProductsConstant.HTTP_METHOD, request.getMethod())
-                .with(ProductsConstant.QUERY_PARAMS, formatAsJsonObject(Utilities.getQueryParams(request)))
+                .with(ProductsConstant.QUERY_PARAMS, formatAsJsonObject(getQueryParams(request)))
                 .with(ProductsConstant.TIMESTAMP, Instant.now().toString())
-                .with(ProductsConstant.PATH_VARIABLES, Utilities.getPathVariables(request))
-                .with(ProductsConstant.HEADERS, formatAsJsonObject(Utilities.getHeaders(request)))
+                .with(ProductsConstant.PATH_VARIABLES, getPathVariables(request))
+                .with(ProductsConstant.HEADERS, formatAsJsonObject(getHeaders(request)))
                 .with(ProductsConstant.RESPONSE_BODY, formatAsJsonObject(errorResponse))
                 .with(ProductsConstant.STATUS, status.toString())
                 .with(ProductsConstant.REQUEST_ID, requestId != null ? requestId : NULL_STRING);

@@ -22,9 +22,12 @@ import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.*;
 
+import static com.apogee.product.aop.AOPUtilities.formatAsJsonObject;
+import static com.apogee.product.aop.AOPUtilities.getHeaders;
+import static com.apogee.product.aop.AOPUtilities.getPathVariables;
+import static com.apogee.product.aop.AOPUtilities.getQueryParams;
 import static com.apogee.product.constants.ProductsConstant.NULL_STRING;
 import static com.apogee.product.constants.ProductsConstant.REQUEST_ID;
-import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 
 @Log4j2
 @Aspect
@@ -47,11 +50,11 @@ public class LoggerAspect {
         StringMapMessage message = new StringMapMessage()
                 .with(ProductsConstant.URL, request.getRequestURL().toString())
                 .with(ProductsConstant.HTTP_METHOD, request.getMethod())
-                .with(ProductsConstant.QUERY_PARAMS, formatAsJsonObject(Utilities.getQueryParams(request)))
+                .with(ProductsConstant.QUERY_PARAMS, formatAsJsonObject(getQueryParams(request)))
                 .with(ProductsConstant.REQUEST_BODY, requestBody != null ? requestBody : NULL_STRING)
                 .with(ProductsConstant.TIMESTAMP, Instant.now().toString())
-                .with(ProductsConstant.PATH_VARIABLES, Utilities.getPathVariables(request))
-                .with(ProductsConstant.HEADERS, formatAsJsonObject(Utilities.getHeaders(request)))
+                .with(ProductsConstant.PATH_VARIABLES, getPathVariables(request))
+                .with(ProductsConstant.HEADERS, formatAsJsonObject(getHeaders(request)))
                 .with(ProductsConstant.REQUEST_ID, requestId != null ? requestId : NULL_STRING);
 
         Object response = null;
