@@ -5,7 +5,6 @@ import com.apogee.product.dtos.output.FailureResponse;
 import com.apogee.product.exceptions.DBException;
 import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
-import com.apogee.product.utilities.Utilities;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 

@@ -2,16 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.5</version>
         <relativePath/>
     </parent>
+
     <groupId>com.apogee</groupId>
     <artifactId>products-ms</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+
     <name>products-ms</name>
+
     <description>Product micro-service</description>
 
     <properties>
@@ -26,23 +30,28 @@
         <sonar.java.binaries>target/classes</sonar.java.binaries>
         <sonar.host.url>http://localhost:9000</sonar.host.url>
         <sonar.login>${env.SONAR_TOKEN}</sonar.login>
+        <common-utils.version>0.0.1</common-utils.version>
     </properties>
+
     <url/>
     <licenses>
         <license/>
     </licenses>
+
     <developers>
         <developer>
             <name>Mohammed Hassan</name>
             <email>mohammed_hassan2525@yahoo.com</email>
         </developer>
     </developers>
+
     <scm>
         <connection/>
         <developerConnection/>
         <tag/>
         <url/>
     </scm>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -150,6 +159,12 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${swagger.version}</version> <!-- use latest stable -->
+        </dependency>
+
+        <dependency>
+            <groupId>com.apogee.common</groupId>
+            <artifactId>common-utils</artifactId>
+            <version>${common-utils.version}</version>
         </dependency>
 
     </dependencies>

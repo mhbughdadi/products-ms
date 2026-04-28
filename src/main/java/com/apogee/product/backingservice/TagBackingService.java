@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.apogee.product.utilities.Utilities.transform;
-import static com.apogee.product.utilities.Utilities.transformCollection;
+import static com.apogee.common.mapper.ObjectMapper.transform;
+import static com.apogee.common.mapper.ObjectMapper.transformCollection;
 
 @Service
 public class TagBackingService {

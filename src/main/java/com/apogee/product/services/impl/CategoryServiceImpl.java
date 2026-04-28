@@ -7,7 +7,6 @@ import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.models.Tag;
 import com.apogee.product.repositories.TagRepository;
-import com.apogee.product.utilities.Mapper;
 import com.apogee.product.models.Category;
 import com.apogee.product.repositories.CategoryRepository;
 import com.apogee.product.services.CategoryService;
@@ -24,8 +23,8 @@ import java.util.stream.Collectors;
 import static com.apogee.product.constants.ProductsConstant.ERROR_CATEGORY_TAG_ALREADY_EXISTS;
 import static com.apogee.product.constants.ProductsConstant.ERROR_CATEGORY_TAG_NOT_FOUND;
 import static com.apogee.product.constants.ProductsConstant.ERROR_RECORD_NOT_FOUND;
-import static com.apogee.product.utilities.Utilities.transform;
-import static com.apogee.product.utilities.Utilities.transformCollection;
+import static com.apogee.common.mapper.ObjectMapper.transform;
+import static com.apogee.common.mapper.ObjectMapper.transformCollection;
 
 @Service
 @Transactional

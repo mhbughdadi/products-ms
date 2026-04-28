@@ -15,7 +15,6 @@ import com.apogee.product.repositories.ProductRepository;
 import com.apogee.product.repositories.SkuRepository;
 import com.apogee.product.repositories.TagRepository;
 import com.apogee.product.services.SkuService;
-import com.apogee.product.utilities.Mapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,8 +28,8 @@ import java.util.stream.Collectors;
 import static com.apogee.product.constants.ProductsConstant.ERROR_CATEGORY_TAG_ALREADY_EXISTS;
 import static com.apogee.product.constants.ProductsConstant.ERROR_RECORD_NOT_FOUND;
 import static com.apogee.product.constants.ProductsConstant.ERROR_SKU_TAG_NOT_FOUND;
-import static com.apogee.product.utilities.Utilities.transform;
-import static com.apogee.product.utilities.Utilities.transformCollection;
+import static com.apogee.common.mapper.ObjectMapper.transform;
+import static com.apogee.common.mapper.ObjectMapper.transformCollection;
 
 @Service
 @Transactional

@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 import static com.apogee.product.constants.ProductsConstant.ERROR_CATEGORY_TAG_ALREADY_EXISTS;
 import static com.apogee.product.constants.ProductsConstant.ERROR_PRODUCT_TAG_NOT_FOUND;
 import static com.apogee.product.constants.ProductsConstant.ERROR_RECORD_NOT_FOUND;
-import static com.apogee.product.utilities.Utilities.transform;
-import static com.apogee.product.utilities.Utilities.transformCollection;
+import static com.apogee.common.mapper.ObjectMapper.transform;
+import static com.apogee.common.mapper.ObjectMapper.transformCollection;
 
 @Service
 @Transactional

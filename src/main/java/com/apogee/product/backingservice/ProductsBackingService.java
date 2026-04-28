@@ -10,14 +10,13 @@ import com.apogee.product.services.ProductService;
 import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.exceptions.DBException;
-import com.apogee.product.utilities.Utilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.apogee.product.utilities.Utilities.transform;
-import static com.apogee.product.utilities.Utilities.transformCollection;
+import static com.apogee.common.mapper.ObjectMapper.transform;
+import static com.apogee.common.mapper.ObjectMapper.transformCollection;
 
 @Service
 public class ProductsBackingService {
@@ -33,7 +32,7 @@ public class ProductsBackingService {
 
         AllProductsResponseDto response = new AllProductsResponseDto();
 
-        List<ProductOutputDto> allProducts = Utilities.transformCollection(productService.findAllProducts(), ProductOutputDto.class);
+        List<ProductOutputDto> allProducts = transformCollection(productService.findAllProducts(), ProductOutputDto.class);
         response.setProducts(allProducts);
 
         return response;

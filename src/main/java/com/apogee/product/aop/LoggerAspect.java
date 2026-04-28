@@ -1,7 +1,6 @@
 package com.apogee.product.aop;
 
 import com.apogee.product.constants.ProductsConstant;
-import com.apogee.product.utilities.Utilities;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.message.StringMapMessage;

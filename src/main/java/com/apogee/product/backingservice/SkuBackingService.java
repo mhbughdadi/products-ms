@@ -15,7 +15,6 @@ import com.apogee.product.models.Sku;
 import com.apogee.product.models.Tag;
 import com.apogee.product.services.ImageService;
 import com.apogee.product.services.SkuService;
-import com.apogee.product.utilities.Utilities;
 import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.exceptions.DBException;
@@ -24,8 +23,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.apogee.product.utilities.Utilities.transform;
-import static com.apogee.product.utilities.Utilities.transformCollection;
+import static com.apogee.common.mapper.ObjectMapper.transform;
+import static com.apogee.common.mapper.ObjectMapper.transformCollection;
 
 @Service
 public class SkuBackingService {
@@ -40,7 +39,7 @@ public class SkuBackingService {
 
         AllSkusResponseDto response = new AllSkusResponseDto();
 
-        List<SkuOutputDto> allSkus = Utilities.transformCollection(skuService.findAllSkus(), SkuOutputDto.class);
+        List<SkuOutputDto> allSkus = transformCollection(skuService.findAllSkus(), SkuOutputDto.class);
         response.setSkus(allSkus);
 
         return response;

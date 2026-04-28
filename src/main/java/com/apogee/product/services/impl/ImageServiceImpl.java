@@ -20,8 +20,8 @@ import java.util.List;
 
 import static com.apogee.product.constants.ProductsConstant.ERROR_PRODUCT_IMAGE_NOT_FOUND;
 import static com.apogee.product.constants.ProductsConstant.ERROR_RECORD_NOT_FOUND;
-import static com.apogee.product.utilities.Utilities.transform;
-import static com.apogee.product.utilities.Utilities.transformCollection;
+import static com.apogee.common.mapper.ObjectMapper.transform;
+import static com.apogee.common.mapper.ObjectMapper.transformCollection;
 
 @Service
 @Transactional

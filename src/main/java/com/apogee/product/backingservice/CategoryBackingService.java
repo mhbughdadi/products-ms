@@ -9,7 +9,6 @@ import com.apogee.product.dtos.output.SuccessfulResponse;
 import com.apogee.product.models.Category;
 import com.apogee.product.models.Tag;
 import com.apogee.product.services.CategoryService;
-import com.apogee.product.utilities.Mapper;
 import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.exceptions.DBException;
@@ -18,8 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.apogee.product.utilities.Utilities.transform;
-import static com.apogee.product.utilities.Utilities.transformCollection;
+import static com.apogee.common.mapper.ObjectMapper.transform;
+import static com.apogee.common.mapper.ObjectMapper.transformCollection;
 
 @Service
 public class CategoryBackingService {
