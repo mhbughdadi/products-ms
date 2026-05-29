@@ -18,11 +18,16 @@
 
     <Loggers>
 
-        <Logger name="org.springframework.web" level="info"/>
+        <Logger name="org.springframework.web" level="warn"/>
         <Logger name="org.hibernate" level="warn"/>
 
         <!-- your app -->
         <Logger name="com.apogee.product" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="LogstashAppender"/>
+        </Logger>
+
+        <Logger name="com.apogee.spring.common" level="info" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="LogstashAppender"/>
         </Logger>

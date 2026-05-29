@@ -5,7 +5,7 @@ Purpose: Short, actionable notes to help an AI agent contribute safely and produ
 ## Big picture (what this service is)
 - Spring Boot 3.3.5, Java 21 microservice that exposes a REST API for managing products. See `ProductApplication.java`.
 - Persistence: JPA repositories + MySQL (datasource configured in `application.properties` / `application-dev.properties`). Repositories live in `com.apogee.product.repositories`.
-- API surface: controllers under `com.apogee.product.controllers` → each controller delegates to a *backingService* (e.g. `ProductsBackingService`) which orchestrates domain *services* and *utilities*.
+- API surface: controllers under `com.apogee.product.controller` → each controller delegates to a *backingService* (e.g. `ProductsBackingService`) which orchestrates domain *services* and *utilities*.
 - Layers:
   - Controllers (HTTP, OpenAPI annotations) → BackingService (API orchestration) → Service (business logic, transactions) → Repository (DB).
   - DTOs: input in `dtos.inputs`, output in `dtos.output`. Models in `models/`, entities in `entities/`.
