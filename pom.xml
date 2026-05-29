@@ -31,6 +31,7 @@
         <sonar.host.url>http://localhost:9000</sonar.host.url>
         <sonar.login>${env.SONAR_TOKEN}</sonar.login>
         <common-utils.version>0.0.1</common-utils.version>
+        <spring-common.version>0.0.2</spring-common.version>
     </properties>
 
     <url/>
@@ -167,6 +168,13 @@
             <version>${common-utils.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.apogee.spring.common</groupId>
+            <artifactId>spring-common</artifactId>
+            <version>${spring-common.version}</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -207,5 +215,23 @@
 
         </plugins>
     </build>
+
+    <distributionManagement>
+
+        <repository>
+            <id>nexus-releases</id>
+            <url>
+                http://localhost:8081/repository/maven-releases/
+            </url>
+        </repository>
+
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>
+                http://localhost:8081/repository/maven-snapshots/
+            </url>
+        </snapshotRepository>
+
+    </distributionManagement>
 
 </project>

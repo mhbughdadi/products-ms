@@ -4,17 +4,33 @@
 
   WORKDIR /build
 
+
+# Build args
+ARG NEXUS_USERNAME
+ARG NEXUS_PASSWORD
+ARG NEXUS_URL
+
+# Export as env vars for Maven settings.xml
+ENV NEXUS_USERNAME=$NEXUS_USERNAME
+ENV NEXUS_PASSWORD=$NEXUS_PASSWORD
+ENV NEXUS_URL=$NEXUS_URL
+
+
+  # Copy Maven settings first
+  COPY .mvn/settings.xml /root/.m2/settings.xml
+
   # Copy pom.xml and download dependencies first for better build caching
   COPY pom.xml .
+  
   RUN mvn dependency:go-offline
 
   # Copy the source code and build the application
   COPY src ./src
+
   RUN mvn clean package -DskipTests
-  RUN ls  -a /build/target
 
   # Use a lightweight JDK image for the final runtime
-  FROM eclipse-temurin:21-jdk
+  FROM eclipse-temurin:21-jre
 
   WORKDIR /app
 
