@@ -1,15 +1,15 @@
-package com.apogee.product.controllers;
+package com.apogee.product.controller;
 
 import com.apogee.product.backingservice.CategoryBackingService;
 import com.apogee.product.dtos.inputs.CategoryDto;
 import com.apogee.product.dtos.output.AllCategoriesResponseDto;
 import com.apogee.product.dtos.output.AllTagsResponseDto;
 import com.apogee.product.dtos.output.CategoryResponseDto;
-import com.apogee.product.dtos.output.Response;
 import com.apogee.product.dtos.output.SuccessfulResponse;
 import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
 import com.apogee.product.exceptions.DBException;
+import com.apogee.spring.common.dto.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

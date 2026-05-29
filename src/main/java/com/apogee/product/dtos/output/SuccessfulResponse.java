@@ -1,6 +1,7 @@
 package com.apogee.product.dtos.output;
 
-import com.apogee.product.enums.Status;
+import com.apogee.spring.common.dto.Response;
+import com.apogee.spring.common.dto.Status;
 
 import java.io.Serial;
 

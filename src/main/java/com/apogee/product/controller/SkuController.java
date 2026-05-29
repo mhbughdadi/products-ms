@@ -1,4 +1,4 @@
-package com.apogee.product.controllers;
+package com.apogee.product.controller;
 
 import com.apogee.product.backingservice.SkuBackingService;
 import com.apogee.product.dtos.inputs.BenefitDto;
@@ -7,12 +7,12 @@ import com.apogee.product.dtos.output.AllBenefitResponseDto;
 import com.apogee.product.dtos.output.AllSkusResponseDto;
 import com.apogee.product.dtos.output.AllTagsResponseDto;
 import com.apogee.product.dtos.output.BenefitResponseDto;
-import com.apogee.product.dtos.output.Response;
 import com.apogee.product.dtos.output.SkuResponseDto;
 import com.apogee.product.dtos.output.SuccessfulResponse;
 import com.apogee.product.exceptions.DBException;
 import com.apogee.product.exceptions.MapperException;
 import com.apogee.product.exceptions.RecordNotFoundException;
+import com.apogee.spring.common.dto.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
